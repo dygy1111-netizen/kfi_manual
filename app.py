@@ -92,52 +92,79 @@ else:
         st.markdown('<div class="img-box">🖼️ <b>이미지 영역</b></div>', unsafe_allow_html=True)
         st.image(path, use_container_width=True, caption=caption)
 
-    # ✅ 섹션별 내용 (PNG 이미지)
+    # ✅ 섹션별 내용 (PNG 이미지 + Markdown 표 추가)
     if current.startswith("1.1"):
         show_image("images/distance.png", "안전거리 및 보유공지")
         st.write("- 안전거리 및 보유공지 기준을 설명합니다.")
+
+        # 📊 Markdown 표 추가
+        st.markdown("""
+        **안전거리·보유공지 기준표**
+
+        | 구분           | 기준           | 비고                        |
+        |----------------|----------------|------------------------------|
+        | 위험물 제1류   | 5m 이상        | 종류별 차등 적용             |
+        | 위험물 제2류   | 3m 이상        | 인화점·저장량에 따라 조정 가능 |
+        | 위험물 제4류   | 6m 이상        | 옥외탱크저장소 특례 참고     |
+        """)
+        st.info("💡 Markdown 표는 모바일에서도 자동으로 폭을 맞춰 깔끔하게 표시됩니다.")
+
     elif current.startswith("1.2"):
         show_image("images/sign.png", "표지 및 게시판")
         st.write("- 표지 및 게시판 설치 기준을 설명합니다.")
+
     elif current.startswith("1.3"):
         show_image("images/structure.png", "외부구조 및 설비")
         st.write("- 외부구조 및 설비를 설명합니다.")
+
     elif current.startswith("1.4"):
         show_image("images/dyke.png", "방유제")
         st.write("- 방유제 설계 및 설치 기준입니다.")
+
     elif current.startswith("1.5"):
         show_image("images/special.png", "옥외탱크저장소의 특례")
         st.write("- 옥외탱크저장소 특례사항입니다.")
+
     elif current.startswith("1.6"):
         show_image("images/fire.png", "소화설비")
         st.write("- 소화설비 기준을 설명합니다.")
+
     elif current.startswith("2.1"):
         show_image("images/procedure.png", "검사절차 및 확인사항")
         st.write("- 안전성능검사 절차 및 확인사항입니다.")
+
     elif current.startswith("2.2"):
         show_image("images/method.png", "검사방법")
         st.write("- 안전성능검사 방법을 설명합니다.")
+
     elif current.startswith("2.3"):
         show_image("images/reference.png", "참고사항")
         st.write("- 안전성능검사 참고사항입니다.")
+
     elif current.startswith("3.1"):
         show_image("images/reg_procedure.png", "정기검사 절차")
         st.write("- 정기검사 절차 및 확인사항입니다.")
+
     elif current.startswith("3.2"):
         show_image("images/reg_method.png", "정기검사 방법")
         st.write("- 정기검사 방법을 설명합니다.")
+
     elif current.startswith("3.3"):
         show_image("images/reg_reference.png", "정기검사 참고사항")
         st.write("- 정기검사 참고사항입니다.")
+
     elif current.startswith("4.1"):
         show_image("images/query.png", "소방청 질의회신 및 협의사항")
         st.write("- 소방청 질의회신 및 협의사항을 정리합니다.")
+
     elif current.startswith("4.2"):
         show_image("images/standard.png", "검사관련 규격 및 기술지침")
         st.write("- 검사관련 규격 및 기술지침을 소개합니다.")
+
     elif current.startswith("4.3"):
         show_image("images/case.png", "검사 부적합 사례 및 실무 팁")
         st.write("- 검사 부적합 사례와 실무 팁을 정리합니다.")
+
     else:
         show_image("images/location.png", "샘플 이미지")
         st.write("이 섹션의 상세 내용을 여기에 추가하세요.")
