@@ -202,38 +202,41 @@ if st.session_state.page == "인트로":
 
 # ---------- 목차 페이지 ---------- #
 elif st.session_state.page == "목차":
+    # 메인 타이틀
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # 전체 박스 + 대분류/소분류 스타일
+    # 전체 박스 + 타이틀/항목 스타일
     st.markdown("""
     <style>
-    /* ✅ 모든 항목을 감싸는 큰 박스 */
+    /* ✅ 전체를 감싸는 큰 박스 */
     div[data-testid="stVerticalBlock"] > div.big-card {
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        background-color: #fafafa;           /* 살짝 따뜻한 회색 배경 */
+        border: 1px solid #d1d5db;
+        border-radius: 18px;
+        padding: 2.2rem 3rem;                /* 좌우 여백 크게 */
+        margin: 0 auto 2rem auto;            /* 위/아래 여백 + 중앙 위치 */
+        max-width: 800px;                    /* 박스 최대 너비 */
+        box-shadow: 0 8px 18px rgba(0,0,0,0.08);
     }
     /* 대분류 제목 */
     .chapter-title {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        color: #333333;
-        margin: 1.2rem 0 0.6rem 0;
+        color: #1e293b;                      /* 진한 그레이 */
+        margin-top: 1.4rem;
+        margin-bottom: 0.8rem;
         padding-bottom: 0.4rem;
         border-bottom: 1px solid #e5e7eb;
     }
-    /* 소분류 버튼을 링크처럼 */
+    /* 소분류 버튼 → 링크 스타일 */
     div[data-testid="stButton"] > button {
         background-color: transparent !important;
-        color: #1e3a8a !important;
+        color: #2563eb !important;           /* 파란 텍스트 */
         border: none !important;
         box-shadow: none !important;
         text-align: left !important;
-        padding: 0.25rem 0 !important;
-        font-size: 1rem;
+        padding: 0.35rem 0 !important;
+        font-size: 1.05rem;
     }
     div[data-testid="stButton"] > button:hover {
         text-decoration: underline;
@@ -242,7 +245,7 @@ elif st.session_state.page == "목차":
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ 하나의 큰 박스 안에 모든 항목
+    # ✅ 하나의 큰 박스 안에 모든 목차 출력
     with st.container():
         st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
@@ -250,12 +253,13 @@ elif st.session_state.page == "목차":
             # 대분류 제목
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-            # 소분류 버튼 (링크 스타일)
+            # 소분류 버튼
             for sub in subs:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
 
         st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
