@@ -156,6 +156,52 @@ sections = {
     ]
 }
 
+def go_home(): st.session_state.page = "목차"
+def go_page(p):
+    st.session_state.page = p
+    # 히스토리 저장 (중복 연속 저장 방지)
+    if not st.session_state.history or st.session_state.history[-1] != p:
+        st.session_state.history.append(p)
+def toggle_favorite(item):
+    if item in st.session_state.favorites:
+        st.session_state.favorites.remove(item)
+    else:
+        st.session_state.favorites.add(item)
+
+# ---------- 유틸 ----------
+def find_image(name):
+    exts = ['jpg','jpeg','png']
+    for e in exts:
+        path = f"images/{name}.{e}"
+        if os.path.exists(path): return path
+    for e in exts:
+        g = glob.glob(f"images/{name}*.{e}")
+        if g: return g[0]
+    return None
+
+def load_content(key):
+    safe = key.replace(" ", "_").replace("/", "_")
+    path = Path(f"contents/{safe}.md")
+    if path.exists():
+        with open(path,"r",encoding="utf-8") as f:
+            return f.read()
+    return None
+
+# ---------- 사이드바 : 검색/즐겨찾기/히스토리 ----------
+st.sidebar.subheader("🔍 검색")
+query = st.sidebar.text_input("항목 검색", value=st.session_state.search)
+st.session_state.search = query
+
+if st.session_state.favorites:
+    st.sidebar.markdown("⭐ **즐겨찾기**")
+    for f in st.session_state.favorites:
+        st.sidebar.button(f, on_click=go_page, args=(f,))
+
+if st.session_state.history:
+    st.sidebar.markdown("🕘 **최근 열람**")
+    for h in reversed(st.session_state.history[-5:]):  # 최근 5개
+        st.sidebar.button(h, on_click=go_page, args=(h,))
+
 # ---------- 세션 상태 ---------- #
 if "page" not in st.session_state:
     st.session_state.page = "목차"
