@@ -329,20 +329,37 @@ elif st.session_state.page == "목차":
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
+# 🔍 검색어가 있을 때 필터링
+def match(q, text):   # 검색어 포함 여부
+    return q.lower() in text.lower()
+
+filtered_sections = {}
+if st.session_state.search:
+    q = st.session_state.search
+    for main, subs in sections.items():
+        # 대분류가 검색어와 일치 → 모든 소분류 표시
+        if match(q, main):
+            filtered_sections[main] = subs
+        else:
+            # 소분류 중 검색어 포함된 것만 표시
+            sub_hits = [s for s in subs if match(q, s)]
+            if sub_hits:
+                filtered_sections[main] = sub_hits
+else:
+    filtered_sections = sections
+
+
     # ✅ 하나의 큰 박스 안에 모든 목차
-    with st.container():
-        st.markdown('<div class="big-card">', unsafe_allow_html=True)
+with st.container():
+    st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
-        for main, subs in sections.items():
-            # 대분류
-            st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+    for main, subs in filtered_sections.items():  # ← sections → filtered_sections
+        st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+        for sub in subs:
+            st.button(sub, key=f"menu-{sub}", use_container_width=True,
+                      on_click=go_page, args=(sub,))
+    st.markdown("</div>", unsafe_allow_html=True)
 
-            # 소분류 → 옅은 파란색 박스 버튼
-            for sub in subs:
-                st.button(sub, key=f"menu-{sub}", use_container_width=True,
-                          on_click=go_page, args=(sub,))
-
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------- 본문 ---------- #
