@@ -3,7 +3,11 @@ import json, re
 from pathlib import Path
 
 st.set_page_config(page_title="자주하는 질문", page_icon="💡", layout="wide")
-st.title("💡 자주하는 질문 (FAQ)")
+st.markdown(
+    "<h3 style='font-size:1.3rem; font-weight:700; margin-bottom:0.8rem;'>💡 자주하는 질문 (FAQ)</h3>",
+    unsafe_allow_html=True
+)
+
 
 # ---------------- CSS: 깔끔한 접기/펼치기 스타일 ----------------
 st.markdown("""
