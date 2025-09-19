@@ -223,10 +223,20 @@ elif st.session_state.page == "목차":
         display: flex;
         align-items: center;
     }
-    .chapter-title .icon {
-        margin-right: 0.5em;
-        font-size: 1.4rem;
-    }
+.chapter-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #222222;
+    margin-bottom: 0.8em;
+    display: flex;
+    align-items: center;
+
+    /* 🔑 추가 부분 */
+    white-space: nowrap;      /* 줄바꿈 금지 */
+    overflow: hidden;         /* 넘치는 텍스트 숨기기 */
+    text-overflow: ellipsis;  /* 말줄임(...) 처리 */
+}
+
     </style>
     """, unsafe_allow_html=True)
 
