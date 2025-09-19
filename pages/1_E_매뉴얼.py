@@ -208,48 +208,66 @@ elif st.session_state.page == "목차":
     st.markdown("""
     <style>
     .chapter-box {
-        background-color: #ffffff;      /* 흰색 박스 */
-        border: 1px solid #e0e0e0;      /* 은은한 테두리 */
-        border-radius: 12px;
-        padding: 1.2em 1.4em;
-        margin-top: 1.5em;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.05); /* 부드러운 그림자 */
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;      /* 연한 테두리 */
+        border-radius: 14px;
+        padding: 1.4em;
+        margin-top: 1.4em;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        transition: box-shadow 0.2s ease;
+    }
+    .chapter-box:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
     .chapter-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: 700;
-        color: #222222;
+        color: #1e3a8a;                 /* 네이비 블루 */
         margin-bottom: 0.8em;
+        padding-bottom: 0.4em;
+        border-bottom: 1px solid #e5e7eb;
         display: flex;
         align-items: center;
     }
-.chapter-title {
-    font-size: 1.1rem;      /* 🔹폰트 크기 축소 */
-    font-weight: 700;
-    color: #222222;
-    margin-bottom: 0.8em;
-    display: flex;
-    align-items: center;
-    line-height: 1.2;       /* 🔹줄 간격도 줄여서 높이 확보 */
-    word-break: keep-all;   /* 🔹한국어 단어 단위 줄바꿈 */
-}
-
-
+    .chapter-title .icon {
+        margin-right: 0.5em;
+        font-size: 1.3rem;
+    }
+    .sub-btn {
+        margin-bottom: 0.4em;
+    }
+    .stButton button {
+        width: 100%;
+        border-radius: 8px;
+        background-color: #2563eb;       /* 파란색 버튼 */
+        color: white;
+        border: none;
+        padding: 0.6em;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
+    }
+    .stButton button:hover {
+        background-color: #1e40af;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ 대분류 + 세부 항목 출력
+    # ✅ 대분류 박스 출력
     for main, subs in sections.items():
         st.markdown(
-            f'<div class="chapter-box">'
-            f'<div class="chapter-title"><span class="icon">📂</span>{main}</div>',
+            f"""
+            <div class="chapter-box">
+              <div class="chapter-title"><span class="icon">📂</span>{main}</div>
+            """,
             unsafe_allow_html=True
         )
-        # 하위 세부 목차 → 파란색 버튼 유지
+        # 하위 세부 항목 → 파란색 버튼
         for sub in subs:
             st.button(sub, key=f"menu-{sub}", use_container_width=True,
                       on_click=go_page, args=(sub,))
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
