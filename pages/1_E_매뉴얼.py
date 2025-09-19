@@ -1,23 +1,56 @@
 import streamlit as st
 import os, glob
+from pathlib import Path
 
-st.set_page_config(page_title="E-매뉴얼", page_icon="📘", layout="wide")
+# ✅ 공통 페이지 설정
+st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
 
-# ---------- 공공기관 스타일 CSS ---------- #
+# ---------- 공통 CSS ---------- #
 st.markdown("""
 <style>
 html, body, [class*="css"] {
     font-family: 'Noto Sans KR', sans-serif;
-    background-color: #f5f7fa;
+    background-color: #ffffff;   /* ✅ 전체 배경 흰색 */
     line-height: 1.7;
 }
-.big-title {
-    font-size: 2.2rem !important;
-    font-weight: 800;
+
+/* 인트로 타이틀 */
+.title-container {
     text-align: center;
-    color: #003366;
-    margin-bottom: 1.2em;
+    margin-top: 30px;
+    margin-bottom: 20px;
 }
+.main-title {
+    font-size: 2.0rem;           /* ✅ 모바일 대비 소폭 축소 */
+    font-weight: 800;
+    color: #222222;              /* ✅ 진회색 */
+    line-height: 1.4;
+}
+.sub-title {
+    font-size: 2.0rem;
+    font-weight: 800;
+    color: #444444;              /* ✅ 회색톤 서브타이틀 */
+    line-height: 1.4;
+}
+.guide-text {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-top: 10px;
+    line-height: 1.6;
+    color: #555555;
+}
+
+/* 목차 메인 제목 */
+.menu-main {
+    font-size: 1.2rem;           /* ✅ 기존 subheader보다 작게 */
+    font-weight: 700;
+    color: #222222;
+    margin-top: 1.0em;
+    line-height: 1.4;
+    word-break: keep-all;        /* ✅ 한국어 단어 단위 줄바꿈 */
+}
+
+/* 버튼 스타일 */
 .stButton button {
     width: 100%;
     border-radius: 8px;
@@ -30,11 +63,13 @@ html, body, [class*="css"] {
     margin-bottom: 0.4em;
 }
 .stButton button:hover { background-color: #0072e0; }
+
 .section-title { color:#003366; font-weight:700; margin-top:1.2em; font-size:1.1rem; }
 table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
 table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
 table th { background-color: #005bac; color: white; }
 table tr:nth-child(even) { background-color: #f0f4f8; }
+
 .back-btn button {
     background-color: #005bac;
     color: white;
@@ -47,14 +82,14 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- 이미지 탐색 함수 (jpg/png/jpeg 모두 허용) ---------- #
+# ---------- 이미지 탐색 함수 ---------- #
 def find_image(name):
     exts = ['jpg','jpeg','png']
     for e in exts:
         path = f"images/{name}.{e}"
         if os.path.exists(path):
             return path
-    for e in exts:  # 대소문자 혼합 대비
+    for e in exts:
         g = glob.glob(f"images/{name}*.{e}")
         if g:
             return g[0]
@@ -88,24 +123,52 @@ sections = {
     ]
 }
 
-# 세션 상태
+# ---------- 세션 상태 ---------- #
 if "page" not in st.session_state:
-    st.session_state.page = "목차"
+    st.session_state.page = "인트로"
 
 def go_home():
     st.session_state.page = "목차"
-
 def go_page(p):
-    st.session_state.page = p   # on_click으로 호출 시 바로 rerun되어 즉시 반영
+    st.session_state.page = p
+
+# ---------- 인트로(첫 페이지) ---------- #
+if st.session_state.page == "인트로":
+    st.markdown("""
+    <div class="title-container">
+        <div class="main-title">클릭하며 배우는</div>
+        <div class="sub-title">위험물탱크 E-매뉴얼</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="guide-text">
+    ☰ <b>왼쪽 상단 메뉴</b>를 클릭해 📘 <b>E-매뉴얼</b><br>
+    또는 💡 <b>자주하는 질문(FAQ)</b> 페이지로 이동하세요.
+    </div>
+    """, unsafe_allow_html=True)
+
+    cover_path = None
+    for ext in ("jpg", "jpeg", "png"):
+        p = Path(f"images/cover.{ext}")
+        if p.exists():
+            cover_path = p
+            break
+    if cover_path:
+        st.markdown("---")
+        st.image(str(cover_path), use_container_width=True, caption="E-매뉴얼 표지")
+    else:
+        st.info("💡 images 폴더에 cover.jpg/png/jpeg 파일을 넣으면 표지가 표시됩니다.")
+    if st.button("📘 매뉴얼 바로가기", use_container_width=True):
+        go_home()
 
 # ---------- 목차 ---------- #
-if st.session_state.page == "목차":
-    st.markdown('<div class="big-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
+elif st.session_state.page == "목차":
+    st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
     st.markdown("아래에서 원하는 항목을 선택해 주세요.")
     for main, subs in sections.items():
-        st.subheader(main)
+        st.markdown(f'<div class="menu-main">{main}</div>', unsafe_allow_html=True)  # ✅ 폰트크기 축소 적용
         for sub in subs:
-            # ✅ on_click 방식 + 고유 key
             st.button(sub, use_container_width=True,
                       key=f"menu-{sub}",
                       on_click=go_page, args=(sub,))
@@ -113,7 +176,7 @@ if st.session_state.page == "목차":
 # ---------- 본문 ---------- #
 else:
     current = st.session_state.page
-    st.markdown(f'<div class="big-title">{current}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
     def show_image(name, caption=""):
         img_path = find_image(name)
@@ -122,7 +185,6 @@ else:
         else:
             st.warning(f"이미지를 찾을 수 없습니다: {name}")
 
-    # ✅ 섹션별 내용 샘플 (목적·기준·부록)
     if current.startswith("1.1"):
         show_image("안전거리","안전거리")
         st.markdown('<div class="section-title">목적</div>', unsafe_allow_html=True)
@@ -162,7 +224,7 @@ else:
         show_image("소방청 질의회신 및 협의사항","부록 4.1")
         st.write("소방청 질의회신 및 협의사항을 정리합니다.")
 
-    # (다른 항목도 동일하게 show_image('한글파일명') + st.button(on_click=...) 사용)
+    # ... (다른 항목도 동일 패턴)
 
     # ✅ 목차로 돌아가기 버튼
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
