@@ -205,60 +205,65 @@ elif st.session_state.page == "목차":
     # 메인 타이틀
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # 전체 박스 + 타이틀/항목 스타일
+    # Glassmorphism + Modern List 스타일
     st.markdown("""
     <style>
-    /* ✅ 전체를 감싸는 큰 박스 */
+    /* 큰 카드 박스 */
     div[data-testid="stVerticalBlock"] > div.big-card {
-        background-color: #fafafa;           /* 살짝 따뜻한 회색 배경 */
-        border: 1px solid #d1d5db;
-        border-radius: 18px;
-        padding: 2.2rem 3rem;                /* 좌우 여백 크게 */
-        margin: 0 auto 2rem auto;            /* 위/아래 여백 + 중앙 위치 */
-        max-width: 800px;                    /* 박스 최대 너비 */
-        box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        background: rgba(255,255,255,0.65);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.4);
+        border-radius: 20px;
+        padding: 2rem 3rem;
+        margin: 0 auto 2rem auto;
+        max-width: 850px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
     }
     /* 대분류 제목 */
     .chapter-title {
         font-size: 1.25rem;
         font-weight: 700;
-        color: #1e293b;                      /* 진한 그레이 */
-        margin-top: 1.4rem;
+        color: #1f2937;        /* 다크그레이 */
+        margin-top: 1.6rem;
         margin-bottom: 0.8rem;
         padding-bottom: 0.4rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
     }
-    /* 소분류 버튼 → 링크 스타일 */
+    /* 소분류 버튼 → 최신 링크 스타일 */
     div[data-testid="stButton"] > button {
-        background-color: transparent !important;
-        color: #2563eb !important;           /* 파란 텍스트 */
+        background: transparent !important;
+        color: #2563eb !important;     /* 모던 블루 */
         border: none !important;
         box-shadow: none !important;
         text-align: left !important;
         padding: 0.35rem 0 !important;
         font-size: 1.05rem;
+        font-weight: 500;
+        transition: all 0.15s ease;
     }
     div[data-testid="stButton"] > button:hover {
+        color: #1d4ed8 !important;     /* 진한 블루 */
         text-decoration: underline;
         background-color: transparent !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ 하나의 큰 박스 안에 모든 목차 출력
+    # ✅ 하나의 큰 카드 안에 전체 목차를 렌더링
     with st.container():
         st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
         for main, subs in sections.items():
-            # 대분류 제목
+            # 대분류
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-            # 소분류 버튼
+            # 소분류 (링크형 버튼)
             for sub in subs:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
 
         st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
