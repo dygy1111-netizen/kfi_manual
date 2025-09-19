@@ -13,13 +13,14 @@ if faq_path.exists():
     with open(faq_path, "r", encoding="utf-8") as f:
         faq_list = json.load(f)
 else:
+    # 샘플 데이터
     faq_list = [
         {"q": "E-매뉴얼은 어떻게 이용하나요?",
          "a": "왼쪽 사이드바에서 E-매뉴얼을 클릭하면 목차와 내용을 볼 수 있습니다."},
         {"q": "모바일에서도 볼 수 있나요?",
          "a": "네, 모바일 브라우저에서도 화면 폭에 맞춰 자동으로 표시됩니다."},
         {"q": "이미지 확장자 제한이 있나요?",
-         "a": "jpg, jpeg, png 등 일반적인 이미지 확장자는 모두 지원합니다."}
+         "a": "jpg, jpeg, png 등 일반적인 이미지 확장자를 모두 지원합니다."}
     ]
 
 # --------------------------------------------------
@@ -45,20 +46,22 @@ else:
 # 4️⃣ 키워드 하이라이트 함수
 # --------------------------------------------------
 def highlight(text, kw):
-    # 검색어를 HTML <mark> 태그로 감싸 강조
+    if not kw:
+        return text
     pattern = re.compile(re.escape(kw), re.IGNORECASE)
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
 # --------------------------------------------------
-# 5️⃣ 검색 결과 출력
+# 5️⃣ 검색 결과 출력 (질문 클릭 → 답변 펼침)
 # --------------------------------------------------
 if results:
     for item in results:
-        q_text = highlight(item["q"], keyword) if keyword else item["q"]
-        a_text = highlight(item["a"], keyword) if keyword else item["a"]
+        q_text = highlight(item["q"], keyword)
+        a_text = highlight(item["a"], keyword)
 
-        st.markdown(f"**Q. {q_text}**", unsafe_allow_html=True)
-        st.markdown(a_text, unsafe_allow_html=True)
-        st.markdown("---")
+        # 질문을 클릭하면 내용이 펼쳐지는 영역
+        with st.expander(f"Q. {item['q']}"):
+            # 답변에는 검색어 하이라이트 적용
+            st.markdown(a_text, unsafe_allow_html=True)
 else:
     st.warning("검색 결과가 없습니다.")
