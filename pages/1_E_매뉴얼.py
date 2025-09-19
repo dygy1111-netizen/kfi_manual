@@ -205,8 +205,8 @@ elif st.session_state.page == "목차":
     st.markdown("""
     <style>
     /* 🔹전체 큰 박스 */
-    .big-card {
-        background-color: #f9fafb;        /* 아주 연한 회색 배경 */
+    div[data-testid="stVerticalBlock"] > div.big-card {
+        background-color: #f9fafb;      /* 아주 연한 회색 */
         border: 1px solid #e5e7eb;
         border-radius: 18px;
         padding: 2rem 2.5rem;
@@ -224,47 +224,51 @@ elif st.session_state.page == "목차":
         padding-bottom: 0.4rem;
         border-bottom: 1px solid #e5e7eb;
     }
-    /* 소분류 링크(오른쪽 정렬) */
-    .sub-link {
-        display: block;
-        text-align: right;                 /* ✅ 오른쪽 정렬 */
-        padding: 0.3rem 0;
-        color: #2563eb;
+    /* ✅ 소분류 버튼을 링크처럼 보이게 */
+    div[data-testid="stButton"] > button {
+        background-color: transparent !important;
+        color: #2563eb !important;
+        border: none !important;
+        box-shadow: none !important;
+        text-align: right !important;       /* 오른쪽 정렬 */
+        padding: 0.35rem 0 !important;
         font-size: 1.05rem;
         font-weight: 500;
-        text-decoration: none;
-        transition: color 0.2s ease;
     }
-    .sub-link:hover {
+    div[data-testid="stButton"] > button:hover {
         text-decoration: underline;
-        color: #1d4ed8;
+        color: #1d4ed8 !important;
+        background-color: transparent !important;
     }
 
     /* 모바일 대응 */
     @media (max-width: 600px) {
-        .big-card {
+        div[data-testid="stVerticalBlock"] > div.big-card {
             padding: 1.2rem;
             max-width: 95%;
         }
         .chapter-title { font-size: 1.1rem; }
-        .sub-link { font-size: 1rem; }
+        div[data-testid="stButton"] > button { font-size: 1rem; }
     }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # ✅ 대분류 + 소분류 출력
-    for main, subs in sections.items():
-        # 대분류
-        st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+    # ✅ 하나의 큰 박스 안에 모든 목차
+    with st.container():
+        st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
-        # 소분류 → 오른쪽 정렬된 텍스트 링크
-        for sub in subs:
-            # 페이지 이동은 필요 시 st.button으로 교체 가능
-            st.markdown(f"<a class='sub-link' href='#'>{sub}</a>", unsafe_allow_html=True)
+        for main, subs in sections.items():
+            # 대분류
+            st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+            # 소분류 → 버튼 + 세션 상태 변경 (on_click)
+            for sub in subs:
+                st.button(sub, key=f"menu-{sub}", use_container_width=True,
+                          on_click=go_page, args=(sub,))
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 
