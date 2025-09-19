@@ -201,6 +201,7 @@ if st.session_state.page == "인트로":
         go_home()
 
 # ---------- 목차 페이지 ---------- #
+# ---------- 목차 페이지 ---------- #
 elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
@@ -209,20 +210,18 @@ elif st.session_state.page == "목차":
     <style>
     .chapter-box {
         background-color: #ffffff;
-        border: 1px solid #e2e8f0;      /* 연한 테두리 */
+        border: 1px solid #e2e8f0;
         border-radius: 14px;
         padding: 1.4em;
         margin-top: 1.4em;
         box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         transition: box-shadow 0.2s ease;
     }
-    .chapter-box:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
+    .chapter-box:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .chapter-title {
         font-size: 1.2rem;
         font-weight: 700;
-        color: #1e3a8a;                 /* 네이비 블루 */
+        color: #1e3a8a;
         margin-bottom: 0.8em;
         padding-bottom: 0.4em;
         border-bottom: 1px solid #e5e7eb;
@@ -233,40 +232,31 @@ elif st.session_state.page == "목차":
         margin-right: 0.5em;
         font-size: 1.3rem;
     }
-    .sub-btn {
-        margin-bottom: 0.4em;
-    }
     .stButton button {
         width: 100%;
         border-radius: 8px;
-        background-color: #2563eb;       /* 파란색 버튼 */
+        background-color: #2563eb;
         color: white;
         border: none;
         padding: 0.6em;
         font-size: 0.95rem;
         font-weight: 600;
+        margin-bottom: 0.4em;
         transition: background-color 0.2s ease;
     }
-    .stButton button:hover {
-        background-color: #1e40af;
-    }
+    .stButton button:hover { background-color: #1e40af; }
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ 대분류 박스 출력
+    # ✅ 대분류 + 세부 항목을 한 박스로 묶기
     for main, subs in sections.items():
-        st.markdown(
-            f"""
-            <div class="chapter-box">
-              <div class="chapter-title"><span class="icon">📂</span>{main}</div>
-            """,
-            unsafe_allow_html=True
-        )
-        # 하위 세부 항목 → 파란색 버튼
-        for sub in subs:
-            st.button(sub, key=f"menu-{sub}", use_container_width=True,
-                      on_click=go_page, args=(sub,))
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container():  # Streamlit 컨테이너
+            st.markdown(f"<div class='chapter-box'><div class='chapter-title'><span class='icon'>📂</span>{main}</div>", unsafe_allow_html=True)
+            # 하위 버튼을 같은 박스 안에서 출력
+            for sub in subs:
+                st.button(sub, key=f"menu-{sub}", use_container_width=True,
+                          on_click=go_page, args=(sub,))
+            st.markdown("</div>", unsafe_allow_html=True)
 
 
 
