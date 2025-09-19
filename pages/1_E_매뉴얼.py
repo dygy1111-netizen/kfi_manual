@@ -55,16 +55,15 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- 이미지 탐색 함수 (jpg/png/jpeg 모두 허용) ---------- #
+# ---------- 이미지 탐색 함수 (한글 파일명 + jpg/png/jpeg) ---------- #
 def find_image(name):
     exts = ['jpg','jpeg','png']
     for e in exts:
         path = f"images/{name}.{e}"
         if os.path.exists(path):
             return path
-    # glob 사용(대소문자 혼합 대비)
-    for e in exts:
-        g = glob.glob(f"images/{name}*.{e}", casefold=True)
+    for e in exts:  # 혹시 대소문자 혼합된 경우
+        g = glob.glob(f"images/{name}*.{e}")
         if g: return g[0]
     return None
 
@@ -120,15 +119,15 @@ else:
 
     def show_image(name, caption=""):
         img_path = find_image(name)
+        st.markdown('<div class="img-box">🖼️ <b>이미지 영역</b></div>', unsafe_allow_html=True)
         if img_path:
-            st.markdown('<div class="img-box">🖼️ <b>이미지 영역</b></div>', unsafe_allow_html=True)
             st.image(img_path, use_container_width=True, caption=caption)
         else:
-            st.warning("이미지를 찾을 수 없습니다.")
+            st.warning(f"이미지를 찾을 수 없습니다: {name}")
 
-    # ✅ 섹션별 내용 샘플 (목적·기준·부록)
+    # ✅ 섹션별 내용 (이미지명 한글 적용)
     if current.startswith("1.1"):
-        show_image("distance","안전거리")
+        show_image("안전거리","안전거리")
         st.markdown('<div class="section-title">목적</div>', unsafe_allow_html=True)
         st.write("위험물탱크 간 안전거리를 확보하여 화재 확산을 방지합니다.")
         st.markdown('<div class="section-title">기준</div>', unsafe_allow_html=True)
@@ -144,7 +143,7 @@ else:
             go_page("4.1 소방청 질의회신 및 협의사항")
 
     elif current.startswith("1.2"):
-        show_image("notice","보유공지")
+        show_image("보유공지","보유공지")
         st.markdown('<div class="section-title">목적</div>', unsafe_allow_html=True)
         st.write("위험물 저장량에 따라 필요 공지를 설치해 안전을 확보합니다.")
         st.markdown('<div class="section-title">기준</div>', unsafe_allow_html=True)
@@ -159,10 +158,10 @@ else:
             go_page("4.2 검사관련 규격 및 기술지침")
 
     elif current.startswith("4.1"):
-        show_image("query","부록 4.1")
+        show_image("소방청 질의회신 및 협의사항","부록 4.1")
         st.write("소방청 질의회신 및 협의사항을 정리합니다.")
 
-    # (이하 다른 항목은 기존 방식과 동일하게 작성)
+    # (다른 항목도 동일한 방식으로 show_image('한글파일명') 호출)
 
     # 목차로 돌아가기
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
