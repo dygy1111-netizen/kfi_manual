@@ -3,7 +3,9 @@ import os, glob
 from pathlib import Path
 
 # ✅ 페이지 설정
-st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
+st.set_page_config(page_title="위험물탱크 E-매뉴얼",
+                   page_icon="📘",
+                   layout="centered")   # ← wide 대신 centered
 
 # ---------- 공통 CSS ---------- #
 st.markdown("""
