@@ -7,8 +7,8 @@ st.set_page_config(page_title="위험물탱크 E-매뉴얼",
                    page_icon="📘",
                    layout="centered")
 
-# ---------- 공통 CSS ---------- #
-st.markdown("""
+# ---------- 공통 CSS (변수에 저장해서 마지막에 재적용) ---------- #
+custom_css = """
 <style>
 html, body, [class*="css"] {
     font-family: 'Noto Sans KR', sans-serif;
@@ -18,14 +18,14 @@ html, body, [class*="css"] {
 .main-title {
     font-size: 2.0rem;
     font-weight: 800;
-    color: #222222;
+    color: #222222 !important;
     line-height: 1.4;
     text-align:center;
 }
 .chapter-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1f2937;
+    color: #1f2937 !important;
     margin-top: 1.6rem;
     margin-bottom: 0.8rem;
     padding-bottom: 0.4rem;
@@ -34,26 +34,27 @@ html, body, [class*="css"] {
 .stButton button {
     width: 100%;
     border-radius: 8px;
-    background-color: #005bac;
-    color: white;
+    background-color: #005bac !important;
+    color: white !important;
     border: none;
     padding: 0.7em;
     font-size: 1rem;
     font-weight: 600;
     margin-bottom:0.3em;
 }
-.stButton button:hover { background-color: #0072e0; }
+.stButton button:hover { background-color: #0072e0 !important; }
 .back-btn button {
-    background-color: #005bac;
-    color: white;
+    background-color: #005bac !important;
+    color: white !important;
     border-radius: 6px;
     padding: 0.6em 1em;
     border: none;
     font-weight: 600;
 }
-.back-btn button:hover { background-color: #0072e0; }
+.back-btn button:hover { background-color: #0072e0 !important; }
 </style>
-""", unsafe_allow_html=True)
+"""
+st.markdown(custom_css, unsafe_allow_html=True)  # ✅ 최초 적용
 
 # ---------- 이미지 탐색 함수 ---------- #
 def find_image(name):
@@ -151,7 +152,7 @@ elif st.session_state.page == "목차":
             st.button(h, key=f"hist-{h}", on_click=go_page, args=(h,))
         st.markdown("---")
 
-    # 검색 처리
+    # 🔎 검색 결과
     if query:
         for subs in sections.values():
             for sub in subs:
@@ -166,7 +167,7 @@ elif st.session_state.page == "목차":
             st.info("검색 결과가 없습니다.")
         st.markdown("---")
 
-    # 기본 목차
+    # ✅ 기본 목차 출력
     with st.container():
         st.markdown('<div class="big-card">', unsafe_allow_html=True)
         for main, subs in sections.items():
@@ -197,9 +198,9 @@ else:
     else:
         st.warning("⚠️ 아직 준비된 내용이 없습니다.")
 
-    # 즐겨찾기 토글
+    # 즐겨찾기 토글 버튼
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
-    st.button(fav_icon, key=f"fav-toggle", on_click=toggle_favorite, args=(current,))
+    st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
     # 목차로 돌아가기
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
@@ -207,3 +208,6 @@ else:
               use_container_width=True,
               key="btn-home",
               on_click=go_home)
+
+# ✅ CSS를 마지막에 다시 적용 (색상 유지)
+st.markdown(custom_css, unsafe_allow_html=True)
