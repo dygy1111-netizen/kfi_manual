@@ -271,14 +271,15 @@ else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
-    # ✅ 이미지 자동 출력 함수
-    def show_image_auto(key):
-        # 세부 목차 이름을 안전한 파일명으로 변환
-        safe_name = key.replace(" ", "_").replace("/", "_")
-        img_path = find_image(safe_name)
-        if img_path:
-            # 이미지가 있으면 자동 출력
-            st.image(img_path, use_container_width=True, caption=key)
+# ✅ 이미지 자동 출력 함수
+def show_image_auto(key):
+    safe_name = key.replace(" ", "_").replace("/", "_")
+    img_path = find_image(safe_name)
+    if img_path:
+        # ✅ PC에서 사진 크기 제한 (예: 최대 750px)
+        # 모바일에서도 자동으로 화면에 맞게 줄어듦
+        st.image(img_path, width=750, caption=key)
+
 
     # 🔹항상 이미지 시도 (파일이 없으면 그냥 넘어감)
     show_image_auto(current)
