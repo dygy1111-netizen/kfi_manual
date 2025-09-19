@@ -254,26 +254,6 @@ elif st.session_state.page == "목차":
 
 
 # ---------- 본문 ---------- #
-else:
-    current = st.session_state.page
-    st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
-
-    # ✅ 이미지 출력 함수 (기존 유지)
-    def show_image(name, caption=""):
-        img_path = find_image(name)
-        if img_path:
-            st.image(img_path, use_container_width=True, caption=caption)
-
-    # ✅ 외부 콘텐츠 로딩 함수
-    def load_content(key):
-        safe_name = key.replace(" ", "_").replace("/", "_")  # 파일명 안전 처리
-        path = Path(f"contents/{safe_name}.md")
-        if path.exists():
-            with open(path, "r", encoding="utf-8") as f:
-                return f.read()
-        return None
-
-    # 이미지가 필요한 경우 (선택)
 # ✅ 자동 이미지 출력
 def show_image_auto(key):
     safe_name = key.replace(" ", "_").replace("/", "_")
