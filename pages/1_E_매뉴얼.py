@@ -258,56 +258,33 @@ else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
+    # ✅ 이미지 출력 함수 (기존 유지)
+    def show_image(name, caption=""):
+        img_path = find_image(name)
+        if img_path:
+            st.image(img_path, use_container_width=True, caption=caption)
+
+    # ✅ 외부 콘텐츠 로딩 함수
     def load_content(key):
-        # 파일명 규칙 : "세부목차.md" → 공백/특수문자 제거 후 저장
-        safe_name = key.replace(" ", "_").replace("/", "_")
+        safe_name = key.replace(" ", "_").replace("/", "_")  # 파일명 안전 처리
         path = Path(f"contents/{safe_name}.md")
         if path.exists():
             with open(path, "r", encoding="utf-8") as f:
                 return f.read()
         return None
 
-    # 이미지가 있으면 출력
-    def show_image(name, caption=""):
-        img_path = find_image(name)
-        if img_path:
-            st.image(img_path, use_container_width=True, caption=caption)
+    # 이미지가 필요한 경우 (선택)
+    if current.startswith("1.1"):
+        show_image("안전거리", "안전거리")
 
-    # ✅ 외부 콘텐츠 불러오기
+    # ✅ Markdown 파일 출력
     content = load_content(current)
     if content:
         st.markdown(content, unsafe_allow_html=True)
     else:
         st.warning("⚠️ 아직 준비된 내용이 없습니다.")
 
-        st.markdown('<div class="section-title">부록</div>', unsafe_allow_html=True)
-        st.button("➡️ 방화상 유효한 담 (부록 4.1)",
-                  use_container_width=True,
-                  key="btn-4.1",
-                  on_click=go_page, args=("4.1 소방청 질의회신 및 협의사항",))
-
-    elif current.startswith("1.2"):
-        show_image("보유공지","보유공지")
-        st.markdown('<div class="section-title">목적</div>', unsafe_allow_html=True)
-        st.write("위험물 저장량에 따라 필요 공지를 설치해 안전을 확보합니다.")
-        st.markdown('<div class="section-title">기준</div>', unsafe_allow_html=True)
-        st.markdown("""
-        | 저장량 | 공지 너비 |
-        |--------|----------|
-        | 500리터 미만 | 1m |
-        | 500~1000리터 | 2m |
-        """)
-        st.markdown('<div class="section-title">부록</div>', unsafe_allow_html=True)
-        st.button("➡️ 검사관련 규격 참고 (부록 4.2)",
-                  use_container_width=True,
-                  key="btn-4.2",
-                  on_click=go_page, args=("4.2 검사관련 규격 및 기술지침",))
-
-    elif current.startswith("4.1"):
-        show_image("소방청 질의회신 및 협의사항","부록 4.1")
-        st.write("소방청 질의회신 및 협의사항을 정리합니다.")
-
-    # ✅ 목차로 돌아가기
+    # ✅ 목차로 돌아가기 버튼 유지
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     st.button("🏠 목차로 돌아가기",
               use_container_width=True,
