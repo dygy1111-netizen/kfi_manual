@@ -18,20 +18,6 @@ html, body, [class*="css"] {
     background-color: #ffffff;
     line-height: 1.7;
 }
-...
-</style>
-""", unsafe_allow_html=True)
-
-# ▼ 이후 기존 코드 계속 ▼
-
-# ---------- 공통 CSS ---------- #
-st.markdown("""
-<style>
-html, body, [class*="css"] {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #ffffff;
-    line-height: 1.7;
-}
 
 /* 인트로 타이틀 */
 .title-container {
@@ -240,18 +226,18 @@ elif st.session_state.page == "목차":
     div[data-testid="stButton"] > button {
         background-color: #e0f2fe !important;     /* 파스텔 블루 배경 */
         color: #1e40af !important;               /* 짙은 블루 텍스트 */
-        border: 1px solid #bfdbfe !important;    /* 연한 파란색 테두리 */
+        border: 1px solid #bfdbfe !important;
         box-shadow: none !important;
         text-align: right !important;
         padding: 0.45rem 0.8rem !important;
         font-size: 1.05rem;
         font-weight: 500;
         border-radius: 10px !important;
-        margin-bottom: 0.4rem !important;        /* 버튼 간 간격 */
+        margin-bottom: 0.4rem !important;
         transition: all 0.15s ease;
     }
     div[data-testid="stButton"] > button:hover {
-        background-color: #dbeafe !important;    /* 호버 시 살짝 진해짐 */
+        background-color: #dbeafe !important;
         color: #1e3a8a !important;
     }
 
@@ -269,39 +255,32 @@ elif st.session_state.page == "목차":
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # ✅ 하나의 큰 박스 안에 모든 목차
     with st.container():
         st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
         for main, subs in sections.items():
-            # 대분류
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
-
-            # 소분류 → 옅은 파란색 박스 버튼
             for sub in subs:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
-
         st.markdown("</div>", unsafe_allow_html=True)
-
 
 # ---------- 본문 ---------- #
 else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
-    # ✅ 이미지 자동 출력 함수
-def show_image_auto(key):
-    safe_name = key.replace(" ", "_").replace("/", "_")
-    img_path = find_image(safe_name)
-    if img_path:
-        if st.session_state.browser_width and st.session_state.browser_width < 768:
-            # ✅ 모바일 → 현재 코드 그대로 (화면에 맞춰 꽉 차게)
-            st.image(img_path, use_container_width=True, caption=key)
-        else:
-            # ✅ PC → 최대 폭을 제한 (예: 750px)
-            st.image(img_path, width=750, caption=key)
-
+    # ✅ 이미지 자동 출력 함수 (모바일/PC 크기 다르게)
+    def show_image_auto(key):
+        safe_name = key.replace(" ", "_").replace("/", "_")
+        img_path = find_image(safe_name)
+        if img_path:
+            if st.session_state.browser_width and st.session_state.browser_width < 768:
+                # ✅ 모바일 → 화면에 맞게 최적화
+                st.image(img_path, use_container_width=True, caption=key)
+            else:
+                # ✅ PC → 최대 폭 제한
+                st.image(img_path, width=750, caption=key)
 
     # 🔹항상 이미지 시도 (파일이 없으면 그냥 넘어감)
     show_image_auto(current)
@@ -315,14 +294,12 @@ def show_image_auto(key):
                 return f.read()
         return None
 
-    # ✅ Markdown 파일 출력
     content = load_content(current)
     if content:
         st.markdown(content, unsafe_allow_html=True)
     else:
         st.warning("⚠️ 아직 준비된 내용이 없습니다.")
 
-    # ✅ 목차로 돌아가기 버튼
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     st.button("🏠 목차로 돌아가기",
               use_container_width=True,
