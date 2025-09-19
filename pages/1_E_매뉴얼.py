@@ -205,32 +205,28 @@ if st.session_state.page == "인트로":
 elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # ✅ 새로운 목차 스타일 CSS
+    # 🔹박스/버튼 스타일
     st.markdown("""
     <style>
-    .chapter-box {
+    .chapter-card {
         background-color: #ffffff;
-        border: 1px solid #e2e8f0;
+        border: 2px solid #e0e0e0;
         border-radius: 14px;
-        padding: 1.4em;
-        margin-top: 1.4em;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        transition: box-shadow 0.2s ease;
     }
-    .chapter-box:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .chapter-title {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
         font-weight: 700;
         color: #1e3a8a;
-        margin-bottom: 0.8em;
-        padding-bottom: 0.4em;
-        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 0.8rem;
         display: flex;
         align-items: center;
     }
     .chapter-title .icon {
-        margin-right: 0.5em;
-        font-size: 1.3rem;
+        margin-right: 0.5rem;
+        font-size: 1.4rem;
     }
     .stButton button {
         width: 100%;
@@ -248,15 +244,19 @@ elif st.session_state.page == "목차":
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ 대분류 + 세부 항목을 한 박스로 묶기
+    # 🔹대분류 1개 = 큰 박스 1개
     for main, subs in sections.items():
-        with st.container():  # Streamlit 컨테이너
-            st.markdown(f"<div class='chapter-box'><div class='chapter-title'><span class='icon'>📂</span>{main}</div>", unsafe_allow_html=True)
-            # 하위 버튼을 같은 박스 안에서 출력
-            for sub in subs:
-                st.button(sub, key=f"menu-{sub}", use_container_width=True,
-                          on_click=go_page, args=(sub,))
-            st.markdown("</div>", unsafe_allow_html=True)
+        # 큰 박스 시작
+        st.markdown(
+            f"<div class='chapter-card'><div class='chapter-title'><span class='icon'>📂</span>{main}</div>",
+            unsafe_allow_html=True
+        )
+        # 같은 박스 내부에 세부 항목 버튼
+        for sub in subs:
+            st.button(sub, key=f"menu-{sub}", use_container_width=True,
+                      on_click=go_page, args=(sub,))
+        # 박스 닫기
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 
