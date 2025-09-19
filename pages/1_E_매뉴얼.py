@@ -114,15 +114,27 @@ def toggle_favorite(item):
 st.sidebar.subheader("🔍 검색")
 st.session_state.search = st.sidebar.text_input("항목 검색", value=st.session_state.search)
 
+# 즐겨찾기 출력
 if st.session_state.favorites:
     st.sidebar.markdown("⭐ **즐겨찾기**")
-    for f in st.session_state.favorites:
-        st.sidebar.button(f, on_click=go_page, args=(f,))
+    for i, f in enumerate(st.session_state.favorites):
+        st.sidebar.button(
+            f,
+            key=f"fav-{i}-{f}",            # 🔑 고유 key 부여
+            on_click=go_page,
+            args=(f,)
+        )
 
+# 최근 열람 출력
 if st.session_state.history:
     st.sidebar.markdown("🕘 **최근 열람**")
-    for h in st.session_state.history[:5]:
-        st.sidebar.button(h, on_click=go_page, args=(h,))
+    for i, h in enumerate(reversed(st.session_state.history[-5:])):
+        st.sidebar.button(
+            h,
+            key=f"hist-{i}-{h}",           # 🔑 고유 key 부여
+            on_click=go_page,
+            args=(h,)
+        )
 
 # ---------- 인트로 ----------
 if st.session_state.page == "인트로":
