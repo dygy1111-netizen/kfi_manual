@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘")  # 앱 아이콘은 유지 가능
+st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘")
 
 # ✅ 깔끔한 2줄 타이틀
 st.markdown("""
@@ -31,7 +31,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ✅ 깔끔한 안내 문구 (두 줄)
 st.markdown("""
-👈 **왼쪽 상단의 ▤ 메뉴(사이드바)** 를 클릭해  
-**E-매뉴얼** 또는 **자주하는 질문(FAQ)** 페이지로 이동하세요.
+왼쪽 상단의 메뉴를 클릭해 **E-매뉴얼**  
+또는 **자주하는 질문(FAQ)** 페이지로 이동하세요.
 """)
