@@ -204,22 +204,24 @@ if st.session_state.page == "인트로":
 elif st.session_state.page == "목차":
     st.markdown("""
     <style>
+    /* 큰 박스 (모바일 반응형) */
     .big-card {
-        background: rgba(255,255,255,0.65);
+        background: rgba(255,255,255,0.7);
         backdrop-filter: blur(12px);
-        border: 1px solid rgba(255,255,255,0.4);
         border-radius: 20px;
-        padding: 2rem 1.5rem;
+        border: 1px solid rgba(0,0,0,0.1);
+        padding: 2rem;
         margin: 0 auto 2rem auto;
-        max-width: 850px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        max-width: 850px;        /* 데스크톱 최대 너비 */
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        text-align: right;       /* ✅ 오른쪽 정렬 */
     }
     .chapter-title {
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #1e293b;
         margin-top: 1.4rem;
-        margin-bottom: 0.6rem;
+        margin-bottom: 0.8rem;
         padding-bottom: 0.4rem;
         border-bottom: 1px solid rgba(0,0,0,0.1);
     }
@@ -232,22 +234,40 @@ elif st.session_state.page == "목차":
         text-decoration: none;
         transition: color 0.2s ease;
     }
-    .sub-link:hover { text-decoration: underline; color: #1d4ed8; }
+    .sub-link:hover {
+        text-decoration: underline;
+        color: #1d4ed8;
+    }
+
+    /* 모바일 대응: 작은 화면일 때 패딩 줄이기 */
+    @media (max-width: 600px) {
+        .big-card {
+            padding: 1.2rem;
+            max-width: 95%;
+        }
+        .chapter-title {
+            font-size: 1.1rem;
+        }
+        .sub-link {
+            font-size: 1rem;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
     st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
-    # 대분류 + 소분류 출력 (모바일에서도 동일하게 작동)
     for main, subs in sections.items():
+        # 대분류
         st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+        # 소분류
         for sub in subs:
-            # ❗️이 부분은 실제 페이지 이동 대신 자바스크립트 사용하거나
-            # 세션 상태를 변경하는 방법으로 교체 필요
+            # 여기서는 세션 이동 대신 단순 링크 (세션 이동 필요하면 JS 처리 필요)
             st.markdown(f"<a class='sub-link' href='#'>{sub}</a>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
