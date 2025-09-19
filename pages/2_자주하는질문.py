@@ -71,15 +71,16 @@ def highlight(text, kw):
     pattern = re.compile(re.escape(kw), re.IGNORECASE)
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
-# ---------------- 렌더링 (st.expander + markdown)
+# ---------------- 렌더링 (st.expander + 이미지 지원)
 if results:
     for item in results:
-        q_html = highlight(item["q"], keyword)   # 질문 하이라이트
-        a_html = highlight(item["a"], keyword)   # 답변 하이라이트 (마크다운 그대로)
+        q_html = highlight(item["q"], keyword)
+        a_html = highlight(item["a"], keyword)
 
-        # 질문 클릭 → 답변 펼침
         with st.expander(q_html):
-            # 답변은 마크다운으로 출력 → 이미지, 표, 링크 모두 지원
             st.markdown(a_html, unsafe_allow_html=True)
+            # ✅ 이미지 키가 있으면 직접 출력
+            if "img" in item and item["img"]:
+                st.image(item["img"], use_container_width=True)
 else:
     st.warning("검색 결과가 없습니다.")
