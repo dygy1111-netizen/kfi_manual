@@ -2,7 +2,7 @@ import streamlit as st
 import os, glob
 from pathlib import Path
 
-# ✅ 페이지 설정 (앱 전체에서 한 번만)
+# ✅ 페이지 설정
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
 
 # ---------- 공통 CSS ---------- #
@@ -10,7 +10,7 @@ st.markdown("""
 <style>
 html, body, [class*="css"] {
     font-family: 'Noto Sans KR', sans-serif;
-    background-color: #ffffff;   /* ✅ 전체 배경 흰색 */
+    background-color: #ffffff;
     line-height: 1.7;
 }
 
@@ -40,34 +40,47 @@ html, body, [class*="css"] {
     color: #555555;
 }
 
-/* 목차 메인 제목 */
-.menu-main {
-    font-size: 1.2rem;
+/* 📘 목차 큰 박스 */
+.menu-box {
+    border: 2px solid #d9e6f2;
+    background-color: #f8fbff;
+    border-radius: 12px;
+    padding: 1.2em;
+    margin-top: 1.2em;
+}
+.menu-title {
+    font-size: 1.3rem;
     font-weight: 700;
-    color: #222222;
-    margin-top: 1.0em;
-    line-height: 1.4;
-    word-break: keep-all;
+    color: #003366;
+    margin-bottom: 0.8em;
+    display: flex;
+    align-items: center;
+}
+.menu-title .emoji {
+    margin-right: 0.4em;
+    font-size: 1.4rem;
+}
+.menu-btn {
+    width: 100%;
+    margin-bottom: 0.4em;
 }
 
-/* ✅ 버튼 색상을 회색 계열로 변경 */
+/* 📘 파란색 버튼 */
 .stButton button {
     width: 100%;
     border-radius: 8px;
-    background-color: #666666;  /* 중간톤 회색 */
+    background-color: #005bac;
     color: white;
     border: none;
     padding: 0.7em;
     font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 0.4em;
 }
-.stButton button:hover {
-    background-color: #999999;  /* hover 시 밝은 회색 */
-}
+.stButton button:hover { background-color: #0072e0; }
 
+/* 본문 파란색 스타일 유지 */
 .section-title {
-    color:#333333;
+    color:#003366;
     font-weight:700;
     margin-top:1.2em;
     font-size:1.1rem;
@@ -83,20 +96,20 @@ table th, table td {
     text-align: center;
 }
 table th {
-    background-color: #666666;  /* 테이블 헤더도 버튼과 통일 */
+    background-color: #005bac;
     color: white;
 }
-table tr:nth-child(even) { background-color: #f5f5f5; }
+table tr:nth-child(even) { background-color: #f0f4f8; }
 
 .back-btn button {
-    background-color: #666666;
+    background-color: #005bac;
     color: white;
     border-radius: 6px;
     padding: 0.6em 1em;
     border: none;
     font-weight: 600;
 }
-.back-btn button:hover { background-color: #999999; }
+.back-btn button:hover { background-color: #0072e0; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -142,7 +155,6 @@ sections = {
 }
 
 # ---------- 세션 상태 ---------- #
-# ✅ 초기값을 '목차'로 지정 → 사이드바에서 매뉴얼 클릭 시 표지가 뜨지 않음
 if "page" not in st.session_state:
     st.session_state.page = "목차"
 
@@ -151,15 +163,14 @@ def go_home():
 def go_page(p):
     st.session_state.page = p
 
-# ---------- 사이드바 메뉴 ---------- #
-# 원하는 경우 사이드바에 FAQ / 인트로 이동 버튼을 둘 수도 있음
+# ---------- 사이드바 ---------- #
 st.sidebar.title("메뉴")
 if st.sidebar.button("🏠 인트로로 이동"):
     st.session_state.page = "인트로"
 if st.sidebar.button("📘 매뉴얼로 이동"):
     st.session_state.page = "목차"
 
-# ---------- 인트로(첫 페이지) ---------- #
+# ---------- 인트로 페이지 ---------- #
 if st.session_state.page == "인트로":
     st.markdown("""
     <div class="title-container">
@@ -189,16 +200,19 @@ if st.session_state.page == "인트로":
     if st.button("📘 매뉴얼 바로가기", use_container_width=True):
         go_home()
 
-# ---------- 목차 ---------- #
+# ---------- 목차 페이지 ---------- #
 elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
     st.markdown("아래에서 원하는 항목을 선택해 주세요.")
     for main, subs in sections.items():
-        st.markdown(f'<div class="menu-main">{main}</div>', unsafe_allow_html=True)
+        # ✅ 큰 박스 + 📘 아이콘
+        st.markdown(
+            f'<div class="menu-box"><div class="menu-title"><span class="emoji">📘</span>{main}</div>',
+            unsafe_allow_html=True
+        )
         for sub in subs:
-            st.button(sub, use_container_width=True,
-                      key=f"menu-{sub}",
-                      on_click=go_page, args=(sub,))
+            st.button(sub, key=f"menu-{sub}", on_click=go_page, args=(sub,))
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ---------- 본문 ---------- #
 else:
@@ -251,9 +265,7 @@ else:
         show_image("소방청 질의회신 및 협의사항","부록 4.1")
         st.write("소방청 질의회신 및 협의사항을 정리합니다.")
 
-    # ... (다른 항목도 동일 패턴)
-
-    # ✅ 목차로 돌아가기 버튼
+    # ✅ 목차로 돌아가기
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     st.button("🏠 목차로 돌아가기",
               use_container_width=True,
