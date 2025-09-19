@@ -13,7 +13,6 @@ if faq_path.exists():
     with open(faq_path, "r", encoding="utf-8") as f:
         faq_list = json.load(f)
 else:
-    # 샘플 데이터
     faq_list = [
         {"q": "E-매뉴얼은 어떻게 이용하나요?",
          "a": "왼쪽 사이드바에서 E-매뉴얼을 클릭하면 목차와 내용을 볼 수 있습니다."},
@@ -52,18 +51,15 @@ def highlight(text, kw):
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
 # --------------------------------------------------
-# 5️⃣ 검색 결과 출력 (질문 클릭 → 답변 펼침, 둘 다 하이라이트)
+# 5️⃣ 검색 결과 출력
 # --------------------------------------------------
 if results:
     for item in results:
         q_html = highlight(item["q"], keyword)
         a_html = highlight(item["a"], keyword)
 
-        # 🔑 질문을 클릭하면 답변이 펼쳐지는 영역
-        with st.expander("", expanded=False):
-            # expander 내부 제목 부분을 HTML로 표시
-            st.markdown(f"<div style='font-weight:700;font-size:1.05rem'>{q_html}</div>",
-                        unsafe_allow_html=True)
+        # ✅ 질문을 expander label 로 직접 전달
+        with st.expander(label=q_html, expanded=False, unsafe_allow_html=True):
             st.markdown(a_html, unsafe_allow_html=True)
 else:
     st.warning("검색 결과가 없습니다.")
