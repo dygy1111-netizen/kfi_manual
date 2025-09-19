@@ -203,16 +203,46 @@ if st.session_state.page == "인트로":
 # ---------- 목차 페이지 ---------- #
 elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
-    st.markdown("아래에서 원하는 항목을 선택해 주세요.")
+
+    # ✅ 새로운 목차 스타일 CSS
+    st.markdown("""
+    <style>
+    .chapter-box {
+        background-color: #ffffff;      /* 흰색 박스 */
+        border: 1px solid #e0e0e0;      /* 은은한 테두리 */
+        border-radius: 12px;
+        padding: 1.2em 1.4em;
+        margin-top: 1.5em;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05); /* 부드러운 그림자 */
+    }
+    .chapter-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #222222;
+        margin-bottom: 0.8em;
+        display: flex;
+        align-items: center;
+    }
+    .chapter-title .icon {
+        margin-right: 0.5em;
+        font-size: 1.4rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ✅ 대분류 + 세부 항목 출력
     for main, subs in sections.items():
-        # ✅ 큰 박스 + 📘 아이콘
         st.markdown(
-            f'<div class="menu-box"><div class="menu-title"><span class="emoji">📘</span>{main}</div>',
+            f'<div class="chapter-box">'
+            f'<div class="chapter-title"><span class="icon">📂</span>{main}</div>',
             unsafe_allow_html=True
         )
+        # 하위 세부 목차 → 파란색 버튼 유지
         for sub in subs:
-            st.button(sub, key=f"menu-{sub}", on_click=go_page, args=(sub,))
+            st.button(sub, key=f"menu-{sub}", use_container_width=True,
+                      on_click=go_page, args=(sub,))
         st.markdown('</div>', unsafe_allow_html=True)
+
 
 # ---------- 본문 ---------- #
 else:
