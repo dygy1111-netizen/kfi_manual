@@ -1,6 +1,6 @@
 [
   {
     "q": "이미지 테스트",
-    "a": "아래 이미지를 확인하세요.\n\n![](faq_images/sample.png)"
+    "a": "아래 이미지를 확인하세요.<br><br><img src='faq_images/sample.png' style='max-width:100%;'>"
   }
 ]
