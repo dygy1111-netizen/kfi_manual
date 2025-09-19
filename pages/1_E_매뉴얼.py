@@ -202,32 +202,45 @@ if st.session_state.page == "인트로":
 
 # ---------- 목차 페이지 ---------- #
 elif st.session_state.page == "목차":
+    # 메인 타이틀
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
+    # 카드 공통 스타일
+    st.markdown("""
+    <style>
+    .chapter-box {
+        background-color: #ffffff;
+        border: 1px solid #dddddd;
+        border-radius: 14px;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .chapter-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #333333;
+        margin-bottom: 0.8rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # 대분류 박스 + 소분류 버튼
     for main, subs in sections.items():
         with st.container():
-            # 대분류 박스를 감싸는 컨테이너
-            st.markdown(
-                f"<div style='background-color:#ffffff;"
-                f"border:1px solid #e2e8f0;border-radius:12px;"
-                f"padding:1.2em;margin-bottom:1.5em;"
-                f"box-shadow:0 2px 6px rgba(0,0,0,0.05);'>",
-                unsafe_allow_html=True
-            )
+            # 박스 전체
+            st.markdown(f"<div class='chapter-box'>", unsafe_allow_html=True)
 
             # 대분류 제목
-            st.markdown(
-                f"<div style='font-size:1.2rem;font-weight:700;"
-                f"color:#1e3a8a;margin-bottom:0.8em;'>📂 {main}</div>",
-                unsafe_allow_html=True
-            )
+            st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-            # 소분류 버튼들 (같은 컨테이너 내부)
+            # 소분류 버튼 (같은 컨테이너 안에서 렌더링)
             for sub in subs:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
 
             st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
