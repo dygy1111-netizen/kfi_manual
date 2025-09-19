@@ -224,18 +224,16 @@ elif st.session_state.page == "목차":
         align-items: center;
     }
 .chapter-title {
-    font-size: 1.3rem;
+    font-size: 1.1rem;      /* 🔹폰트 크기 축소 */
     font-weight: 700;
     color: #222222;
     margin-bottom: 0.8em;
     display: flex;
     align-items: center;
-
-    /* 🔑 추가 부분 */
-    white-space: nowrap;      /* 줄바꿈 금지 */
-    overflow: hidden;         /* 넘치는 텍스트 숨기기 */
-    text-overflow: ellipsis;  /* 말줄임(...) 처리 */
+    line-height: 1.2;       /* 🔹줄 간격도 줄여서 높이 확보 */
+    word-break: keep-all;   /* 🔹한국어 단어 단위 줄바꿈 */
 }
+
 
     </style>
     """, unsafe_allow_html=True)
