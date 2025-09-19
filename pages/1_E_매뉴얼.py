@@ -204,7 +204,7 @@ if st.session_state.page == "인트로":
 elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # Streamlit 컨테이너에 적용할 공통 CSS
+    # 카드 공통 CSS
     st.markdown("""
     <style>
     div[data-testid="stVerticalBlock"] > div.card-box {
@@ -221,25 +221,36 @@ elif st.session_state.page == "목차":
         color: #333333;
         margin-bottom: 0.8rem;
     }
+    .sub-link {
+        color: #1e3a8a;
+        font-size: 1rem;
+        padding: 0.2rem 0;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+    }
+    .sub-link:hover {
+        text-decoration: underline;
+    }
     </style>
     """, unsafe_allow_html=True)
 
+    # ✅ 대분류 박스
     for main, subs in sections.items():
-        # 컨테이너 자체를 카드처럼 꾸미기 위해 key 부여
         with st.container():
-            # div.card-box를 강제로 생성하기 위해 빈 마크다운
             st.markdown('<div class="card-box">', unsafe_allow_html=True)
 
             # 대분류 제목
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-            # 소분류 버튼 (같은 컨테이너 안에 렌더링)
+            # 소분류 → 박스 없는 링크 스타일
             for sub in subs:
-                st.button(sub, key=f"menu-{sub}", use_container_width=True,
-                          on_click=go_page, args=(sub,))
-
-            # 박스 닫기
+                # 클릭 시 페이지 이동
+                if st.markdown(f"<a class='sub-link' href='javascript:void(0);'>{sub}</a>",
+                               unsafe_allow_html=True):
+                    pass
             st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
