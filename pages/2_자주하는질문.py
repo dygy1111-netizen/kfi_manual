@@ -43,7 +43,7 @@ else:
     results = faq_list
 
 # --------------------------------------------------
-# 4️⃣ 키워드 하이라이트 함수
+# 4️⃣ 하이라이트 함수
 # --------------------------------------------------
 def highlight(text, kw):
     if not kw:
@@ -52,16 +52,18 @@ def highlight(text, kw):
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
 # --------------------------------------------------
-# 5️⃣ 검색 결과 출력 (질문 클릭 → 답변 펼침)
+# 5️⃣ 검색 결과 출력 (질문 클릭 → 답변 펼침, 둘 다 하이라이트)
 # --------------------------------------------------
 if results:
     for item in results:
-        q_text = highlight(item["q"], keyword)
-        a_text = highlight(item["a"], keyword)
+        q_html = highlight(item["q"], keyword)
+        a_html = highlight(item["a"], keyword)
 
-        # 질문을 클릭하면 내용이 펼쳐지는 영역
-        with st.expander(f"Q. {item['q']}"):
-            # 답변에는 검색어 하이라이트 적용
-            st.markdown(a_text, unsafe_allow_html=True)
+        # 🔑 질문을 클릭하면 답변이 펼쳐지는 영역
+        with st.expander("", expanded=False):
+            # expander 내부 제목 부분을 HTML로 표시
+            st.markdown(f"<div style='font-weight:700;font-size:1.05rem'>{q_html}</div>",
+                        unsafe_allow_html=True)
+            st.markdown(a_html, unsafe_allow_html=True)
 else:
     st.warning("검색 결과가 없습니다.")
