@@ -1,14 +1,9 @@
 import streamlit as st
 import os, glob
 from pathlib import Path
-from streamlit_javascript import st_javascript   # ✅ 추가
 
 # ✅ 페이지 설정
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
-
-# ✅ 브라우저 실제 너비 가져오기 (PC/모바일 구분용)
-if "browser_width" not in st.session_state:
-    st.session_state.browser_width = st_javascript("window.innerWidth")
 
 # ---------- 공통 CSS ---------- #
 st.markdown("""
@@ -115,6 +110,21 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
     font-weight: 600;
 }
 .back-btn button:hover { background-color: #0072e0; }
+
+/* ✅ 이미지 반응형 크기 */
+.responsive-img {
+    display: block;
+    margin: 0 auto;
+    width: 95%;
+    max-width: 750px;    /* PC에서는 최대 폭 제한 */
+    height: auto;
+    border-radius: 6px;
+}
+@media (max-width: 768px) {
+    .responsive-img {
+        max-width: 100%;  /* 모바일은 화면에 맞춰 최적화 */
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -204,7 +214,7 @@ elif st.session_state.page == "목차":
     <style>
     /* 🔹전체 큰 박스 */
     div[data-testid="stVerticalBlock"] > div.big-card {
-        background-color: #f9fafb;      /* 아주 연한 회색 */
+        background-color: #f9fafb;
         border: 1px solid #e5e7eb;
         border-radius: 18px;
         padding: 2rem 2.5rem;
@@ -212,7 +222,6 @@ elif st.session_state.page == "목차":
         max-width: 850px;
         box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     }
-    /* 대분류 제목 */
     .chapter-title {
         font-size: 1.25rem;
         font-weight: 700;
@@ -222,10 +231,9 @@ elif st.session_state.page == "목차":
         padding-bottom: 0.4rem;
         border-bottom: 1px solid #e5e7eb;
     }
-    /* ✅ 소분류 버튼 스타일 : 옅은 파란색 박스 */
     div[data-testid="stButton"] > button {
-        background-color: #e0f2fe !important;     /* 파스텔 블루 배경 */
-        color: #1e40af !important;               /* 짙은 블루 텍스트 */
+        background-color: #e0f2fe !important;
+        color: #1e40af !important;
         border: 1px solid #bfdbfe !important;
         box-shadow: none !important;
         text-align: right !important;
@@ -240,8 +248,6 @@ elif st.session_state.page == "목차":
         background-color: #dbeafe !important;
         color: #1e3a8a !important;
     }
-
-    /* 모바일 대응 */
     @media (max-width: 600px) {
         div[data-testid="stVerticalBlock"] > div.big-card {
             padding: 1.2rem;
@@ -257,7 +263,6 @@ elif st.session_state.page == "목차":
 
     with st.container():
         st.markdown('<div class="big-card">', unsafe_allow_html=True)
-
         for main, subs in sections.items():
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
             for sub in subs:
@@ -270,22 +275,19 @@ else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
-    # ✅ 이미지 자동 출력 함수 (모바일/PC 크기 다르게)
+    # ✅ 이미지 자동 출력 함수 (CSS 기반 반응형)
     def show_image_auto(key):
         safe_name = key.replace(" ", "_").replace("/", "_")
         img_path = find_image(safe_name)
         if img_path:
-            if st.session_state.browser_width and st.session_state.browser_width < 768:
-                # ✅ 모바일 → 화면에 맞게 최적화
-                st.image(img_path, use_container_width=True, caption=key)
-            else:
-                # ✅ PC → 최대 폭 제한
-                st.image(img_path, width=750, caption=key)
+            # <img> 태그로 직접 삽입 → CSS에서 반응형 처리
+            st.markdown(
+                f'<img src="{img_path}" class="responsive-img" alt="{key}"/>',
+                unsafe_allow_html=True
+            )
 
-    # 🔹항상 이미지 시도 (파일이 없으면 그냥 넘어감)
     show_image_auto(current)
 
-    # ✅ 외부 콘텐츠 로딩 함수
     def load_content(key):
         safe_name = key.replace(" ", "_").replace("/", "_")
         path = Path(f"contents/{safe_name}.md")
