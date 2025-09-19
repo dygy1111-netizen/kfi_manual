@@ -71,16 +71,17 @@ def highlight(text, kw):
     pattern = re.compile(re.escape(kw), re.IGNORECASE)
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
-# ---------------- 렌더링 (st.expander + 이미지 지원)
+# ---------------- 렌더링 (질문 → 이미지 → 답변)
 if results:
     for item in results:
-        q_html = highlight(item["q"], keyword)
-        a_html = highlight(item["a"], keyword)
+        q_html = highlight(item["q"], keyword)   # 질문 하이라이트
+        a_html = highlight(item["a"], keyword)   # 답변 하이라이트
 
         with st.expander(q_html):
-            st.markdown(a_html, unsafe_allow_html=True)
-            # ✅ 이미지 키가 있으면 직접 출력
+            # ✅ 이미지가 있으면 먼저 출력
             if "img" in item and item["img"]:
                 st.image(item["img"], use_container_width=True)
+            # ✅ 답변 출력 (이미지 유무와 관계없이)
+            st.markdown(a_html, unsafe_allow_html=True)
 else:
     st.warning("검색 결과가 없습니다.")
