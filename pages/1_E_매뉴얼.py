@@ -204,32 +204,35 @@ if st.session_state.page == "인트로":
 elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # 📋 카드와 버튼 스타일
+    # 전체 박스 + 대분류/소분류 스타일
     st.markdown("""
     <style>
-    /* 대분류 카드 박스 */
-    div[data-testid="stVerticalBlock"] > div.card-box {
+    /* ✅ 모든 항목을 감싸는 큰 박스 */
+    div[data-testid="stVerticalBlock"] > div.big-card {
         background-color: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
     }
+    /* 대분류 제목 */
     .chapter-title {
         font-size: 1.2rem;
         font-weight: 700;
         color: #333333;
-        margin-bottom: 0.8rem;
+        margin: 1.2rem 0 0.6rem 0;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid #e5e7eb;
     }
-    /* ✅ 소분류 버튼 스타일 제거 */
+    /* 소분류 버튼을 링크처럼 */
     div[data-testid="stButton"] > button {
         background-color: transparent !important;
         color: #1e3a8a !important;
         border: none !important;
         box-shadow: none !important;
         text-align: left !important;
-        padding: 0.2rem 0 !important;
+        padding: 0.25rem 0 !important;
         font-size: 1rem;
     }
     div[data-testid="stButton"] > button:hover {
@@ -239,20 +242,21 @@ elif st.session_state.page == "목차":
     </style>
     """, unsafe_allow_html=True)
 
-    # 대분류 카드 안에 소분류 버튼 출력
-    for main, subs in sections.items():
-        with st.container():
-            st.markdown('<div class="card-box">', unsafe_allow_html=True)
+    # ✅ 하나의 큰 박스 안에 모든 항목
+    with st.container():
+        st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
+        for main, subs in sections.items():
             # 대분류 제목
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-            # 소분류 버튼 (박스 없는 링크 스타일)
+            # 소분류 버튼 (링크 스타일)
             for sub in subs:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
 
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
