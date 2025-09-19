@@ -5,20 +5,6 @@ from pathlib import Path
 # ✅ 페이지 설정
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
 
-# ✅ 다크 테마에서도 항상 밝게 보이도록 앱 전체 배경/글씨 강제
-st.markdown("""
-<style>
-/* 전체 앱 배경을 항상 흰색으로 고정 */
-[data-testid="stAppViewContainer"] {
-    background-color: #ffffff !important;
-}
-/* 앱 내부 모든 기본 텍스트를 진한 검정으로 고정 */
-[data-testid="stAppViewContainer"] * {
-    color: #111111 !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # ---------- 공통 CSS ---------- #
 st.markdown("""
 <style>
@@ -218,75 +204,80 @@ if st.session_state.page == "인트로":
 elif st.session_state.page == "목차":
     st.markdown("""
     <style>
-    /* ✅ 전체 큰 박스 – 라이트 모드 고정 */
-    div[data-testid="stVerticalBlock"] > div.big-card {
-        background-color: #ffffff !important;
+    /* 🔹전체 큰 박스 */
+    .big-card {
+        background-color: #f9fafb;        /* 아주 연한 회색 배경 */
         border: 1px solid #e5e7eb;
         border-radius: 18px;
         padding: 2rem 2.5rem;
         margin: 0 auto 2rem auto;
         max-width: 850px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     }
     /* 대분류 제목 */
     .chapter-title {
         font-size: 1.25rem;
         font-weight: 700;
-        color: #111827 !important;
+        color: #1f2937;
         margin-top: 1.6rem;
         margin-bottom: 0.8rem;
         padding-bottom: 0.4rem;
         border-bottom: 1px solid #e5e7eb;
     }
-    /* ✅ 소분류 버튼 – 파스텔 블루 박스 */
-    div[data-testid="stButton"] > button {
-        background-color: #e0f2fe !important;
-        color: #1e3a8a !important;
-        border: 1px solid #bfdbfe !important;
-        box-shadow: none !important;
-        text-align: right !important;
-        padding: 0.45rem 0.8rem !important;
+    /* 소분류 링크(오른쪽 정렬) */
+    .sub-link {
+        display: block;
+        text-align: right;                 /* ✅ 오른쪽 정렬 */
+        padding: 0.3rem 0;
+        color: #2563eb;
         font-size: 1.05rem;
         font-weight: 500;
-        border-radius: 10px !important;
-        margin-bottom: 0.4rem !important;
-        transition: all 0.15s ease;
+        text-decoration: none;
+        transition: color 0.2s ease;
     }
-    div[data-testid="stButton"] > button:hover {
-        background-color: #dbeafe !important;
-        color: #1e40af !important;
+    .sub-link:hover {
+        text-decoration: underline;
+        color: #1d4ed8;
     }
+
     /* 모바일 대응 */
     @media (max-width: 600px) {
-        div[data-testid="stVerticalBlock"] > div.big-card {
+        .big-card {
             padding: 1.2rem;
             max-width: 95%;
         }
         .chapter-title { font-size: 1.1rem; }
-        div[data-testid="stButton"] > button {
-            font-size: 1rem;
-            padding: 0.4rem 0.7rem !important;
-        }
+        .sub-link { font-size: 1rem; }
     }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # ✅ 하나의 큰 박스 안에 모든 목차
-    with st.container():
-        st.markdown('<div class="big-card">', unsafe_allow_html=True)
+    # ✅ 대분류 + 소분류 출력
+    for main, subs in sections.items():
+        # 대분류
+        st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-        for main, subs in sections.items():
-            # 대분류
-            st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+        # 소분류 → 오른쪽 정렬된 텍스트 링크
+        for sub in subs:
+            # 페이지 이동은 필요 시 st.button으로 교체 가능
+            st.markdown(f"<a class='sub-link' href='#'>{sub}</a>", unsafe_allow_html=True)
 
-            # 소분류 버튼 (파스텔 블루 박스)
-            for sub in subs:
-                st.button(sub, key=f"menu-{sub}", use_container_width=True,
-                          on_click=go_page, args=(sub,))
+    st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ---------- 본문 ---------- #
 else:
@@ -295,9 +286,11 @@ else:
 
     # ✅ 이미지 자동 출력 함수
     def show_image_auto(key):
+        # 세부 목차 이름을 안전한 파일명으로 변환
         safe_name = key.replace(" ", "_").replace("/", "_")
         img_path = find_image(safe_name)
         if img_path:
+            # 이미지가 있으면 자동 출력
             st.image(img_path, use_container_width=True, caption=key)
 
     # 🔹항상 이미지 시도 (파일이 없으면 그냥 넘어감)
