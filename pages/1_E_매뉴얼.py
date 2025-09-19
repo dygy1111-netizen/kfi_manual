@@ -253,29 +253,33 @@ elif st.session_state.page == "목차":
 
 
 # ---------- 본문 ---------- #
+# ---------- 본문 ---------- #
 else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
+    def load_content(key):
+        # 파일명 규칙 : "세부목차.md" → 공백/특수문자 제거 후 저장
+        safe_name = key.replace(" ", "_").replace("/", "_")
+        path = Path(f"contents/{safe_name}.md")
+        if path.exists():
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
+        return None
+
+    # 이미지가 있으면 출력
     def show_image(name, caption=""):
         img_path = find_image(name)
         if img_path:
             st.image(img_path, use_container_width=True, caption=caption)
-        else:
-            st.warning(f"이미지를 찾을 수 없습니다: {name}")
 
-    if current.startswith("1.1"):
-        show_image("안전거리","안전거리")
-        st.markdown('<div class="section-title">목적</div>', unsafe_allow_html=True)
-        st.write("위험물탱크 간 안전거리를 확보하여 화재 확산을 방지합니다.")
-        st.markdown('<div class="section-title">기준</div>', unsafe_allow_html=True)
-        st.markdown("""
-        | 구분 | 기준 |
-        |------|------|
-        | 위험물 제1류 | 5m 이상 |
-        | 위험물 제2류 | 3m 이상 |
-        | 위험물 제4류 | 6m 이상 |
-        """)
+    # ✅ 외부 콘텐츠 불러오기
+    content = load_content(current)
+    if content:
+        st.markdown(content, unsafe_allow_html=True)
+    else:
+        st.warning("⚠️ 아직 준비된 내용이 없습니다.")
+
         st.markdown('<div class="section-title">부록</div>', unsafe_allow_html=True)
         st.button("➡️ 방화상 유효한 담 (부록 4.1)",
                   use_container_width=True,
