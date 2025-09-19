@@ -163,13 +163,6 @@ def go_home():
 def go_page(p):
     st.session_state.page = p
 
-# ---------- 사이드바 ---------- #
-st.sidebar.title("메뉴")
-if st.sidebar.button("🏠 인트로로 이동"):
-    st.session_state.page = "인트로"
-if st.sidebar.button("📘 매뉴얼로 이동"):
-    st.session_state.page = "목차"
-
 # ---------- 인트로 페이지 ---------- #
 if st.session_state.page == "인트로":
     st.markdown("""
