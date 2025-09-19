@@ -253,7 +253,6 @@ elif st.session_state.page == "목차":
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
-    st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
     # ✅ 대분류 + 소분류 출력
     for main, subs in sections.items():
