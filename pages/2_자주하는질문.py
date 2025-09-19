@@ -2,6 +2,10 @@ import streamlit as st
 import json, re
 from pathlib import Path
 
+# 테스트
+st.write("📂 현재 작업 디렉토리:", Path.cwd())
+st.image("faq_images/sample.png", caption="테스트 이미지")
+
 st.set_page_config(page_title="자주하는 질문", page_icon="💡", layout="wide")
 
 # 🔹제목을 한 줄 작게
