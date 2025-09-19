@@ -1,61 +1,24 @@
 import streamlit as st
-from pathlib import Path
 
-st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘")
+st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
 
-# ===== 타이틀 스타일 =====
+# ───── 공공기관 스타일 CSS ─────
 st.markdown("""
 <style>
-.title-container {
-    text-align: center;
-    margin-top: 30px;
-    margin-bottom: 20px;
-    font-family: 'Noto Sans KR', sans-serif;
-}
-.main-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #003366;
-    line-height: 1.4;
-}
-.sub-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #003366;
-    line-height: 1.4;
-}
-.guide-text {
-    text-align: center;
-    font-size: 1.1rem;
-    margin-top: 10px;
-    line-height: 1.6;
-}
+.title {text-align:center; font-size:2.2rem; font-weight:800; color:#003366; margin-bottom:1.2em;}
+.subtitle {text-align:center; font-size:1.2rem; color:#333333; margin-bottom:1.5em;}
+.menu-title {font-size:1.1rem; font-weight:600; margin-top:1.5em;}
 </style>
-
-<div class="title-container">
-    <div class="main-title">클릭하며 배우는</div>
-    <div class="sub-title">위험물탱크 E-매뉴얼</div>
-</div>
 """, unsafe_allow_html=True)
 
-# ===== 안내 문구 (두 줄 유지 + 이모지) =====
-st.markdown("""
-<div class="guide-text">
-☰ <b>왼쪽 상단 메뉴</b>를 클릭해 📘 <b>E-매뉴얼</b><br>
-또는 💡 <b>자주하는 질문(FAQ)</b> 페이지로 이동하세요.
-</div>
-""", unsafe_allow_html=True)
+# ───── 메인 타이틀 ─────
+st.markdown('<div class="title">📘 클릭하며 배우는 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">왼쪽 상단 메뉴(☰)를 열거나 아래 링크를 클릭해 원하는 페이지로 이동하세요.</div>',
+            unsafe_allow_html=True)
 
-# ===== 하단 커버 이미지 =====
-cover_path = None
-for ext in ("jpg", "jpeg", "png"):
-    p = Path(f"images/cover.{ext}")
-    if p.exists():
-        cover_path = p
-        break
+# ───── 목차(간단 링크) ─────
+st.markdown('<div class="menu-title">📑 주요 항목 바로가기</div>', unsafe_allow_html=True)
 
-if cover_path:
-    st.markdown("---")
-    st.image(str(cover_path), use_container_width=True, caption="E-매뉴얼 표지")
-else:
-    st.info("💡 images 폴더에 cover.jpg/png/jpeg 파일을 넣으면 여기 표지가 표시됩니다.")
+st.markdown("- [1.1 안전거리](1_위험물탱크%20위치_구조_설비%20기준/1_안전거리)")
+st.markdown("- [1.2 보유공지](1_위험물탱크%20위치_구조_설비%20기준/2_보유공지)")
+st.markdown("- [FAQ (자주하는 질문)](5_자주하는질문)")
