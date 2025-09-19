@@ -54,9 +54,10 @@ def find_image(name):
         path = f"images/{name}.{e}"
         if os.path.exists(path):
             return path
-    for e in exts:  # 혹시 대소문자 혼합 대비
+    for e in exts:  # 대소문자 혼합 대비
         g = glob.glob(f"images/{name}*.{e}")
-        if g: return g[0]
+        if g:
+            return g[0]
     return None
 
 # ---------- 목차 데이터 ---------- #
@@ -95,7 +96,7 @@ def go_home():
     st.session_state.page = "목차"
 
 def go_page(p):
-    st.session_state.page = p
+    st.session_state.page = p   # on_click으로 호출 시 바로 rerun되어 즉시 반영
 
 # ---------- 목차 ---------- #
 if st.session_state.page == "목차":
@@ -104,9 +105,10 @@ if st.session_state.page == "목차":
     for main, subs in sections.items():
         st.subheader(main)
         for sub in subs:
-            # ✅ key=sub 로 고유 키 부여
-            if st.button(sub, use_container_width=True, key=f"menu-{sub}"):
-                go_page(sub)
+            # ✅ on_click 방식 + 고유 key
+            st.button(sub, use_container_width=True,
+                      key=f"menu-{sub}",
+                      on_click=go_page, args=(sub,))
 
 # ---------- 본문 ---------- #
 else:
@@ -116,7 +118,6 @@ else:
     def show_image(name, caption=""):
         img_path = find_image(name)
         if img_path:
-            # ✅ 불필요한 '이미지 영역' 텍스트 제거
             st.image(img_path, use_container_width=True, caption=caption)
         else:
             st.warning(f"이미지를 찾을 수 없습니다: {name}")
@@ -135,10 +136,10 @@ else:
         | 위험물 제4류 | 6m 이상 |
         """)
         st.markdown('<div class="section-title">부록</div>', unsafe_allow_html=True)
-        # ✅ key 부여
-        if st.button("➡️ 방화상 유효한 담 (부록 4.1)",
-                     use_container_width=True, key="btn-4.1"):
-            go_page("4.1 소방청 질의회신 및 협의사항")
+        st.button("➡️ 방화상 유효한 담 (부록 4.1)",
+                  use_container_width=True,
+                  key="btn-4.1",
+                  on_click=go_page, args=("4.1 소방청 질의회신 및 협의사항",))
 
     elif current.startswith("1.2"):
         show_image("보유공지","보유공지")
@@ -152,17 +153,20 @@ else:
         | 500~1000리터 | 2m |
         """)
         st.markdown('<div class="section-title">부록</div>', unsafe_allow_html=True)
-        if st.button("➡️ 검사관련 규격 참고 (부록 4.2)",
-                     use_container_width=True, key="btn-4.2"):
-            go_page("4.2 검사관련 규격 및 기술지침")
+        st.button("➡️ 검사관련 규격 참고 (부록 4.2)",
+                  use_container_width=True,
+                  key="btn-4.2",
+                  on_click=go_page, args=("4.2 검사관련 규격 및 기술지침",))
 
     elif current.startswith("4.1"):
         show_image("소방청 질의회신 및 협의사항","부록 4.1")
         st.write("소방청 질의회신 및 협의사항을 정리합니다.")
 
-    # (다른 항목도 동일한 방식으로 show_image('한글파일명') 호출)
+    # (다른 항목도 동일하게 show_image('한글파일명') + st.button(on_click=...) 사용)
 
-    # ✅ 목차로 돌아가기
+    # ✅ 목차로 돌아가기 버튼
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
-    if st.button("🏠 목차로 돌아가기", use_container_width=True, key="btn-home"):
-        go_home()
+    st.button("🏠 목차로 돌아가기",
+              use_container_width=True,
+              key="btn-home",
+              on_click=go_home)
