@@ -205,8 +205,8 @@ elif st.session_state.page == "목차":
     st.markdown("""
     <style>
     /* 🔹전체 큰 박스 */
-    .big-card {
-        background-color: #f9fafb;        /* 아주 연한 회색 배경 */
+    div[data-testid="stVerticalBlock"] > div.big-card {
+        background-color: #f9fafb;      /* 아주 연한 회색 */
         border: 1px solid #e5e7eb;
         border-radius: 18px;
         padding: 2rem 2.5rem;
@@ -224,59 +224,53 @@ elif st.session_state.page == "목차":
         padding-bottom: 0.4rem;
         border-bottom: 1px solid #e5e7eb;
     }
-    /* 소분류 링크(오른쪽 정렬) */
-    .sub-link {
-        display: block;
-        text-align: right;                 /* ✅ 오른쪽 정렬 */
-        padding: 0.3rem 0;
-        color: #2563eb;
+    /* ✅ 소분류 버튼 스타일 : 옅은 파란색 박스 */
+    div[data-testid="stButton"] > button {
+        background-color: #e0f2fe !important;     /* 파스텔 블루 배경 */
+        color: #1e40af !important;               /* 짙은 블루 텍스트 */
+        border: 1px solid #bfdbfe !important;    /* 연한 파란색 테두리 */
+        box-shadow: none !important;
+        text-align: right !important;
+        padding: 0.45rem 0.8rem !important;
         font-size: 1.05rem;
         font-weight: 500;
-        text-decoration: none;
-        transition: color 0.2s ease;
+        border-radius: 10px !important;
+        margin-bottom: 0.4rem !important;        /* 버튼 간 간격 */
+        transition: all 0.15s ease;
     }
-    .sub-link:hover {
-        text-decoration: underline;
-        color: #1d4ed8;
+    div[data-testid="stButton"] > button:hover {
+        background-color: #dbeafe !important;    /* 호버 시 살짝 진해짐 */
+        color: #1e3a8a !important;
     }
 
     /* 모바일 대응 */
     @media (max-width: 600px) {
-        .big-card {
+        div[data-testid="stVerticalBlock"] > div.big-card {
             padding: 1.2rem;
             max-width: 95%;
         }
         .chapter-title { font-size: 1.1rem; }
-        .sub-link { font-size: 1rem; }
+        div[data-testid="stButton"] > button { font-size: 1rem; padding: 0.4rem 0.7rem !important; }
     }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
-    # ✅ 대분류 + 소분류 출력
-    for main, subs in sections.items():
-        # 대분류
-        st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+    # ✅ 하나의 큰 박스 안에 모든 목차
+    with st.container():
+        st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
-        # 소분류 → 오른쪽 정렬된 텍스트 링크
-        for sub in subs:
-            # 페이지 이동은 필요 시 st.button으로 교체 가능
-            st.markdown(f"<a class='sub-link' href='#'>{sub}</a>", unsafe_allow_html=True)
+        for main, subs in sections.items():
+            # 대분류
+            st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+            # 소분류 → 옅은 파란색 박스 버튼
+            for sub in subs:
+                st.button(sub, key=f"menu-{sub}", use_container_width=True,
+                          on_click=go_page, args=(sub,))
 
-
-
-
-
-
-
-
-
-
-
-
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------- 본문 ---------- #
