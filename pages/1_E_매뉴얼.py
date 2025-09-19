@@ -285,6 +285,24 @@ elif st.session_state.page == "목차":
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
+# 🔍 검색어로 필터링
+def match(q, t): 
+    return q.lower() in t.lower()       # 대소문자 무시 부분 일치
+
+q = st.session_state.search.strip()      # 검색어
+if q:
+    filtered_sections = {}               # 결과 저장용 딕셔너리
+    for main, subs in sections.items():
+        if match(q, main):               # 대분류 이름 일치 시 전체 표시
+            filtered_sections[main] = subs
+        else:
+            hits = [s for s in subs if match(q, s)]  # 소분류 중 일치 항목
+            if hits:
+                filtered_sections[main] = hits
+else:
+    filtered_sections = sections         # 검색어 없으면 전체
+
+
     # ✅ 하나의 큰 박스 안에 모든 목차
     with st.container():
         st.markdown('<div class="big-card">', unsafe_allow_html=True)
