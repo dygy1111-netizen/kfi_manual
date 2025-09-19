@@ -276,15 +276,35 @@ else:
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
     # ✅ 이미지 자동 출력 함수 (CSS 기반 반응형)
-    def show_image_auto(key):
-        safe_name = key.replace(" ", "_").replace("/", "_")
-        img_path = find_image(safe_name)
-        if img_path:
-            # <img> 태그로 직접 삽입 → CSS에서 반응형 처리
-            st.markdown(
-                f'<img src="{img_path}" class="responsive-img" alt="{key}"/>',
-                unsafe_allow_html=True
-            )
+    # ✅ 이미지 자동 출력 함수 (PC/모바일 반응형, 엑박 방지)
+def show_image_auto(key):
+    safe_name = key.replace(" ", "_").replace("/", "_")
+    img_path = find_image(safe_name)
+    if img_path:
+        # CSS를 컨테이너에 적용하여 PC에서는 최대 폭만 제한
+        st.markdown("""
+        <style>
+        .image-container img {
+            max-width: 750px;   /* ✅ PC 최대 폭 제한 */
+            width: 95%;         /* 모바일은 거의 꽉 차게 */
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 6px;
+        }
+        @media (max-width: 768px) {
+            .image-container img {
+                max-width: 100%; /* ✅ 모바일은 제한 해제 */
+            }
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        # Streamlit이 안전하게 URL 처리하도록 st.image 사용
+        with st.container():
+            st.markdown('<div class="image-container">', unsafe_allow_html=True)
+            st.image(img_path, use_container_width=True, caption=key)
+            st.markdown('</div>', unsafe_allow_html=True)
+
 
     show_image_auto(current)
 
