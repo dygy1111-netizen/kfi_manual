@@ -204,30 +204,31 @@ if st.session_state.page == "인트로":
 elif st.session_state.page == "목차":
     st.markdown("""
     <style>
-    /* 큰 박스 (모바일 반응형) */
+    /* 🔹전체 큰 박스 */
     .big-card {
-        background: rgba(255,255,255,0.7);
-        backdrop-filter: blur(12px);
-        border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.1);
-        padding: 2rem;
+        background-color: #f9fafb;        /* 아주 연한 회색 배경 */
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 2rem 2.5rem;
         margin: 0 auto 2rem auto;
-        max-width: 850px;        /* 데스크톱 최대 너비 */
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-        text-align: right;       /* ✅ 오른쪽 정렬 */
+        max-width: 850px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     }
+    /* 대분류 제목 */
     .chapter-title {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        color: #1e293b;
-        margin-top: 1.4rem;
+        color: #1f2937;
+        margin-top: 1.6rem;
         margin-bottom: 0.8rem;
         padding-bottom: 0.4rem;
-        border-bottom: 1px solid rgba(0,0,0,0.1);
+        border-bottom: 1px solid #e5e7eb;
     }
+    /* 소분류 링크(오른쪽 정렬) */
     .sub-link {
         display: block;
-        padding: 0.35rem 0;
+        text-align: right;                 /* ✅ 오른쪽 정렬 */
+        padding: 0.3rem 0;
         color: #2563eb;
         font-size: 1.05rem;
         font-weight: 500;
@@ -239,18 +240,14 @@ elif st.session_state.page == "목차":
         color: #1d4ed8;
     }
 
-    /* 모바일 대응: 작은 화면일 때 패딩 줄이기 */
+    /* 모바일 대응 */
     @media (max-width: 600px) {
         .big-card {
             padding: 1.2rem;
             max-width: 95%;
         }
-        .chapter-title {
-            font-size: 1.1rem;
-        }
-        .sub-link {
-            font-size: 1rem;
-        }
+        .chapter-title { font-size: 1.1rem; }
+        .sub-link { font-size: 1rem; }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -258,15 +255,18 @@ elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
     st.markdown('<div class="big-card">', unsafe_allow_html=True)
 
+    # ✅ 대분류 + 소분류 출력
     for main, subs in sections.items():
         # 대분류
         st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
-        # 소분류
+
+        # 소분류 → 오른쪽 정렬된 텍스트 링크
         for sub in subs:
-            # 여기서는 세션 이동 대신 단순 링크 (세션 이동 필요하면 JS 처리 필요)
+            # 페이지 이동은 필요 시 st.button으로 교체 가능
             st.markdown(f"<a class='sub-link' href='#'>{sub}</a>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
