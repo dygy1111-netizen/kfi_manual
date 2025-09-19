@@ -1,9 +1,28 @@
 import streamlit as st
 import os, glob
 from pathlib import Path
+from streamlit_javascript import st_javascript   # ✅ 추가
 
 # ✅ 페이지 설정
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
+
+# ✅ 브라우저 실제 너비 가져오기 (PC/모바일 구분용)
+if "browser_width" not in st.session_state:
+    st.session_state.browser_width = st_javascript("window.innerWidth")
+
+# ---------- 공통 CSS ---------- #
+st.markdown("""
+<style>
+html, body, [class*="css"] {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #ffffff;
+    line-height: 1.7;
+}
+...
+</style>
+""", unsafe_allow_html=True)
+
+# ▼ 이후 기존 코드 계속 ▼
 
 # ---------- 공통 CSS ---------- #
 st.markdown("""
@@ -110,21 +129,6 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
     font-weight: 600;
 }
 .back-btn button:hover { background-color: #0072e0; }
-
-/* ✅ 이미지 반응형 크기 */
-.responsive-img {
-    display: block;
-    margin: 0 auto;
-    width: 95%;
-    max-width: 750px;    /* PC에서는 최대 폭 제한 */
-    height: auto;
-    border-radius: 6px;
-}
-@media (max-width: 768px) {
-    .responsive-img {
-        max-width: 100%;  /* 모바일은 화면에 맞춰 최적화 */
-    }
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -214,7 +218,7 @@ elif st.session_state.page == "목차":
     <style>
     /* 🔹전체 큰 박스 */
     div[data-testid="stVerticalBlock"] > div.big-card {
-        background-color: #f9fafb;
+        background-color: #f9fafb;      /* 아주 연한 회색 */
         border: 1px solid #e5e7eb;
         border-radius: 18px;
         padding: 2rem 2.5rem;
@@ -222,6 +226,7 @@ elif st.session_state.page == "목차":
         max-width: 850px;
         box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     }
+    /* 대분류 제목 */
     .chapter-title {
         font-size: 1.25rem;
         font-weight: 700;
@@ -231,23 +236,26 @@ elif st.session_state.page == "목차":
         padding-bottom: 0.4rem;
         border-bottom: 1px solid #e5e7eb;
     }
+    /* ✅ 소분류 버튼 스타일 : 옅은 파란색 박스 */
     div[data-testid="stButton"] > button {
-        background-color: #e0f2fe !important;
-        color: #1e40af !important;
-        border: 1px solid #bfdbfe !important;
+        background-color: #e0f2fe !important;     /* 파스텔 블루 배경 */
+        color: #1e40af !important;               /* 짙은 블루 텍스트 */
+        border: 1px solid #bfdbfe !important;    /* 연한 파란색 테두리 */
         box-shadow: none !important;
         text-align: right !important;
         padding: 0.45rem 0.8rem !important;
         font-size: 1.05rem;
         font-weight: 500;
         border-radius: 10px !important;
-        margin-bottom: 0.4rem !important;
+        margin-bottom: 0.4rem !important;        /* 버튼 간 간격 */
         transition: all 0.15s ease;
     }
     div[data-testid="stButton"] > button:hover {
-        background-color: #dbeafe !important;
+        background-color: #dbeafe !important;    /* 호버 시 살짝 진해짐 */
         color: #1e3a8a !important;
     }
+
+    /* 모바일 대응 */
     @media (max-width: 600px) {
         div[data-testid="stVerticalBlock"] > div.big-card {
             padding: 1.2rem;
@@ -261,53 +269,40 @@ elif st.session_state.page == "목차":
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 
+    # ✅ 하나의 큰 박스 안에 모든 목차
     with st.container():
         st.markdown('<div class="big-card">', unsafe_allow_html=True)
+
         for main, subs in sections.items():
+            # 대분류
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+
+            # 소분류 → 옅은 파란색 박스 버튼
             for sub in subs:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
+
         st.markdown("</div>", unsafe_allow_html=True)
+
 
 # ---------- 본문 ---------- #
 else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
-    # ✅ 이미지 자동 출력 함수 (CSS 기반 반응형)
-    # ✅ 이미지 자동 출력 함수 (PC/모바일 반응형, 엑박 방지)
-def show_image_auto(key):
-    safe_name = key.replace(" ", "_").replace("/", "_")
-    img_path = find_image(safe_name)
-    if img_path:
-        # CSS를 컨테이너에 적용하여 PC에서는 최대 폭만 제한
-        st.markdown("""
-        <style>
-        .image-container img {
-            max-width: 750px;   /* ✅ PC 최대 폭 제한 */
-            width: 95%;         /* 모바일은 거의 꽉 차게 */
-            height: auto;
-            display: block;
-            margin: 0 auto;
-            border-radius: 6px;
-        }
-        @media (max-width: 768px) {
-            .image-container img {
-                max-width: 100%; /* ✅ 모바일은 제한 해제 */
-            }
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        # Streamlit이 안전하게 URL 처리하도록 st.image 사용
-        with st.container():
-            st.markdown('<div class="image-container">', unsafe_allow_html=True)
+    # ✅ 이미지 자동 출력 함수
+    def show_image_auto(key):
+        # 세부 목차 이름을 안전한 파일명으로 변환
+        safe_name = key.replace(" ", "_").replace("/", "_")
+        img_path = find_image(safe_name)
+        if img_path:
+            # 이미지가 있으면 자동 출력
             st.image(img_path, use_container_width=True, caption=key)
-            st.markdown('</div>', unsafe_allow_html=True)
 
-
+    # 🔹항상 이미지 시도 (파일이 없으면 그냥 넘어감)
     show_image_auto(current)
 
+    # ✅ 외부 콘텐츠 로딩 함수
     def load_content(key):
         safe_name = key.replace(" ", "_").replace("/", "_")
         path = Path(f"contents/{safe_name}.md")
@@ -316,12 +311,14 @@ def show_image_auto(key):
                 return f.read()
         return None
 
+    # ✅ Markdown 파일 출력
     content = load_content(current)
     if content:
         st.markdown(content, unsafe_allow_html=True)
     else:
         st.warning("⚠️ 아직 준비된 내용이 없습니다.")
 
+    # ✅ 목차로 돌아가기 버튼
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     st.button("🏠 목차로 돌아가기",
               use_container_width=True,
