@@ -5,6 +5,20 @@ from pathlib import Path
 # ✅ 페이지 설정
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
 
+# ✅ 다크 테마에서도 항상 밝게 보이도록 앱 전체 배경/글씨 강제
+st.markdown("""
+<style>
+/* 전체 앱 배경을 항상 흰색으로 고정 */
+[data-testid="stAppViewContainer"] {
+    background-color: #ffffff !important;
+}
+/* 앱 내부 모든 기본 텍스트를 진한 검정으로 고정 */
+[data-testid="stAppViewContainer"] * {
+    color: #111111 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ---------- 공통 CSS ---------- #
 st.markdown("""
 <style>
@@ -206,7 +220,7 @@ elif st.session_state.page == "목차":
     <style>
     /* ✅ 전체 큰 박스 – 라이트 모드 고정 */
     div[data-testid="stVerticalBlock"] > div.big-card {
-        background-color: #ffffff !important;   /* 완전 흰색으로 고정 */
+        background-color: #ffffff !important;
         border: 1px solid #e5e7eb;
         border-radius: 18px;
         padding: 2rem 2.5rem;
@@ -218,7 +232,7 @@ elif st.session_state.page == "목차":
     .chapter-title {
         font-size: 1.25rem;
         font-weight: 700;
-        color: #111827 !important;             /* 아주 진한 다크그레이(거의 검정) */
+        color: #111827 !important;
         margin-top: 1.6rem;
         margin-bottom: 0.8rem;
         padding-bottom: 0.4rem;
@@ -226,8 +240,8 @@ elif st.session_state.page == "목차":
     }
     /* ✅ 소분류 버튼 – 파스텔 블루 박스 */
     div[data-testid="stButton"] > button {
-        background-color: #e0f2fe !important;   /* 밝은 파란 박스 */
-        color: #1e3a8a !important;             /* 짙은 네이비 글씨 */
+        background-color: #e0f2fe !important;
+        color: #1e3a8a !important;
         border: 1px solid #bfdbfe !important;
         box-shadow: none !important;
         text-align: right !important;
@@ -239,7 +253,7 @@ elif st.session_state.page == "목차":
         transition: all 0.15s ease;
     }
     div[data-testid="stButton"] > button:hover {
-        background-color: #dbeafe !important;  /* 호버 시 살짝 진한 블루 */
+        background-color: #dbeafe !important;
         color: #1e40af !important;
     }
     /* 모바일 대응 */
@@ -274,21 +288,6 @@ elif st.session_state.page == "목차":
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ---------- 본문 ---------- #
 else:
     current = st.session_state.page
@@ -296,11 +295,9 @@ else:
 
     # ✅ 이미지 자동 출력 함수
     def show_image_auto(key):
-        # 세부 목차 이름을 안전한 파일명으로 변환
         safe_name = key.replace(" ", "_").replace("/", "_")
         img_path = find_image(safe_name)
         if img_path:
-            # 이미지가 있으면 자동 출력
             st.image(img_path, use_container_width=True, caption=key)
 
     # 🔹항상 이미지 시도 (파일이 없으면 그냥 넘어감)
