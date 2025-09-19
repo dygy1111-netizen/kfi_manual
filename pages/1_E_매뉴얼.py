@@ -224,21 +224,23 @@ elif st.session_state.page == "목차":
         padding-bottom: 0.4rem;
         border-bottom: 1px solid #e5e7eb;
     }
-    /* ✅ 소분류 버튼을 링크처럼 보이게 */
+    /* ✅ 소분류 버튼 스타일 : 옅은 파란색 박스 */
     div[data-testid="stButton"] > button {
-        background-color: transparent !important;
-        color: #2563eb !important;
-        border: none !important;
+        background-color: #e0f2fe !important;     /* 파스텔 블루 배경 */
+        color: #1e40af !important;               /* 짙은 블루 텍스트 */
+        border: 1px solid #bfdbfe !important;    /* 연한 파란색 테두리 */
         box-shadow: none !important;
-        text-align: right !important;       /* 오른쪽 정렬 */
-        padding: 0.35rem 0 !important;
+        text-align: right !important;
+        padding: 0.45rem 0.8rem !important;
         font-size: 1.05rem;
         font-weight: 500;
+        border-radius: 10px !important;
+        margin-bottom: 0.4rem !important;        /* 버튼 간 간격 */
+        transition: all 0.15s ease;
     }
     div[data-testid="stButton"] > button:hover {
-        text-decoration: underline;
-        color: #1d4ed8 !important;
-        background-color: transparent !important;
+        background-color: #dbeafe !important;    /* 호버 시 살짝 진해짐 */
+        color: #1e3a8a !important;
     }
 
     /* 모바일 대응 */
@@ -248,7 +250,7 @@ elif st.session_state.page == "목차":
             max-width: 95%;
         }
         .chapter-title { font-size: 1.1rem; }
-        div[data-testid="stButton"] > button { font-size: 1rem; }
+        div[data-testid="stButton"] > button { font-size: 1rem; padding: 0.4rem 0.7rem !important; }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -263,12 +265,13 @@ elif st.session_state.page == "목차":
             # 대분류
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-            # 소분류 → 버튼 + 세션 상태 변경 (on_click)
+            # 소분류 → 옅은 파란색 박스 버튼
             for sub in subs:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
 
         st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
