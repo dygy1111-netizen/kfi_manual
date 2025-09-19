@@ -2,7 +2,7 @@ import streamlit as st
 import os, glob
 from pathlib import Path
 
-# ✅ 공통 페이지 설정
+# ✅ 페이지 설정 (앱 전체에서 한 번만)
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
 
 # ---------- 공통 CSS ---------- #
@@ -21,15 +21,15 @@ html, body, [class*="css"] {
     margin-bottom: 20px;
 }
 .main-title {
-    font-size: 2.0rem;           /* ✅ 모바일 대비 소폭 축소 */
+    font-size: 2.0rem;
     font-weight: 800;
-    color: #222222;              /* ✅ 진회색 */
+    color: #222222;
     line-height: 1.4;
 }
 .sub-title {
     font-size: 2.0rem;
     font-weight: 800;
-    color: #444444;              /* ✅ 회색톤 서브타이틀 */
+    color: #444444;
     line-height: 1.4;
 }
 .guide-text {
@@ -42,19 +42,19 @@ html, body, [class*="css"] {
 
 /* 목차 메인 제목 */
 .menu-main {
-    font-size: 1.2rem;           /* ✅ 기존 subheader보다 작게 */
+    font-size: 1.2rem;
     font-weight: 700;
     color: #222222;
     margin-top: 1.0em;
     line-height: 1.4;
-    word-break: keep-all;        /* ✅ 한국어 단어 단위 줄바꿈 */
+    word-break: keep-all;
 }
 
-/* 버튼 스타일 */
+/* ✅ 버튼 색상을 회색 계열로 변경 */
 .stButton button {
     width: 100%;
     border-radius: 8px;
-    background-color: #005bac;
+    background-color: #666666;  /* 중간톤 회색 */
     color: white;
     border: none;
     padding: 0.7em;
@@ -62,23 +62,41 @@ html, body, [class*="css"] {
     font-weight: 600;
     margin-bottom: 0.4em;
 }
-.stButton button:hover { background-color: #0072e0; }
+.stButton button:hover {
+    background-color: #999999;  /* hover 시 밝은 회색 */
+}
 
-.section-title { color:#003366; font-weight:700; margin-top:1.2em; font-size:1.1rem; }
-table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
-table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
-table th { background-color: #005bac; color: white; }
-table tr:nth-child(even) { background-color: #f0f4f8; }
+.section-title {
+    color:#333333;
+    font-weight:700;
+    margin-top:1.2em;
+    font-size:1.1rem;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5em;
+}
+table th, table td {
+    border: 1px solid #d0d7e2;
+    padding: 8px;
+    text-align: center;
+}
+table th {
+    background-color: #666666;  /* 테이블 헤더도 버튼과 통일 */
+    color: white;
+}
+table tr:nth-child(even) { background-color: #f5f5f5; }
 
 .back-btn button {
-    background-color: #005bac;
+    background-color: #666666;
     color: white;
     border-radius: 6px;
     padding: 0.6em 1em;
     border: none;
     font-weight: 600;
 }
-.back-btn button:hover { background-color: #0072e0; }
+.back-btn button:hover { background-color: #999999; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -124,13 +142,22 @@ sections = {
 }
 
 # ---------- 세션 상태 ---------- #
+# ✅ 초기값을 '목차'로 지정 → 사이드바에서 매뉴얼 클릭 시 표지가 뜨지 않음
 if "page" not in st.session_state:
-    st.session_state.page = "인트로"
+    st.session_state.page = "목차"
 
 def go_home():
     st.session_state.page = "목차"
 def go_page(p):
     st.session_state.page = p
+
+# ---------- 사이드바 메뉴 ---------- #
+# 원하는 경우 사이드바에 FAQ / 인트로 이동 버튼을 둘 수도 있음
+st.sidebar.title("메뉴")
+if st.sidebar.button("🏠 인트로로 이동"):
+    st.session_state.page = "인트로"
+if st.sidebar.button("📘 매뉴얼로 이동"):
+    st.session_state.page = "목차"
 
 # ---------- 인트로(첫 페이지) ---------- #
 if st.session_state.page == "인트로":
@@ -167,7 +194,7 @@ elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
     st.markdown("아래에서 원하는 항목을 선택해 주세요.")
     for main, subs in sections.items():
-        st.markdown(f'<div class="menu-main">{main}</div>', unsafe_allow_html=True)  # ✅ 폰트크기 축소 적용
+        st.markdown(f'<div class="menu-main">{main}</div>', unsafe_allow_html=True)
         for sub in subs:
             st.button(sub, use_container_width=True,
                       key=f"menu-{sub}",
