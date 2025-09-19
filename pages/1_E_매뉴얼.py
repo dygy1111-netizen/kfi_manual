@@ -30,14 +30,6 @@ html, body, [class*="css"] {
     margin-bottom: 0.4em;
 }
 .stButton button:hover { background-color: #0072e0; }
-.img-box {
-    background-color: #ffffff;
-    border: 1.5px solid #d0d7e2;
-    border-radius: 10px;
-    padding: 1em;
-    margin: 1.2em 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
 .section-title { color:#003366; font-weight:700; margin-top:1.2em; font-size:1.1rem; }
 table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
 table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
@@ -55,14 +47,14 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- 이미지 탐색 함수 (한글 파일명 + jpg/png/jpeg) ---------- #
+# ---------- 이미지 탐색 함수 (jpg/png/jpeg 모두 허용) ---------- #
 def find_image(name):
     exts = ['jpg','jpeg','png']
     for e in exts:
         path = f"images/{name}.{e}"
         if os.path.exists(path):
             return path
-    for e in exts:  # 혹시 대소문자 혼합된 경우
+    for e in exts:  # 혹시 대소문자 혼합 대비
         g = glob.glob(f"images/{name}*.{e}")
         if g: return g[0]
     return None
@@ -99,8 +91,11 @@ sections = {
 if "page" not in st.session_state:
     st.session_state.page = "목차"
 
-def go_home(): st.session_state.page = "목차"
-def go_page(p): st.session_state.page = p
+def go_home():
+    st.session_state.page = "목차"
+
+def go_page(p):
+    st.session_state.page = p
 
 # ---------- 목차 ---------- #
 if st.session_state.page == "목차":
@@ -109,7 +104,8 @@ if st.session_state.page == "목차":
     for main, subs in sections.items():
         st.subheader(main)
         for sub in subs:
-            if st.button(sub, use_container_width=True):
+            # ✅ key=sub 로 고유 키 부여
+            if st.button(sub, use_container_width=True, key=f"menu-{sub}"):
                 go_page(sub)
 
 # ---------- 본문 ---------- #
@@ -119,13 +115,13 @@ else:
 
     def show_image(name, caption=""):
         img_path = find_image(name)
-        st.markdown('<div class="img-box">🖼️ <b>이미지 영역</b></div>', unsafe_allow_html=True)
         if img_path:
+            # ✅ 불필요한 '이미지 영역' 텍스트 제거
             st.image(img_path, use_container_width=True, caption=caption)
         else:
             st.warning(f"이미지를 찾을 수 없습니다: {name}")
 
-    # ✅ 섹션별 내용 (이미지명 한글 적용)
+    # ✅ 섹션별 내용 샘플 (목적·기준·부록)
     if current.startswith("1.1"):
         show_image("안전거리","안전거리")
         st.markdown('<div class="section-title">목적</div>', unsafe_allow_html=True)
@@ -139,7 +135,9 @@ else:
         | 위험물 제4류 | 6m 이상 |
         """)
         st.markdown('<div class="section-title">부록</div>', unsafe_allow_html=True)
-        if st.button("➡️ 방화상 유효한 담 (부록 4.1)", use_container_width=True):
+        # ✅ key 부여
+        if st.button("➡️ 방화상 유효한 담 (부록 4.1)",
+                     use_container_width=True, key="btn-4.1"):
             go_page("4.1 소방청 질의회신 및 협의사항")
 
     elif current.startswith("1.2"):
@@ -154,7 +152,8 @@ else:
         | 500~1000리터 | 2m |
         """)
         st.markdown('<div class="section-title">부록</div>', unsafe_allow_html=True)
-        if st.button("➡️ 검사관련 규격 참고 (부록 4.2)", use_container_width=True):
+        if st.button("➡️ 검사관련 규격 참고 (부록 4.2)",
+                     use_container_width=True, key="btn-4.2"):
             go_page("4.2 검사관련 규격 및 기술지침")
 
     elif current.startswith("4.1"):
@@ -163,7 +162,7 @@ else:
 
     # (다른 항목도 동일한 방식으로 show_image('한글파일명') 호출)
 
-    # 목차로 돌아가기
+    # ✅ 목차로 돌아가기
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
-    if st.button("🏠 목차로 돌아가기", use_container_width=True):
+    if st.button("🏠 목차로 돌아가기", use_container_width=True, key="btn-home"):
         go_home()
