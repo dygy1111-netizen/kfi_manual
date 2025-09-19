@@ -254,22 +254,23 @@ elif st.session_state.page == "목차":
 
 
 # ---------- 본문 ---------- #
-# ✅ 자동 이미지 출력
-def show_image_auto(key):
-    safe_name = key.replace(" ", "_").replace("/", "_")
-    img_path = find_image(safe_name)
-    if img_path:
-        st.image(img_path, use_container_width=True, caption=key)
-
-# ---------- 본문 ---------- #
 else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
-    # 🔹 이미지 자동 출력 (항상 시도)
+    # ✅ 이미지 자동 출력 함수
+    def show_image_auto(key):
+        # 세부 목차 이름을 안전한 파일명으로 변환
+        safe_name = key.replace(" ", "_").replace("/", "_")
+        img_path = find_image(safe_name)
+        if img_path:
+            # 이미지가 있으면 자동 출력
+            st.image(img_path, use_container_width=True, caption=key)
+
+    # 🔹항상 이미지 시도 (파일이 없으면 그냥 넘어감)
     show_image_auto(current)
 
-    # ✅ 외부 콘텐츠 로딩
+    # ✅ 외부 콘텐츠 로딩 함수
     def load_content(key):
         safe_name = key.replace(" ", "_").replace("/", "_")
         path = Path(f"contents/{safe_name}.md")
@@ -278,20 +279,6 @@ else:
                 return f.read()
         return None
 
-    content = load_content(current)
-    if content:
-        st.markdown(content, unsafe_allow_html=True)
-    else:
-        st.warning("⚠️ 아직 준비된 내용이 없습니다.")
-
-    # ✅ 목차로 돌아가기 버튼
-    st.markdown('<div class="back-btn">', unsafe_allow_html=True)
-    st.button("🏠 목차로 돌아가기",
-              use_container_width=True,
-              key="btn-home",
-              on_click=go_home)
-
-
     # ✅ Markdown 파일 출력
     content = load_content(current)
     if content:
@@ -299,7 +286,7 @@ else:
     else:
         st.warning("⚠️ 아직 준비된 내용이 없습니다.")
 
-    # ✅ 목차로 돌아가기 버튼 유지
+    # ✅ 목차로 돌아가기 버튼
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     st.button("🏠 목차로 돌아가기",
               use_container_width=True,
