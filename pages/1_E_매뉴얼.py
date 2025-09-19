@@ -204,45 +204,44 @@ if st.session_state.page == "인트로":
 elif st.session_state.page == "목차":
     st.markdown("""
     <style>
-    /* 🔹전체 큰 박스 */
+    /* ✅ 전체 큰 박스 – 라이트 모드 고정 */
     div[data-testid="stVerticalBlock"] > div.big-card {
-        background-color: #f9fafb;      /* 아주 연한 회색 */
+        background-color: #ffffff !important;   /* 완전 흰색으로 고정 */
         border: 1px solid #e5e7eb;
         border-radius: 18px;
         padding: 2rem 2.5rem;
         margin: 0 auto 2rem auto;
         max-width: 850px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     }
     /* 대분류 제목 */
     .chapter-title {
         font-size: 1.25rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #111827 !important;             /* 아주 진한 다크그레이(거의 검정) */
         margin-top: 1.6rem;
         margin-bottom: 0.8rem;
         padding-bottom: 0.4rem;
         border-bottom: 1px solid #e5e7eb;
     }
-    /* ✅ 소분류 버튼 스타일 : 옅은 파란색 박스 */
+    /* ✅ 소분류 버튼 – 파스텔 블루 박스 */
     div[data-testid="stButton"] > button {
-        background-color: #e0f2fe !important;     /* 파스텔 블루 배경 */
-        color: #1e40af !important;               /* 짙은 블루 텍스트 */
-        border: 1px solid #bfdbfe !important;    /* 연한 파란색 테두리 */
+        background-color: #e0f2fe !important;   /* 밝은 파란 박스 */
+        color: #1e3a8a !important;             /* 짙은 네이비 글씨 */
+        border: 1px solid #bfdbfe !important;
         box-shadow: none !important;
         text-align: right !important;
         padding: 0.45rem 0.8rem !important;
         font-size: 1.05rem;
         font-weight: 500;
         border-radius: 10px !important;
-        margin-bottom: 0.4rem !important;        /* 버튼 간 간격 */
+        margin-bottom: 0.4rem !important;
         transition: all 0.15s ease;
     }
     div[data-testid="stButton"] > button:hover {
-        background-color: #dbeafe !important;    /* 호버 시 살짝 진해짐 */
-        color: #1e3a8a !important;
+        background-color: #dbeafe !important;  /* 호버 시 살짝 진한 블루 */
+        color: #1e40af !important;
     }
-
     /* 모바일 대응 */
     @media (max-width: 600px) {
         div[data-testid="stVerticalBlock"] > div.big-card {
@@ -250,7 +249,10 @@ elif st.session_state.page == "목차":
             max-width: 95%;
         }
         .chapter-title { font-size: 1.1rem; }
-        div[data-testid="stButton"] > button { font-size: 1rem; padding: 0.4rem 0.7rem !important; }
+        div[data-testid="stButton"] > button {
+            font-size: 1rem;
+            padding: 0.4rem 0.7rem !important;
+        }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -265,12 +267,13 @@ elif st.session_state.page == "목차":
             # 대분류
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
 
-            # 소분류 → 옅은 파란색 박스 버튼
+            # 소분류 버튼 (파스텔 블루 박스)
             for sub in subs:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
 
         st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
