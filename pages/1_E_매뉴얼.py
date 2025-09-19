@@ -252,7 +252,7 @@ elif st.session_state.page == "목차":
         st.markdown('</div>', unsafe_allow_html=True)
 
 
-# ---------- 본문 ---------- #
+
 # ---------- 본문 ---------- #
 else:
     current = st.session_state.page
@@ -274,8 +274,43 @@ else:
         return None
 
     # 이미지가 필요한 경우 (선택)
-    if current.startswith("1.1"):
-        show_image("안전거리", "안전거리")
+# ✅ 자동 이미지 출력
+def show_image_auto(key):
+    safe_name = key.replace(" ", "_").replace("/", "_")
+    img_path = find_image(safe_name)
+    if img_path:
+        st.image(img_path, use_container_width=True, caption=key)
+
+# ---------- 본문 ---------- #
+else:
+    current = st.session_state.page
+    st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
+
+    # 🔹 이미지 자동 출력 (항상 시도)
+    show_image_auto(current)
+
+    # ✅ 외부 콘텐츠 로딩
+    def load_content(key):
+        safe_name = key.replace(" ", "_").replace("/", "_")
+        path = Path(f"contents/{safe_name}.md")
+        if path.exists():
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
+        return None
+
+    content = load_content(current)
+    if content:
+        st.markdown(content, unsafe_allow_html=True)
+    else:
+        st.warning("⚠️ 아직 준비된 내용이 없습니다.")
+
+    # ✅ 목차로 돌아가기 버튼
+    st.markdown('<div class="back-btn">', unsafe_allow_html=True)
+    st.button("🏠 목차로 돌아가기",
+              use_container_width=True,
+              key="btn-home",
+              on_click=go_home)
+
 
     # ✅ Markdown 파일 출력
     content = load_content(current)
