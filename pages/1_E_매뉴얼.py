@@ -1,28 +1,9 @@
 import streamlit as st
 import os, glob
 from pathlib import Path
-from streamlit_javascript import st_javascript   # ✅ 추가
 
 # ✅ 페이지 설정
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
-
-# ✅ 브라우저 실제 너비 가져오기 (PC/모바일 구분용)
-if "browser_width" not in st.session_state:
-    st.session_state.browser_width = st_javascript("window.innerWidth")
-
-# ---------- 공통 CSS ---------- #
-st.markdown("""
-<style>
-html, body, [class*="css"] {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #ffffff;
-    line-height: 1.7;
-}
-...
-</style>
-""", unsafe_allow_html=True)
-
-# ▼ 이후 기존 코드 계속 ▼
 
 # ---------- 공통 CSS ---------- #
 st.markdown("""
