@@ -1,9 +1,28 @@
 import streamlit as st
 import os, glob
 from pathlib import Path
+from streamlit_javascript import st_javascript   # ✅ 추가
 
 # ✅ 페이지 설정
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="wide")
+
+# ✅ 브라우저 실제 너비 가져오기 (PC/모바일 구분용)
+if "browser_width" not in st.session_state:
+    st.session_state.browser_width = st_javascript("window.innerWidth")
+
+# ---------- 공통 CSS ---------- #
+st.markdown("""
+<style>
+html, body, [class*="css"] {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #ffffff;
+    line-height: 1.7;
+}
+...
+</style>
+""", unsafe_allow_html=True)
+
+# ▼ 이후 기존 코드 계속 ▼
 
 # ---------- 공통 CSS ---------- #
 st.markdown("""
@@ -272,13 +291,17 @@ else:
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
     # ✅ 이미지 자동 출력 함수
-    def show_image_auto(key):
-        # 세부 목차 이름을 안전한 파일명으로 변환
-        safe_name = key.replace(" ", "_").replace("/", "_")
-        img_path = find_image(safe_name)
-        if img_path:
-            # 이미지가 있으면 자동 출력
+def show_image_auto(key):
+    safe_name = key.replace(" ", "_").replace("/", "_")
+    img_path = find_image(safe_name)
+    if img_path:
+        if st.session_state.browser_width and st.session_state.browser_width < 768:
+            # ✅ 모바일 → 현재 코드 그대로 (화면에 맞춰 꽉 차게)
             st.image(img_path, use_container_width=True, caption=key)
+        else:
+            # ✅ PC → 최대 폭을 제한 (예: 750px)
+            st.image(img_path, width=750, caption=key)
+
 
     # 🔹항상 이미지 시도 (파일이 없으면 그냥 넘어감)
     show_image_auto(current)
