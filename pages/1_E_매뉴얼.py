@@ -153,8 +153,8 @@ def toggle_favorite(item):
     save_user_data()
 
 # ======================= 사이드바 ======================= #
-st.sidebar.subheader("🔍 검색")
-st.session_state.search = st.sidebar.text_input("항목 검색", value=st.session_state.search)
+#st.sidebar.subheader("🔍 검색")
+#st.session_state.search = st.sidebar.text_input("항목 검색", value=st.session_state.search)
 
 if st.session_state.favorites:
     st.sidebar.markdown("⭐ **즐겨찾기**")
