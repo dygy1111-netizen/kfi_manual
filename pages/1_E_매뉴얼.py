@@ -241,18 +241,18 @@ elif st.session_state.page == "목차":
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
+
 # 🔍 돋보기 아이콘만 있는 검색창
 st.session_state.search = st.text_input(
     "",
     value=st.session_state.search,
-    placeholder="🔍"  # 검색창 안에 돋보기 아이콘
+    placeholder="🔍"   # 검색창 안에 돋보기 아이콘
 )
 
 q = st.session_state.search.strip().lower()
 
-# --- 🔎 검색 결과 메뉴 (전체 메뉴는 그대로 유지) ---
+# --- 🔎 검색 결과 블록 ---
 if q:
-    # 검색 필터링
     search_results = {}
     for main, subs in sections.items():
         if q in main.lower():
@@ -263,7 +263,10 @@ if q:
                 search_results[main] = hits
 
     if search_results:
-        st.markdown("<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>", unsafe_allow_html=True)
+        st.markdown(
+            "<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>",
+            unsafe_allow_html=True
+        )
         with st.container():
             st.markdown('<div class="big-card">', unsafe_allow_html=True)
             for main, subs in search_results.items():
@@ -272,16 +275,17 @@ if q:
                     st.button(sub, key=f"search-{sub}", use_container_width=True,
                               on_click=go_page, args=(sub,))
             st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        st.info("검색 결과가 없습니다.")
-    with st.container():
-        st.markdown('<div class="big-card">', unsafe_allow_html=True)
-        for main, subs in filtered.items():
-            st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
-            for sub in subs:
-                st.button(sub, key=f"menu-{sub}", use_container_width=True,
-                          on_click=go_page, args=(sub,))
-        st.markdown("</div>", unsafe_allow_html=True)
+
+# --- 📚 전체 메뉴(항상 표시) ---
+st.markdown("<br><div style='font-weight:700; color:#1f2937;'>📚 전체 목차</div>", unsafe_allow_html=True)
+with st.container():
+    st.markdown('<div class="big-card">', unsafe_allow_html=True)
+    for main, subs in sections.items():   # ✅ sections 원본 그대로
+        st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+        for sub in subs:
+            st.button(sub, key=f"menu-{sub}", use_container_width=True,
+                      on_click=go_page, args=(sub,))
+    st.markdown("</div>", unsafe_allow_html=True)
 
 else:
     current = st.session_state.page
