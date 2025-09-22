@@ -235,68 +235,10 @@ else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
-    # ===== PDF 데이터 생성 =====
-    pdf_buffer = BytesIO()
-    c = canvas.Canvas(pdf_buffer, pagesize=A4)
-    width, height = A4
-
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(50, height - 50, current)
-
-    content_text = load_content(current) or "내용이 없습니다."
-    c.setFont("Helvetica", 11)
-    y = height - 80
-    for line in content_text.split("\n"):
-        for chunk in [line[i:i+90] for i in range(0, len(line), 90)]:
-            c.drawString(50, y, chunk)
-            y -= 15
-            if y < 50:
-                c.showPage()
-                c.setFont("Helvetica", 11)
-                y = height - 50
-    c.save()
-
-    # ===== 모바일에서도 한 줄 정렬 =====
-    st.markdown(
-        """
-        <style>
-        .button-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            flex-wrap: nowrap;
-            margin-bottom: 12px;
-        }
-        .button-row > div {
-            flex: 1;
-        }
-        @media (max-width: 480px) {
-            .button-row {
-                gap: 6px;
-            }
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # ⭐ 즐겨찾기 + 📄 PDF 다운로드 버튼을 한 줄에 표시
-    st.markdown('<div class="button-row">', unsafe_allow_html=True)
-
-    # 👉 즐겨찾기 버튼
+    # ⭐ 즐겨찾기 토글
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # 👉 PDF 다운로드 버튼
-    st.download_button(
-        label="📄 PDF 다운로드",
-        data=pdf_buffer.getvalue(),
-        file_name=f"{current}.pdf",
-        mime="application/pdf",
-        key="pdf-download"
-    )
-
-    st.markdown("</div>", unsafe_allow_html=True)
     # ✅ 이미지 여러 장 + 설명 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
