@@ -258,12 +258,6 @@ elif st.session_state.page == "목차":
         for main, subs in sections.items():
             st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
             for sub in subs:
-                if isinstance(sub, dict):  # 하위목차가 있는 경우(예: 1.4)
-                with st.expander(sub["title"]):
-                    for s in sub["subs"]:
-                        st.button(s, key=f"menu-{s}", use_container_width=True,
-                                  on_click=go_page, args=(s,))
-            else:
                 st.button(sub, key=f"menu-{sub}", use_container_width=True,
                           on_click=go_page, args=(sub,))
         st.markdown("</div>", unsafe_allow_html=True)
