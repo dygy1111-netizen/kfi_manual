@@ -72,7 +72,7 @@ sections = {
 # ======================= 유틸 함수 ======================= #
 def find_images(name):
     """
-    name으로 시작하는 이미지 파일들을 찾아 (경로, 설명) 튜플 리스트로 반환
+    name으로 시작하는 이미지들을 (경로, 설명) 튜플 리스트로 반환
     예: images/1.1_안전거리_탑뷰.jpg  →  ('images/1.1_안전거리_탑뷰.jpg', '탑뷰')
     """
     exts = ['jpg', 'jpeg', 'png']
@@ -80,10 +80,10 @@ def find_images(name):
     for e in exts:
         for path in sorted(glob.glob(f"images/{name}_*.{e}")):
             base = os.path.splitext(os.path.basename(path))[0]
-            # name_ 이후의 부분을 설명으로 추출
-            desc = base[len(name) + 1 :]  # name + '_' 이후 텍스트
+            desc = base[len(name) + 1 :]  # name_ 이후 텍스트가 설명
             results.append((path, desc))
     return results
+
 
 
 def load_content(key):
