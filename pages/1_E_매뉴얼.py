@@ -71,18 +71,14 @@ sections = {
 
 # ======================= 유틸 함수 ======================= #
 def find_images(name):
-    """
-    name으로 시작하는 이미지들을 (경로, 설명) 튜플 리스트로 반환
-    예: images/1.1_안전거리_탑뷰.jpg → ('images/1.1_안전거리_탑뷰.jpg', '탑뷰')
-    """
+    """이름으로 시작하는 이미지들을 (경로, 설명) 튜플 리스트로 반환"""
     exts = ['jpg', 'jpeg', 'png']
     results = []
     for e in exts:
         for path in sorted(glob.glob(f"images/{name}*.{e}")):
             base = os.path.splitext(os.path.basename(path))[0]
-            # 설명 추출 (name_이후 텍스트가 있으면 설명으로 사용)
             desc = ""
-            if base.startswith(name + "_"):
+            if base.startswith(name + "_"):  # name_ 이후 텍스트가 설명
                 desc = base[len(name) + 1 :]
             results.append((path, desc))
     return results
@@ -94,16 +90,6 @@ def load_content(key):
         with open(p, "r", encoding="utf-8") as f:
             return f.read()
     return None
-
-def load_all_users():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-def save_all_users(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
 
 # ======================= 세션 상태 초기화 ======================= #
 if "page" not in st.session_state: st.session_state.page = "목차"
@@ -153,9 +139,6 @@ def toggle_favorite(item):
     save_user_data()
 
 # ======================= 사이드바 ======================= #
-#st.sidebar.subheader("🔍 검색")
-#st.session_state.search = st.sidebar.text_input("항목 검색", value=st.session_state.search)
-
 if st.session_state.favorites:
     st.sidebar.markdown("⭐ **즐겨찾기**")
     for i,f in enumerate(st.session_state.favorites):
@@ -192,100 +175,47 @@ if st.session_state.page == "인트로":
     if st.button("📘 매뉴얼 바로가기", use_container_width=True): go_home()
 
 elif st.session_state.page == "목차":
-    # 🔍 검색 필터
+    # 🔍 메인 검색창
+    st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
+    st.session_state.search = st.text_input(
+        "", value=st.session_state.search, placeholder="🔍"
+    )
     q = st.session_state.search.strip().lower()
+
+    # --- 🔎 검색 결과 블록 ---
     if q:
-        filtered = {}
+        search_results = {}
         for main, subs in sections.items():
             if q in main.lower():
-                filtered[main] = subs
+                search_results[main] = subs
             else:
                 hits = [s for s in subs if q in s.lower()]
-                if hits: filtered[main] = hits
-    else:
-        filtered = sections
+                if hits: search_results[main] = hits
 
-    st.markdown("""
-    <style>
-    div[data-testid="stVerticalBlock"] > div.big-card {
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 18px;
-        padding: 2rem 2.5rem;
-        margin: 0 auto 2rem auto;
-        max-width: 850px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    }
-    .chapter-title {
-        font-size: 1.25rem; font-weight: 700; color: #1f2937;
-        margin-top: 1.6rem; margin-bottom: 0.8rem;
-        padding-bottom: 0.4rem; border-bottom: 1px solid #e5e7eb;
-    }
-    div[data-testid="stButton"] > button {
-        background-color: #e0f2fe !important;
-        color: #1e40af !important;
-        border: 1px solid #bfdbfe !important;
-        box-shadow: none !important;
-        text-align: right !important;
-        padding: 0.45rem 0.8rem !important;
-        font-size: 1.05rem; font-weight: 500;
-        border-radius: 10px !important;
-        margin-bottom: 0.4rem !important;
-        transition: all 0.15s ease;
-    }
-    div[data-testid="stButton"] > button:hover {
-        background-color: #dbeafe !important;
-        color: #1e3a8a !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+        if search_results:
+            st.markdown(
+                "<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>",
+                unsafe_allow_html=True
+            )
+            with st.container():
+                st.markdown('<div class="big-card">', unsafe_allow_html=True)
+                for main, subs in search_results.items():
+                    st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+                    for sub in subs:
+                        st.button(sub, key=f"search-{sub}", use_container_width=True,
+                                  on_click=go_page, args=(sub,))
+                st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
-
-# 🔍 돋보기 아이콘만 있는 검색창
-st.session_state.search = st.text_input(
-    "",
-    value=st.session_state.search,
-    placeholder="🔍"   # 검색창 안에 돋보기 아이콘
-)
-
-q = st.session_state.search.strip().lower()
-
-# --- 🔎 검색 결과 블록 ---
-if q:
-    search_results = {}
-    for main, subs in sections.items():
-        if q in main.lower():
-            search_results[main] = subs
-        else:
-            hits = [s for s in subs if q in s.lower()]
-            if hits:
-                search_results[main] = hits
-
-    if search_results:
-        st.markdown(
-            "<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>",
-            unsafe_allow_html=True
-        )
-        with st.container():
-            st.markdown('<div class="big-card">', unsafe_allow_html=True)
-            for main, subs in search_results.items():
-                st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
-                for sub in subs:
-                    st.button(sub, key=f"search-{sub}", use_container_width=True,
-                              on_click=go_page, args=(sub,))
-            st.markdown("</div>", unsafe_allow_html=True)
-
-# --- 📚 전체 메뉴(항상 표시) ---
-st.markdown("<br><div style='font-weight:700; color:#1f2937;'>📚 전체 목차</div>", unsafe_allow_html=True)
-with st.container():
-    st.markdown('<div class="big-card">', unsafe_allow_html=True)
-    for main, subs in sections.items():   # ✅ sections 원본 그대로
-        st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
-        for sub in subs:
-            st.button(sub, key=f"menu-{sub}", use_container_width=True,
-                      on_click=go_page, args=(sub,))
-    st.markdown("</div>", unsafe_allow_html=True)
+    # --- 📚 전체 메뉴 블록 (항상 표시) ---
+    st.markdown("<br><div style='font-weight:700; color:#1f2937;'>📚 전체 목차</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown('<div class="big-card">', unsafe_allow_html=True)
+        for main, subs in sections.items():
+            st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
+            for sub in subs:
+                st.button(sub, key=f"menu-{sub}", use_container_width=True,
+                          on_click=go_page, args=(sub,))
+        st.markdown("</div>", unsafe_allow_html=True)
 
 else:
     current = st.session_state.page
