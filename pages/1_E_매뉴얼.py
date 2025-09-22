@@ -235,22 +235,19 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # ✅ 이미지 여러 장 + 설명 출력 (클릭 시 새 탭에서 확대/이동/축소 가능)
+    # ✅ 이미지 여러 장 + 설명 출력 (st.image + 새 탭 원본 링크)
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
 
     for img_path, desc in img_files:
         caption = f"{current} ({desc})" if desc else current
-        # HTML <a> 로 원본 이미지를 새 탭에서 열기
+
+        # 1️⃣ 페이지 내 미리보기(썸네일)
+        st.image(img_path, use_container_width=True, caption=caption)
+
+        # 2️⃣ 새 탭에서 원본 보기 링크
         st.markdown(
-            f"""
-            <div style="text-align:center; margin-bottom:20px;">
-                <a href="{img_path}" target="_blank">
-                    <img src="{img_path}" style="max-width:400px; cursor: zoom-in;">
-                </a>
-                <div style="font-size:0.9rem; color:#555;">{caption}</div>
-            </div>
-            """,
+            f"[🔎 원본 크게 보기]({img_path})",
             unsafe_allow_html=True
         )
 
