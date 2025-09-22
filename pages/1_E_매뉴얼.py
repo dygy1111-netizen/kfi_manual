@@ -235,28 +235,20 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # ✅ 이미지 여러 장 + 설명 출력 (페이지 내 클릭 확대/축소)
-    safe_name = current.replace(" ", "_").replace("/", "_")
-    img_files = find_images(safe_name)
+from pathlib import Path
 
-    # 🔹 클릭 시 확대/축소를 위한 CSS (반복문 밖에 1번만 선언)
-    st.markdown("""
-    <style>
-    /* Streamlit이 렌더링하는 이미지에 클릭 확대 효과 적용 */
-    .stImage img {
-        transition: transform 0.3s;
-        cursor: zoom-in;
-    }
-    .stImage img:active {
-        transform: scale(2.0);   /* 클릭 시 2배 확대 */
-        cursor: zoom-out;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+for img_path, desc in img_files:
+    caption = f"{current} ({desc})" if desc else current
+    # 썸네일
+    st.image(img_path, use_container_width=True, caption=caption)
 
-    for img_path, desc in img_files:
-        caption = f"{current} ({desc})" if desc else current
-        st.image(img_path, use_container_width=True, caption=caption)
+    # 다운로드 버튼
+    with open(img_path, "rb") as f:
+        st.download_button(
+            label="🔎 원본 파일 다운로드",
+            data=f,
+            file_name=Path(img_path).name
+        )
 
 
     content = load_content(current)
