@@ -241,6 +241,12 @@ elif st.session_state.page == "목차":
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
+    # 🔍 본문 검색 입력 (사이드바 대신)
+    st.session_state.search = st.text_input(
+    "항목 검색",                     # 입력창 라벨
+    value=st.session_state.search,   # 기존 검색 유지
+    placeholder="검색어를 입력하세요"
+)
     with st.container():
         st.markdown('<div class="big-card">', unsafe_allow_html=True)
         for main, subs in filtered.items():
