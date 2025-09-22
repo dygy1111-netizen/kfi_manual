@@ -19,6 +19,14 @@ def save_all_users(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
+
+appendix_list = [
+    {"title": "방화상 유효한 벽 안전거리 단축", "key": "부록 방화상 유효한 벽 안전거리 단축"},
+    {"title": "특례 방유제 검토", "key": "부록 특례 방유제 검토"},
+    {"title": "기타 사례", "key": "부록 기타 사례"}
+]
+
+
 # ======================= CSS ======================= #
 st.markdown("""
 <style>
@@ -236,6 +244,11 @@ else:
     content = load_content(current)
     if content:
         st.markdown(content, unsafe_allow_html=True)
+        # ✅ 부록 목록 버튼 추가
+        if current == "4. 부록":       # '부록 메인 페이지'에서만 표시
+           st.markdown("### 📑 부록 목록")
+           for app in appendix_list:
+               st.button(app["title"], on_click=go_page, args=(app["key"],))
     else:
         st.warning("⚠️ 아직 준비된 내용이 없습니다.")
 
