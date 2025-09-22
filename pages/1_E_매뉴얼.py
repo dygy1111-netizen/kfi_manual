@@ -235,20 +235,24 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-from pathlib import Path
+    # ✅ 이미지 여러 장 + 설명 출력 + 원본 다운로드 버튼
+    from pathlib import Path
 
-for img_path, desc in img_files:
-    caption = f"{current} ({desc})" if desc else current
-    # 썸네일
-    st.image(img_path, use_container_width=True, caption=caption)
+    safe_name = current.replace(" ", "_").replace("/", "_")
+    img_files = find_images(safe_name)
 
-    # 다운로드 버튼
-    with open(img_path, "rb") as f:
-        st.download_button(
-            label="🔎 원본 파일 다운로드",
-            data=f,
-            file_name=Path(img_path).name
-        )
+    for img_path, desc in img_files:
+        caption = f"{current} ({desc})" if desc else current
+        # 1️⃣ 페이지 내 미리보기
+        st.image(img_path, use_container_width=True, caption=caption)
+
+        # 2️⃣ 원본 파일 다운로드 버튼
+        with open(img_path, "rb") as f:
+            st.download_button(
+                label="🔎 원본 파일 다운로드",
+                data=f,
+                file_name=Path(img_path).name
+            )
 
 
     content = load_content(current)
