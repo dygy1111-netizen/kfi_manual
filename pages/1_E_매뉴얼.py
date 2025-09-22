@@ -26,8 +26,8 @@ def save_all_users(data):
 
 appendix_list = [
     {
-      "title": "방화상 유효한 벽을 설치한 경우 안전거리 단축",
-      "key": "방화상 유효한 벽을 설치한 경우 안전거리 단축"
+      "title": "물분무설비 설치기준",
+      "key": "물분무설비 설치기준"
     }
 ]
 
