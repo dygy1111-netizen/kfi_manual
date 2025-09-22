@@ -73,35 +73,37 @@ sections = {
 def find_images(name):
     """
     name으로 시작하는 이미지들을 (경로, 설명) 튜플 리스트로 반환
-    예: images/1.1_안전거리_탑뷰.jpg  →  ('images/1.1_안전거리_탑뷰.jpg', '탑뷰')
+    예: images/1.1_안전거리_탑뷰.jpg → ('images/1.1_안전거리_탑뷰.jpg', '탑뷰')
     """
     exts = ['jpg', 'jpeg', 'png']
     results = []
     for e in exts:
-        for path in sorted(glob.glob(f"images/{name}_*.{e}")):
+        for path in sorted(glob.glob(f"images/{name}*.{e}")):
             base = os.path.splitext(os.path.basename(path))[0]
-            desc = base[len(name) + 1 :]  # name_ 이후 텍스트가 설명
+            # 설명 추출 (name_이후 텍스트가 있으면 설명으로 사용)
+            desc = ""
+            if base.startswith(name + "_"):
+                desc = base[len(name) + 1 :]
             results.append((path, desc))
     return results
-
-
 
 def load_content(key):
     safe = key.replace(" ", "_").replace("/", "_")
     p = Path(f"contents/{safe}.md")
     if p.exists():
-        with open(p, "r", encoding="utf-8") as f: return f.read()
+        with open(p, "r", encoding="utf-8") as f:
+            return f.read()
     return None
 
-# 이미지 여러 장을 찾는 함수
-def find_images(name):
-    exts = ['jpg','jpeg','png']
-    files = []
-    for e in exts:
-        files.extend(sorted(glob.glob(f"images/{name}*.{e}")))
-    return files
+def load_all_users():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
 
-
+def save_all_users(data):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
 # ======================= 세션 상태 초기화 ======================= #
 if "page" not in st.session_state: st.session_state.page = "목차"
@@ -118,8 +120,6 @@ if user_id:
     if user_id not in all_users:
         all_users[user_id] = {"favorites": [], "history": []}
         save_all_users(all_users)
-
-    # 사용자 데이터 로드
     if not st.session_state.favorites and not st.session_state.history:
         st.session_state.favorites = set(all_users[user_id]["favorites"])
         st.session_state.history = all_users[user_id]["history"]
@@ -258,11 +258,11 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # 이미지 여러 개 출력
+    # ✅ 이미지 여러 장 + 설명 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
-
     for img_path, desc in img_files:
+        caption = f"{current} ({desc})" if desc else current
         st.image(img_path, use_container_width=True, caption=caption)
 
     # 본문
