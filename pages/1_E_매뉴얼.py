@@ -82,24 +82,6 @@ def find_image(name):
             return g[0]
     return None
 
-import base64
-from pathlib import Path
-
-def img_to_base64(path):
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
-
-img_data = img_to_base64("images/1.1_안전거리.jpg")
-md_content = f"""
-### 목적
-내용...
-
-<img src="data:image/jpeg;base64,{img_data}" style="width:90%; max-width:800px; margin:15px 0;">
-
-### 기준
-표...
-"""
-st.markdown(md_content, unsafe_allow_html=True)
 
 
 def load_content(key):
@@ -108,6 +90,19 @@ def load_content(key):
     if p.exists():
         with open(p, "r", encoding="utf-8") as f: return f.read()
     return None
+
+import base64
+
+def image_to_base64(image_path: str) -> str:
+    """
+    지정한 이미지 파일을 base64 문자열로 변환해 반환합니다.
+    PNG / JPG / JPEG 모두 지원.
+    """
+    if not os.path.exists(image_path):
+        return ""
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
 
 # ======================= 세션 상태 초기화 ======================= #
 if "page" not in st.session_state: st.session_state.page = "목차"
