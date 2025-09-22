@@ -82,6 +82,25 @@ def find_image(name):
             return g[0]
     return None
 
+import base64
+from pathlib import Path
+
+def img_to_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+img_data = img_to_base64("images/1.1_안전거리.jpg")
+md_content = f"""
+### 목적
+내용...
+
+<img src="data:image/jpeg;base64,{img_data}" style="width:90%; max-width:800px; margin:15px 0;">
+
+### 기준
+표...
+"""
+st.markdown(md_content, unsafe_allow_html=True)
+
 
 def load_content(key):
     safe = key.replace(" ", "_").replace("/", "_")
