@@ -71,13 +71,17 @@ sections = {
 
 # ======================= 유틸 함수 ======================= #
 def find_image(name):
-    for e in ['jpg','jpeg','png']:
-        p = f"images/{name}.{e}"
-        if os.path.exists(p): return p
-    for e in ['jpg','jpeg','png']:
+    exts = ['jpg','jpeg','png']
+    for e in exts:
+        path = f"images/{name}.{e}"
+        if os.path.exists(path):
+            return path
+    for e in exts:
         g = glob.glob(f"images/{name}*.{e}")
-        if g: return g[0]
+        if g:
+            return g[0]
     return None
+
 
 def load_content(key):
     safe = key.replace(" ", "_").replace("/", "_")
