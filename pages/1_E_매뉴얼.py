@@ -91,17 +91,14 @@ def load_content(key):
         with open(p, "r", encoding="utf-8") as f: return f.read()
     return None
 
-import base64
+# 이미지 여러 장을 찾는 함수
+def find_images(name):
+    exts = ['jpg','jpeg','png']
+    files = []
+    for e in exts:
+        files.extend(sorted(glob.glob(f"images/{name}*.{e}")))
+    return files
 
-def image_to_base64(image_path: str) -> str:
-    """
-    지정한 이미지 파일을 base64 문자열로 변환해 반환합니다.
-    PNG / JPG / JPEG 모두 지원.
-    """
-    if not os.path.exists(image_path):
-        return ""
-    with open(image_path, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode()
 
 
 # ======================= 세션 상태 초기화 ======================= #
@@ -264,6 +261,7 @@ else:
     img_files = find_images(safe_name)
     for i, img in enumerate(img_files):
         st.image(img, use_container_width=True, caption=f"{current} ({i+1})")
+
 
 
     # 본문
