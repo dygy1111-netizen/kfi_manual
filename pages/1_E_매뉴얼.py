@@ -71,12 +71,18 @@ sections = {
 
 # ======================= 유틸 함수 ======================= #
 def find_images(name):
-    """images/ 폴더에서 name으로 시작하는 모든 이미지 파일 경로를 리스트로 반환"""
-    exts = ['jpg', 'jpeg', 'png']
+    """images/ 폴더에서 name으로 시작하는 모든 이미지 파일과 캡션 추출"""
+    exts = ['jpg','jpeg','png']
     results = []
     for e in exts:
-        results.extend(sorted(glob.glob(f"images/{name}*.{e}")))
+        for path in sorted(glob.glob(f"images/{name}_*.{e}")):   # ← _설명 붙은 파일
+            # 설명 추출 : name_ 뒤에 오는 부분을 확장자 제거 후 사용
+            base = os.path.splitext(os.path.basename(path))[0]
+            # name_ 뒤 텍스트를 설명으로
+            desc = base.replace(name + "_", "")
+            results.append((path, desc))
     return results
+
 
 
 
@@ -256,8 +262,12 @@ else:
     # 이미지 여러 개 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
-    for i, img in enumerate(img_files):
-        st.image(img, use_container_width=True, caption=f"{current} ({i+1})")
+
+for img_path, desc in img_files:
+    # 설명(desc)이 없으면 current만 표시
+    caption = f"{current} ({desc})" if desc else current
+    st.image(img_path, use_container_width=True, caption=caption)
+
 
 
 
