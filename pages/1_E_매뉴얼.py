@@ -235,25 +235,42 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # ✅ 이미지 여러 장 + 설명 출력
-# ✅ 이미지 여러 장 + 확대 기능
-safe_name = current.replace(" ", "_").replace("/", "_")
-img_files = find_images(safe_name)
+    # ✅ 이미지 여러 장 + 설명 출력 (페이지 내 확대 기능 추가)
+    safe_name = current.replace(" ", "_").replace("/", "_")
+    img_files = find_images(safe_name)
 
-# CSS 한 번만 선언 (반복문 밖)
-st.markdown("""
-<style>
-.zoom-img {transition: transform 0.3s;}
-.zoom-img:hover {transform: scale(1.8);}
-</style>
-""", unsafe_allow_html=True)
+    # 🔹 확대 효과를 위한 CSS (반복문 밖에 1번만 선언)
+    st.markdown("""
+    <style>
+    .zoom-img {
+        transition: transform 0.3s;
+        cursor: zoom-in;
+        margin-bottom: 10px;
+    }
+    .zoom-img:hover {
+        transform: scale(1.8);
+        z-index: 999;
+    }
+    .zoom-caption {
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-for img_path, desc in img_files:
-    caption = f"{current} ({desc})" if desc else current
-    st.markdown(
-        f'<img src="{img_path}" class="zoom-img" width="400"><br><em>{caption}</em>',
-        unsafe_allow_html=True
-    )
+    for img_path, desc in img_files:
+        caption = f"{current} ({desc})" if desc else current
+        st.markdown(
+            f"""
+            <div style="text-align:center;">
+                <img src="{img_path}" class="zoom-img" width="400">
+                <div class="zoom-caption">{caption}</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
 
     content = load_content(current)
     if content:
