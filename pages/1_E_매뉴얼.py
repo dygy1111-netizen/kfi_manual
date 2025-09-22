@@ -1,6 +1,10 @@
 import streamlit as st
 import os, glob, json
 from pathlib import Path
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+
 
 # ======================= 기본 설정 ======================= #
 st.set_page_config(page_title="위험물탱크 E-매뉴얼",
@@ -231,9 +235,43 @@ else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
-    # ⭐ 즐겨찾기 토글
-    fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
-    st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
+    # ⭐ 즐겨찾기 토글 + 📄 PDF 다운로드
+    col1, col2 = st.columns([1,1])
+    with col1:
+        fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
+        st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
+    with col2:
+        # PDF 다운로드 버튼
+        if st.button("📄 PDF 다운로드"):
+            # PDF 생성
+            pdf_buffer = BytesIO()
+            c = canvas.Canvas(pdf_buffer, pagesize=A4)
+            width, height = A4
+
+            # 제목
+            c.setFont("Helvetica-Bold", 14)
+            c.drawString(50, height-50, current)
+
+            # 본문 내용
+            content_text = load_content(current) or "내용이 없습니다."
+            c.setFont("Helvetica", 11)
+            # 긴 텍스트 줄바꿈 처리
+            y = height - 80
+            for line in content_text.split("\n"):
+                for chunk in [line[i:i+90] for i in range(0, len(line), 90)]:
+                    c.drawString(50, y, chunk)
+                    y -= 15
+                    if y < 50:  # 다음 페이지
+                        c.showPage()
+                        c.setFont("Helvetica", 11)
+                        y = height - 50
+            c.save()
+            st.download_button(
+                label="⬇️ PDF 저장하기",
+                data=pdf_buffer.getvalue(),
+                file_name=f"{current}.pdf",
+                mime="application/pdf"
+            )
 
     # ✅ 이미지 여러 장 + 설명 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
