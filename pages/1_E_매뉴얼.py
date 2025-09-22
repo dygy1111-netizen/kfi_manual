@@ -7,6 +7,15 @@ st.set_page_config(page_title="위험물탱크 E-매뉴얼",
                    page_icon="📘",
                    layout="centered")
 
+# 🔹 모바일 손가락 확대/축소 허용
+st.markdown(
+    """
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    """,
+    unsafe_allow_html=True
+)
+
 DATA_FILE = "user_data.json"   # 사용자별 데이터 저장 파일
 
 def load_all_users():
@@ -235,25 +244,12 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # ✅ 이미지 여러 장 + 설명 출력 + 원본 다운로드 버튼
-    from pathlib import Path
-
+    # ✅ 이미지 여러 장 + 설명 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
-
     for img_path, desc in img_files:
         caption = f"{current} ({desc})" if desc else current
-        # 1️⃣ 페이지 내 미리보기
         st.image(img_path, use_container_width=True, caption=caption)
-
-        # 2️⃣ 원본 파일 다운로드 버튼
-        with open(img_path, "rb") as f:
-            st.download_button(
-                label="🔎 원본 파일 다운로드",
-                data=f,
-                file_name=Path(img_path).name
-            )
-
 
     content = load_content(current)
     if content:
