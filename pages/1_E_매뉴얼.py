@@ -235,28 +235,24 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # ✅ 이미지 여러 장 + 설명 출력 (페이지 내 확대 기능 추가)
+    # ✅ 이미지 여러 장 + 설명 출력 (클릭 시 새 탭에서 확대/이동/축소 가능)
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
 
-    # 🔹 확대 효과를 위한 CSS (반복문 밖에 1번만 선언)
-    st.markdown("""
-    <style>
-    .stImage img {
-        transition: transform 0.3s;
-        cursor: zoom-in;
-    }
-    .stImage img:hover {
-        transform: scale(1.8);
-        z-index: 999;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
     for img_path, desc in img_files:
         caption = f"{current} ({desc})" if desc else current
-        # 기존 st.image 그대로 사용 → 경로 문제 없음
-        st.image(img_path, use_container_width=True, caption=caption)
+        # HTML <a> 로 원본 이미지를 새 탭에서 열기
+        st.markdown(
+            f"""
+            <div style="text-align:center; margin-bottom:20px;">
+                <a href="{img_path}" target="_blank">
+                    <img src="{img_path}" style="max-width:400px; cursor: zoom-in;">
+                </a>
+                <div style="font-size:0.9rem; color:#555;">{caption}</div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 
     content = load_content(current)
