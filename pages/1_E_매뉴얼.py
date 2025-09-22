@@ -263,7 +263,6 @@ else:
     img_files = find_images(safe_name)
 
     for img_path, desc in img_files:
-        caption = f"{current} ({desc})" if desc else current
         st.image(img_path, use_container_width=True, caption=caption)
 
     # 본문
