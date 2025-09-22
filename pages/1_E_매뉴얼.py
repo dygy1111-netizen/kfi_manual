@@ -7,15 +7,6 @@ st.set_page_config(page_title="위험물탱크 E-매뉴얼",
                    page_icon="📘",
                    layout="centered")
 
-# 🔹 모바일 손가락 확대/축소 허용
-st.markdown(
-    """
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    """,
-    unsafe_allow_html=True
-)
-
 DATA_FILE = "user_data.json"   # 사용자별 데이터 저장 파일
 
 def load_all_users():
@@ -244,12 +235,18 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # ✅ 이미지 여러 장 + 설명 출력
+    # ✅ 이미지 여러 장 + 확대 슬라이더 기능
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
+
+    # 🔹 확대 비율 조절 슬라이더 (기본 1.0배, 최대 3배)
+    zoom = st.slider("이미지 확대 비율", 0.5, 3.0, 1.0, 0.1)
+
     for img_path, desc in img_files:
         caption = f"{current} ({desc})" if desc else current
-        st.image(img_path, use_container_width=True, caption=caption)
+        # 슬라이더 값으로 width 조절 (기본 기준폭 400px)
+        st.image(img_path, width=int(400 * zoom), caption=caption)
+
 
     content = load_content(current)
     if content:
