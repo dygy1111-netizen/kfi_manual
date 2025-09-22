@@ -70,17 +70,14 @@ sections = {
 }
 
 # ======================= 유틸 함수 ======================= #
-def find_image(name):
-    exts = ['jpg','jpeg','png']
+def find_images(name):
+    """images/ 폴더에서 name으로 시작하는 모든 이미지 파일 경로를 리스트로 반환"""
+    exts = ['jpg', 'jpeg', 'png']
+    results = []
     for e in exts:
-        path = f"images/{name}.{e}"
-        if os.path.exists(path):
-            return path
-    for e in exts:
-        g = glob.glob(f"images/{name}*.{e}")
-        if g:
-            return g[0]
-    return None
+        results.extend(sorted(glob.glob(f"images/{name}*.{e}")))
+    return results
+
 
 
 
