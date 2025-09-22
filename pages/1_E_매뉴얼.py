@@ -242,17 +242,21 @@ else:
         caption = f"{current} ({desc})" if desc else current
         st.image(img_path, use_container_width=True, caption=caption)
 
-    # 본문
     content = load_content(current)
     if content:
-        st.markdown(content, unsafe_allow_html=True)
-        # ✅ 부록 목록 버튼 추가
-        if current == "4. 부록":       # '부록 메인 페이지'에서만 표시
-           st.markdown("### 📑 부록 목록")
-           for app in appendix_list:
-               st.button(app["title"], on_click=go_page, args=(app["key"],))
-    else:
-        st.warning("⚠️ 아직 준비된 내용이 없습니다.")
+    # 부록 영역 분리
+       if "### 부록" in content:
+           main_part, appendix_part = content.split("### 부록", 1)
+           st.markdown(main_part, unsafe_allow_html=True)
+
+           st.markdown("### 부록")
+           # 부록 줄을 버튼으로 변환
+           for line in appendix_part.splitlines():
+               line = line.strip()
+               if line:  # 공백이 아니면
+                  st.button(line, on_click=go_page, args=(line,))
+       else:
+           st.markdown(content, unsafe_allow_html=True)
 
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     st.button("🏠 목차로 돌아가기", use_container_width=True,
