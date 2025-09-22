@@ -235,18 +235,12 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # ✅ 이미지 여러 장 + 확대 슬라이더 기능
+    # ✅ 이미지 여러 장 + 설명 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
-
-    # 🔹 확대 비율 조절 슬라이더 (기본 1.0배, 최대 3배)
-    zoom = st.slider("이미지 확대 비율", 0.5, 3.0, 1.0, 0.1)
-
     for img_path, desc in img_files:
         caption = f"{current} ({desc})" if desc else current
-        # 슬라이더 값으로 width 조절 (기본 기준폭 400px)
-        st.image(img_path, width=int(400 * zoom), caption=caption)
-
+        st.image(img_path, use_container_width=True, caption=caption)
 
     content = load_content(current)
     if content:
