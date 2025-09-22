@@ -23,7 +23,6 @@ def save_all_users(data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 # ======================= CSS ======================= #
-# ======================= CSS ======================= #
 st.markdown("""
 <style>
 html, body, [class*="css"] {
@@ -37,22 +36,13 @@ html, body, [class*="css"] {
 .guide-text { text-align: center; font-size: 1.1rem; margin-top: 10px; line-height: 1.6; color: #555555; }
 .chapter-title { font-size:1.2rem; font-weight:700; margin-top:0.8em; color:#003366; }
 .big-card {border:2px solid #d9e6f2; border-radius:12px; padding:1em; margin-top:0.8em;}
-/* ✅ 모든 버튼(일반 + Expander 내부) 파란색 통일 */
-.stButton button,
-.stExpander .stButton button {
-    width: 100%;
-    border-radius: 8px;
-    background-color: #005bac;
-    color: white;
-    border: none;
-    padding: 0.7em;
-    font-size: 1rem;
-    font-weight: 600;
+.stButton button {
+    width: 100%; border-radius: 8px;
+    background-color: #005bac; color: white;
+    border: none; padding: 0.7em;
+    font-size: 1rem; font-weight: 600;
 }
-.stButton button:hover,
-.stExpander .stButton button:hover {
-    background-color: #0072e0;
-}
+.stButton button:hover { background-color: #0072e0; }
 .section-title { color:#003366; font-weight:700; margin-top:1.2em; font-size:1.1rem; }
 table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
 table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
@@ -66,7 +56,6 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 .back-btn button:hover { background-color: #0072e0; }
 </style>
 """, unsafe_allow_html=True)
-
 
 # ======================= 데이터 ======================= #
 sections = {
