@@ -259,11 +259,12 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # 이미지
+    # 이미지 여러 개 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
-    img = find_image(safe_name)
-    if img:
-        st.image(img, use_container_width=True, caption=current)
+    img_files = find_images(safe_name)
+    for i, img in enumerate(img_files):
+        st.image(img, use_container_width=True, caption=f"{current} ({i+1})")
+
 
     # 본문
     content = load_content(current)
