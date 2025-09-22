@@ -242,34 +242,21 @@ else:
     # 🔹 확대 효과를 위한 CSS (반복문 밖에 1번만 선언)
     st.markdown("""
     <style>
-    .zoom-img {
+    .stImage img {
         transition: transform 0.3s;
         cursor: zoom-in;
-        margin-bottom: 10px;
     }
-    .zoom-img:hover {
+    .stImage img:hover {
         transform: scale(1.8);
         z-index: 999;
-    }
-    .zoom-caption {
-        font-size: 0.9rem;
-        color: #555;
-        margin-bottom: 20px;
     }
     </style>
     """, unsafe_allow_html=True)
 
     for img_path, desc in img_files:
         caption = f"{current} ({desc})" if desc else current
-        st.markdown(
-            f"""
-            <div style="text-align:center;">
-                <img src="{img_path}" class="zoom-img" width="400">
-                <div class="zoom-caption">{caption}</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # 기존 st.image 그대로 사용 → 경로 문제 없음
+        st.image(img_path, use_container_width=True, caption=caption)
 
 
     content = load_content(current)
