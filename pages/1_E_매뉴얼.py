@@ -27,7 +27,7 @@ def save_all_users(data):
 appendix_list = [
     {
       "title": "물분무설비 설치기준",
-      "key": "물분무설비 설치기준"
+      "key": "물분무설비 설치기준",
       "title": "부상지붕 및 내부부상지붕 탱크",
       "key": "부상지붕 및 내부부상지붕 탱크"
     }
