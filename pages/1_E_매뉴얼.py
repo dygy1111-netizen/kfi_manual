@@ -235,14 +235,7 @@ else:
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
-# ⭐ 즐겨찾기 + 📄 PDF 다운로드 버튼 (같은 줄에 배치)
-col1, col2 = st.columns([1, 1])   # 👉 1:1 비율로 나란히
-with col1:
-    fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
-    st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
-
-with col2:
-    # PDF 생성 및 다운로드
+    # ===== PDF 데이터 생성 =====
     pdf_buffer = BytesIO()
     c = canvas.Canvas(pdf_buffer, pagesize=A4)
     width, height = A4
@@ -263,12 +256,47 @@ with col2:
                 y = height - 50
     c.save()
 
+    # ===== 모바일에서도 한 줄 정렬 =====
+    st.markdown(
+        """
+        <style>
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: nowrap;
+            margin-bottom: 12px;
+        }
+        .button-row > div {
+            flex: 1;
+        }
+        @media (max-width: 480px) {
+            .button-row {
+                gap: 6px;
+            }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # ⭐ 즐겨찾기 + 📄 PDF 다운로드 버튼을 한 줄에 표시
+    st.markdown('<div class="button-row">', unsafe_allow_html=True)
+
+    # 👉 즐겨찾기 버튼
+    fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
+    st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
+
+    # 👉 PDF 다운로드 버튼
     st.download_button(
         label="📄 PDF 다운로드",
         data=pdf_buffer.getvalue(),
         file_name=f"{current}.pdf",
-        mime="application/pdf"
+        mime="application/pdf",
+        key="pdf-download"
     )
+
+    st.markdown("</div>", unsafe_allow_html=True)
     # ✅ 이미지 여러 장 + 설명 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
