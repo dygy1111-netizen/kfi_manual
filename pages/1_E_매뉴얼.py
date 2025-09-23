@@ -81,27 +81,29 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
     color:white;
     border:none;
 }
-#footer-btns .stButton>button:hover {
-    background-color:#0072e0;
-}
-/* 큰 정사각형 버튼 컨테이너 */
+/* 하단 큰 정사각형 버튼 컨테이너 */
 #footer-btns {
     display: flex;
-    justify-content: space-between;  /* 좌우 끝으로 정렬 */
-    margin-top: 30px;
+    justify-content: space-between; /* 좌우 끝 */
+    align-items: center;
     padding: 0 30px;
+    margin-top: 30px;
 }
-#footer-btns .stButton>button {
-    width: 135px !important;  /* 3배 크기 */
-    height: 135px !important;
-    border-radius: 20px !important;
-    font-size: 40px !important;
-    background-color: #005bac !important;
-    color: white !important;
+
+/* 버튼 스타일 */
+.big-btn {
+    width: 135px;
+    height: 135px;
+    border-radius: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    background-color: #005bac;
+    color: white;
     border: none;
+    cursor: pointer;
 }
-#footer-btns .stButton>button:hover {
-    background-color: #0072e0 !important;
+.big-btn:hover {
+    background-color: #0072e0;
 }
 
 </style>
@@ -313,17 +315,24 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-    # 🔹뒤로가기/홈 버튼 (정사각형)
-    # 🔹뒤로가기/홈 버튼 (크게 + 좌우 끝 배치)
-    st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
+    # 🔹뒤로가기/홈 버튼 (HTML 커스텀)
+    action = st.experimental_get_query_params().get("action", [None])[0]
 
-    col1, col2 = st.columns([1,1])
-    with col1:
-        if st.button("⟳", key="btn-back"):
-            go_back()
-    with col2:
-        if st.button("🏠", key="btn-home"):
-            go_home()
+    st.markdown("""
+    <div id="footer-btns">
+        <form action="?action=back" method="get">
+            <button class="big-btn" type="submit">⟳</button>
+        </form>
+        <form action="?action=home" method="get">
+            <button class="big-btn" type="submit">🏠</button>
+        </form>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # 버튼 액션 처리
+    if action == "back":
+        go_back()
+    elif action == "home":
+        go_home()
+
 
