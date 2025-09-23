@@ -31,7 +31,7 @@ appendix_list = [
     {"title": "위험물제조소등 접지저항기준(소방청 협의사항)", "key": "위험물제조소등 접지저항기준(소방청 협의사항)"}
 ]
 
-# ======================= CSS ======================= #
+# ======================= CSS & JS ======================= #
 st.markdown("""
 <style>
 /* ===== 공통 레이아웃 ===== */
@@ -39,6 +39,7 @@ html, body, [class*="css"] {
     font-family: 'Noto Sans KR', sans-serif;
     background-color: #ffffff;
     line-height: 1.7;
+    scroll-behavior: smooth;   /* 스크롤 부드럽게 */
 }
 
 /* ===== 제목 영역 ===== */
@@ -102,6 +103,7 @@ html, body, [class*="css"] {
     padding: 0.7em;
     font-size: 1rem;
     font-weight: 600;
+    transition: background-color 0.2s ease;
 }
 .stButton button:hover {
     background-color: #0072e0;
@@ -135,19 +137,34 @@ table tr:nth-child(even) {
 }
 
 /* ===== 하단(목차로 돌아가기) 버튼 ===== */
+.back-btn {
+    display: flex;
+    justify-content: center;     /* 가운데 정렬 */
+    margin-top: 30px;
+}
 .back-btn button {
     background-color: #005bac;
     color: white;
-    border-radius: 6px;
-    padding: 0.6em 1em;
+    border-radius: 8px;
+    padding: 0.8em 1.4em;
     border: none;
     font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
 }
 .back-btn button:hover {
     background-color: #0072e0;
 }
 </style>
+
+<!-- 🔹페이지 로드시 항상 최상단으로 스크롤 -->
+<script>
+window.addEventListener('load', function(){
+    window.scrollTo({top:0, behavior:'auto'});
+});
+</script>
 """, unsafe_allow_html=True)
+
 
 
 # ======================= 데이터 ======================= #
@@ -377,5 +394,14 @@ else:
             st.markdown(content, unsafe_allow_html=True)
 
     # 🔹 목차로 돌아가기 버튼 (하단)
-    st.markdown('<div class="back-btn">', unsafe_allow_html=True)
-    st.button("🏠 목차로 돌아가기", use_container_width=True, key="btn-home", on_click=go_home)
+    st.markdown("""
+    <div class="back-btn">
+        <button onclick="window.scrollTo({top:0, behavior:'auto'}); 
+                     window.parent.postMessage({type:'streamlit:setComponentValue',
+                     key:'go_home', value:true}, '*');">
+            🏠 목차로 돌아가기
+        </button>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.session_state.get("go_home"):
+        go_home()
