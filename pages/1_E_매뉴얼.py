@@ -206,27 +206,27 @@ elif st.session_state.page == "목차":
 
     # --- 🔎 검색 결과 블록 ---
     if q:
-        search_results = {}
-        for main, subs in sections.items():
-            if q in main.lower():
-                search_results[main] = subs
-            else:
-                hits = [s for s in subs if q in s.lower()]
-                if hits: search_results[main] = hits
+    results = [
+        (title, key, main)
+        for title, key, main in search_index
+        if q in title.lower()
+    ]
 
-        if search_results:
-            st.markdown(
-                "<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>",
-                unsafe_allow_html=True
-            )
-            with st.container():
-                st.markdown('<div class="big-card">', unsafe_allow_html=True)
-                for main, subs in search_results.items():
-                    st.markdown(f"<div class='chapter-title'>📂 {main}</div>", unsafe_allow_html=True)
-                    for sub in subs:
-                        st.button(sub, key=f"search-{sub}", use_container_width=True,
-                                  on_click=go_page, args=(sub,))
-                st.markdown("</div>", unsafe_allow_html=True)
+    if results:
+        st.markdown(
+            "<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>",
+            unsafe_allow_html=True
+        )
+        with st.container():
+            st.markdown('<div class="big-card">', unsafe_allow_html=True)
+            for title, key, main in results:
+                # 검색 결과: 상위메뉴 → 하위제목 형태로 표시
+                st.button(f"{main} → {title}",
+                          key=f"search-{key}",
+                          use_container_width=True,
+                          on_click=go_page,
+                          args=(key,))
+            st.markdown("</div>", unsafe_allow_html=True)
 
     # --- 📚 전체 메뉴 블록 (항상 표시) ---
     st.markdown("<br><div style='font-weight:700; color:#1f2937;'>📚 전체 목차</div>", unsafe_allow_html=True)
