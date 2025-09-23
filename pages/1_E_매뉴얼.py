@@ -83,7 +83,30 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 #footer-btns .stButton>button:hover {
     background-color: #0072e0 !important;
 }
- 
+ /* 🔹하단 버튼 전체 컨테이너 */
+div.footer-flex {
+    display: flex;
+    justify-content: space-between;  /* 좌우 끝 */
+    align-items: center;
+    margin-top: 25px;
+    padding: 0 25px;
+}
+/* 🔹버튼 스타일 */
+div.footer-flex button {
+    width: 140px;
+    height: 140px;
+    border-radius: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    background-color: #005bac;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+div.footer-flex button:hover {
+    background-color: #0072e0;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -185,14 +208,15 @@ def toggle_favorite(item):
     save_user_data()
 
 def go_back():
-    # 현재 페이지를 pop하고, 직전 페이지로 이동
     hist = st.session_state.history
     if len(hist) > 1:
-        hist.pop(0)  # 현재 페이지 제거
-        st.session_state.page = hist[0]  # 직전 페이지로
-        save_user_data()
+        # 현재 페이지 제거 후 직전 페이지로 이동
+        hist.pop(0)
+        st.session_state.page = hist[0]
     else:
         st.session_state.page = "목차"
+    save_user_data()
+
 
 # ======================= (중요) 쿼리 파라미터 액션 처리 ======================= #
 # HTML 버튼으로 전달된 액션을 가장 먼저 처리(한 번 클릭에 동작)
@@ -312,21 +336,20 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-# 🔹뒤로가기/홈 버튼 (세션 상태 기반)
-st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
-col1, col2 = st.columns([1,1])
+# 🔹뒤로가기/홈 버튼 (HTML + 세션 상태)
+back_clicked = st.button("hidden_back", key="hidden_back", help="", on_click=None)
+home_clicked = st.button("hidden_home", key="hidden_home", help="", on_click=None)
 
-with col1:
-    if st.button("⟳", key="btn-back"):
-        # 현재 페이지를 pop하고 직전 페이지로 이동
-        if len(st.session_state.history) > 1:
-            st.session_state.history.pop(0)       # 현재 페이지 제거
-            st.session_state.page = st.session_state.history[0]
-        else:
-            st.session_state.page = "목차"
+# 실제 버튼 UI를 HTML로 출력
+st.markdown("""
+<div class="footer-flex">
+    <button onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'hidden_back', value: true}, '*')">⟳</button>
+    <button onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'hidden_home', value: true}, '*')">🏠</button>
+</div>
+""", unsafe_allow_html=True)
 
-with col2:
-    if st.button("🏠", key="btn-home"):
-        st.session_state.page = "목차"
-
-st.markdown('</div>', unsafe_allow_html=True)
+# 클릭 이벤트 처리
+if back_clicked:
+    go_back()
+elif home_clicked:
+    go_home()
