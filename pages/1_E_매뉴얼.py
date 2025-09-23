@@ -24,21 +24,14 @@ def save_all_users(data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+# ======================= 부록 리스트 ======================= #
 appendix_list = [
-    {
-      "title": "물분무설비 설치기준",
-      "key": "물분무설비 설치기준",
-      "title": "부상지붕탱크 구조",
-      "key": "부상지붕탱크 구조",
-      "title": "내부부상지붕탱크 구조",
-      "key": "내부부상지붕탱크 구조",
-      "title": "전기방식설비",
-      "key": "전기방식설비",
-      "title": "위험물제조소등 접지저항기준(소방청 협의사항)",
-      "key": "위험물제조소등 접지저항기준(소방청 협의사항)"
-    }
+    {"title": "물분무설비 설치기준", "key": "물분무설비 설치기준"},
+    {"title": "부상지붕탱크 구조", "key": "부상지붕탱크 구조"},
+    {"title": "내부부상지붕탱크 구조", "key": "내부부상지붕탱크 구조"},
+    {"title": "전기방식설비", "key": "전기방식설비"},
+    {"title": "위험물제조소등 접지저항기준(소방청 협의사항)", "key": "위험물제조소등 접지저항기준(소방청 협의사항)"}
 ]
-
 
 
 # ======================= CSS ======================= #
@@ -88,19 +81,25 @@ sections = {
     ],
     "2. 안전성능검사": ["2.1 검사절차 및 확인사항","2.2 검사방법","2.3 참고사항"],
     "3. 정기검사": ["3.1 검사절차 및 확인사항","3.2 검사방법","3.3 참고사항"],
-    "4. 부록": ["4.1 소방청 질의회신 및 협의사항","4.2 검사관련 규격 및 기술지침","4.3 검사 부적합 사례 및 실무 팁"]
+    "4. 부록": [item["title"] for item in appendix_list]
 }
+
+# ======================= 검색 인덱스 ======================= #
+search_index = []
+for main, subs in sections.items():
+    for sub in subs:
+        if isinstance(sub, str):
+            search_index.append((sub, sub, main))
 
 # ======================= 유틸 함수 ======================= #
 def find_images(name):
-    """이름으로 시작하는 이미지들을 (경로, 설명) 튜플 리스트로 반환"""
     exts = ['jpg', 'jpeg', 'png']
     results = []
     for e in exts:
         for path in sorted(glob.glob(f"images/{name}*.{e}")):
             base = os.path.splitext(os.path.basename(path))[0]
             desc = ""
-            if base.startswith(name + "_"):  # name_ 이후 텍스트가 설명
+            if base.startswith(name + "_"):
                 desc = base[len(name) + 1 :]
             results.append((path, desc))
     return results
@@ -165,7 +164,6 @@ if st.session_state.favorites:
     st.sidebar.markdown("⭐ **즐겨찾기**")
     for i,f in enumerate(st.session_state.favorites):
         st.sidebar.button(f, key=f"fav-{i}-{f}", on_click=go_page, args=(f,))
-
 if st.session_state.history:
     st.sidebar.markdown("🕘 **최근 열람**")
     for i,h in enumerate(reversed(st.session_state.history[-5:])):
@@ -199,34 +197,27 @@ if st.session_state.page == "인트로":
 elif st.session_state.page == "목차":
     # 🔍 메인 검색창
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
-    st.session_state.search = st.text_input(
-        "", value=st.session_state.search, placeholder="🔍"
-    )
+    st.session_state.search = st.text_input("", value=st.session_state.search, placeholder="🔍")
     q = st.session_state.search.strip().lower()
 
     # --- 🔎 검색 결과 블록 ---
     if q:
-    results = [
-        (title, key, main)
-        for title, key, main in search_index
-        if q in title.lower()
-    ]
+        results = [(title, key, main) for title, key, main in search_index if q in title.lower()]
 
-    if results:
-        st.markdown(
-            "<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>",
-            unsafe_allow_html=True
-        )
-        with st.container():
-            st.markdown('<div class="big-card">', unsafe_allow_html=True)
-            for title, key, main in results:
-                # 검색 결과: 상위메뉴 → 하위제목 형태로 표시
-                st.button(f"{main} → {title}",
-                          key=f"search-{key}",
-                          use_container_width=True,
-                          on_click=go_page,
-                          args=(key,))
-            st.markdown("</div>", unsafe_allow_html=True)
+        if results:
+            st.markdown(
+                "<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>",
+                unsafe_allow_html=True
+            )
+            with st.container():
+                st.markdown('<div class="big-card">', unsafe_allow_html=True)
+                for title, key, main in results:
+                    st.button(f"{main} → {title}",
+                              key=f"search-{key}",
+                              use_container_width=True,
+                              on_click=go_page,
+                              args=(key,))
+                st.markdown("</div>", unsafe_allow_html=True)
 
     # --- 📚 전체 메뉴 블록 (항상 표시) ---
     st.markdown("<br><div style='font-weight:700; color:#1f2937;'>📚 전체 목차</div>", unsafe_allow_html=True)
@@ -241,7 +232,7 @@ elif st.session_state.page == "목차":
 
 else:
     current = st.session_state.page
-    st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="main-title'>{current}</div>', unsafe_allow_html=True)
 
     # ⭐ 즐겨찾기 토글
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
@@ -256,19 +247,17 @@ else:
 
     content = load_content(current)
     if content:
-    # 부록 영역 분리
-       if "### 부록" in content:
-           main_part, appendix_part = content.split("### 부록", 1)
-           st.markdown(main_part, unsafe_allow_html=True)
+        if "### 부록" in content:
+            main_part, appendix_part = content.split("### 부록", 1)
+            st.markdown(main_part, unsafe_allow_html=True)
 
-           st.markdown("### 부록")
-           # 부록 줄을 버튼으로 변환
-           for line in appendix_part.splitlines():
-               line = line.strip()
-               if line:  # 공백이 아니면
-                  st.button(line, on_click=go_page, args=(line,))
-       else:
-           st.markdown(content, unsafe_allow_html=True)
+            st.markdown("### 부록")
+            for line in appendix_part.splitlines():
+                line = line.strip()
+                if line:
+                    st.button(line, on_click=go_page, args=(line,))
+        else:
+            st.markdown(content, unsafe_allow_html=True)
 
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     st.button("🏠 목차로 돌아가기", use_container_width=True,
