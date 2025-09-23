@@ -69,7 +69,7 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
     border-radius: 6px; padding: 0.6em 1em;
     border: none; font-weight: 600;
 }
-            .stButton>button.small-square {
+.stButton>button.small-square {
     width:45px !important;      /* 정사각형 너비 */
     height:45px !important;     /* 정사각형 높이 */
     padding:0 !important;
