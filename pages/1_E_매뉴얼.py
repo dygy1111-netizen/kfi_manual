@@ -84,6 +84,30 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 #footer-btns .stButton>button:hover {
     background-color:#0072e0;
 }
+/* 큰 정사각형 버튼 컨테이너 */
+#footer-btns {
+    display: flex;
+    justify-content: space-between; /* 좌우 양끝 */
+    align-items: center;
+    padding: 0 30px;
+    margin-top: 30px;
+}
+
+/* 버튼 스타일 */
+.big-btn {
+    width: 135px;
+    height: 135px;
+    border-radius: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    background-color: #005bac;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.big-btn:hover {
+    background-color: #0072e0;
+}
 
 </style>
 """, unsafe_allow_html=True)
@@ -295,11 +319,19 @@ else:
             st.markdown(content, unsafe_allow_html=True)
 
     # 🔹뒤로가기/홈 버튼 (정사각형)
-    st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
-    with st.container():
-        col1, col2 = st.columns([1,1])
-        with col1:
-            st.button("⟳", key="btn-back", on_click=go_back, help="뒤로가기")
-        with col2:
-            st.button("🏠", key="btn-home", on_click=go_home, help="목차로")
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("""
+<div id="footer-btns">
+    <form action="#" method="post">
+        <button class="big-btn" type="submit" name="action" value="back">⟳</button>
+    </form>
+    <form action="#" method="post">
+        <button class="big-btn" type="submit" name="action" value="home">🏠</button>
+    </form>
+</div>
+""", unsafe_allow_html=True)
+
+# 버튼 액션 처리
+    if st.session_state.get("action") == "back":
+    go_back()
+    elif st.session_state.get("action") == "home":
+    go_home()
