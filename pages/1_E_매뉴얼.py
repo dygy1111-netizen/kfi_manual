@@ -84,12 +84,28 @@ sections = {
     "4. 부록": [item["title"] for item in appendix_list]
 }
 
-# ======================= 검색 인덱스 ======================= #
-search_index = []
+# ======================= 검색 인덱스 (제목 + 본문) ======================= #
+search_index = []  # [(표시이름, key, 상위메뉴, 본문텍스트)]
 for main, subs in sections.items():
     for sub in subs:
         if isinstance(sub, str):
-            search_index.append((sub, sub, main))
+            key = sub
+        else:
+            key = sub["key"]
+
+        safe = key.replace(" ", "_").replace("/", "_")
+        p = Path(f"contents/{safe}.md")
+        body = ""
+        if p.exists():
+            try:
+                body = p.read_text(encoding="utf-8").lower()
+            except:
+                body = ""
+
+        # title, key, main, body 4개 모두 저장
+        title = sub if isinstance(sub, str) else sub["title"]
+        search_index.append((title, key, main, body))
+
 
 # ======================= 유틸 함수 ======================= #
 def find_images(name):
@@ -202,7 +218,11 @@ elif st.session_state.page == "목차":
 
     # --- 🔎 검색 결과 블록 ---
     if q:
-        results = [(title, key, main) for title, key, main in search_index if q in title.lower()]
+        results = [
+            (title, key, main)
+            for title, key, main, body in search_index
+            if q in title.lower() or q in body
+        ]
 
         if results:
             st.markdown(
