@@ -69,9 +69,19 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
     border-radius: 6px; padding: 0.6em 1em;
     border: none; font-weight: 600;
 }
+            .stButton>button.small-square {
+    width:45px !important;      /* 정사각형 너비 */
+    height:45px !important;     /* 정사각형 높이 */
+    padding:0 !important;
+    border-radius:8px !important; /* 모서리 둥글기 */
+    font-size:20px !important;  /* 아이콘 크기 */
+    line-height:1 !important;
+}
+
 .back-btn button:hover { background-color: #0072e0; }
 </style>
 """, unsafe_allow_html=True)
+
 
 # ======================= 데이터 ======================= #
 sections = {
@@ -174,6 +184,17 @@ def toggle_favorite(item):
     else:
         st.session_state.favorites.add(item)
     save_user_data()
+    
+def go_back():
+    if st.session_state.history:
+        # 직전 방문 페이지가 있으면 그 페이지로 이동
+        if len(st.session_state.history) > 1:
+            prev_page = st.session_state.history[1]
+            st.session_state.page = prev_page
+        else:
+            # 기록이 하나뿐이면 목차로 이동
+            st.session_state.page = "목차"
+
 
 # ======================= 사이드바 ======================= #
 if st.session_state.favorites:
@@ -279,6 +300,12 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-    st.markdown('<div class="back-btn">', unsafe_allow_html=True)
-    st.button("🏠 목차로 돌아가기", use_container_width=True,
-              key="btn-home", on_click=go_home)
+    # 🔹뒤로가기 함수는 기존에 추가한 go_back() 사용
+col1, col2 = st.columns([1,1])
+with col1:
+    st.button("⟳", key="btn-back", on_click=go_back,
+              help="뒤로가기", type="secondary", class_="small-square")
+with col2:
+    st.button("🏠", key="btn-home", on_click=go_home,
+              help="목차로", type="secondary", class_="small-square")
+
