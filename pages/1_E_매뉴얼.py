@@ -233,10 +233,10 @@ elif st.session_state.page == "목차":
                 st.markdown('<div class="big-card">', unsafe_allow_html=True)
                 for title, key, main in results:
                     st.button(f"{main} → {title}",
-                              key=f"search-{key}",
-                              use_container_width=True,
-                              on_click=go_page,
-                              args=(key,))
+                             key=f"search-{key}",
+                             use_container_width=True,
+                             on_click=go_page,
+                             args=(key,))
                 st.markdown("</div>", unsafe_allow_html=True)
 
     # --- 📚 전체 메뉴 블록 (항상 표시) ---
