@@ -315,24 +315,21 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-    # 🔹뒤로가기/홈 버튼 (HTML 커스텀)
-    action = st.experimental_get_query_params().get("action", [None])[0]
+# 🔹뒤로가기/홈 버튼 (Streamlit + 세션 상태)
+st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
 
-    st.markdown("""
-    <div id="footer-btns">
-        <form action="?action=back" method="get">
-            <button class="big-btn" type="submit">⟳</button>
-        </form>
-        <form action="?action=home" method="get">
-            <button class="big-btn" type="submit">🏠</button>
-        </form>
-    </div>
-    """, unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+with col1:
+    if st.button("⟳", key="btn-back"):
+        # 세션에 저장된 직전 페이지로 이동
+        if len(st.session_state.history) > 1:
+            prev_page = st.session_state.history[1]
+            st.session_state.page = prev_page
+        else:
+            st.session_state.page = "목차"
+with col2:
+    if st.button("🏠", key="btn-home"):
+        st.session_state.page = "목차"
 
-    # 버튼 액션 처리
-    if action == "back":
-        go_back()
-    elif action == "home":
-        go_home()
-
+st.markdown('</div>', unsafe_allow_html=True)
 
