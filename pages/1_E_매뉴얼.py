@@ -62,50 +62,29 @@ table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center
 table th { background-color: #005bac; color: white; }
 table tr:nth-child(even) { background-color: #f0f4f8; }
 
-/* 작은 정사각형 버튼 (뒤로가기/홈) */
-/* 하단 큰 정사각형 버튼 (뒤로가기/홈) */
+/* ===== 하단 큰 정사각형 버튼(HTML) 영역 ===== */
 #footer-btns {
     display: flex;
-    justify-content: space-between; /* 좌우 양끝 배치 */
-    padding: 0 20px;                /* 좌우 여백 */
-    margin-top: 20px;
-}
-#footer-btns .stButton>button {
-    width:135px !important;   /* 3배 크기 */
-    height:135px !important;
-    padding:0 !important;
-    border-radius:12px !important;
-    font-size:40px !important; /* 아이콘 크기 키움 */
-    line-height:1 !important;
-    background-color:#005bac;
-    color:white;
-    border:none;
-}
-/* 하단 큰 정사각형 버튼 컨테이너 */
-#footer-btns {
-    display: flex;
-    justify-content: space-between; /* 좌우 끝 */
+    justify-content: space-between; /* 좌우 양끝 */
     align-items: center;
-    padding: 0 30px;
-    margin-top: 30px;
+    gap: 20px;
+    margin-top: 28px;
+    padding: 0 20px;
 }
-
-/* 버튼 스타일 */
-.big-btn {
-    width: 135px;
+#footer-btns .big-btn {
+    width: 135px;               /* 3배 크기 */
     height: 135px;
     border-radius: 20px;
-    font-size: 40px;
+    font-size: 40px;            /* 아이콘 크게 */
     font-weight: bold;
     background-color: #005bac;
-    color: white;
+    color: #fff;
     border: none;
     cursor: pointer;
 }
-.big-btn:hover {
+#footer-btns .big-btn:hover {
     background-color: #0072e0;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -207,12 +186,31 @@ def toggle_favorite(item):
     save_user_data()
 
 def go_back():
-    if st.session_state.history:
-        if len(st.session_state.history) > 1:
-            prev_page = st.session_state.history[1]
-            st.session_state.page = prev_page
-        else:
-            st.session_state.page = "목차"
+    # 현재 페이지를 pop하고, 직전 페이지로 이동
+    hist = st.session_state.history
+    if len(hist) > 1:
+        hist.pop(0)  # 현재 페이지 제거
+        st.session_state.page = hist[0]  # 직전 페이지로
+        save_user_data()
+    else:
+        st.session_state.page = "목차"
+
+# ======================= (중요) 쿼리 파라미터 액션 처리 ======================= #
+# HTML 버튼으로 전달된 액션을 가장 먼저 처리(한 번 클릭에 동작)
+action = st.query_params.get("action", None)
+if action:
+    if action == "back":
+        go_back()
+    elif action == "home":
+        go_home()
+    # action 파라미터 제거(다음 렌더에서 잔류 방지)
+    try:
+        q = dict(st.query_params)
+        if "action" in q:
+            del q["action"]
+        st.query_params = q
+    except Exception:
+        pass
 
 # ======================= 사이드바 ======================= #
 if st.session_state.favorites:
@@ -315,21 +313,16 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-# 🔹뒤로가기/홈 버튼 (Streamlit + 세션 상태)
-st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("⟳", key="btn-back"):
-        # 세션에 저장된 직전 페이지로 이동
-        if len(st.session_state.history) > 1:
-            prev_page = st.session_state.history[1]
-            st.session_state.page = prev_page
-        else:
-            st.session_state.page = "목차"
-with col2:
-    if st.button("🏠", key="btn-home"):
-        st.session_state.page = "목차"
-
-st.markdown('</div>', unsafe_allow_html=True)
-
+    # 🔹뒤로가기/홈 버튼 (HTML + 쿼리파라미터)
+    st.markdown("""
+    <div id="footer-btns">
+        <form method="get">
+            <input type="hidden" name="action" value="back"/>
+            <button class="big-btn" type="submit">⟳</button>
+        </form>
+        <form method="get">
+            <input type="hidden" name="action" value="home"/>
+            <button class="big-btn" type="submit">🏠</button>
+        </form>
+    </div>
+    """, unsafe_allow_html=True)
