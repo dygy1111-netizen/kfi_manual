@@ -63,15 +63,28 @@ table th { background-color: #005bac; color: white; }
 table tr:nth-child(even) { background-color: #f0f4f8; }
 
 /* 작은 정사각형 버튼 (뒤로가기/홈) */
-#footer-btns .stButton>button {
-    width:45px !important;
-    height:45px !important;
-    padding:0 !important;
-    border-radius:8px !important;
-    font-size:20px !important;
-    line-height:1 !important;
-    margin:4px;
+/* 하단 큰 정사각형 버튼 (뒤로가기/홈) */
+#footer-btns {
+    display: flex;
+    justify-content: space-between; /* 좌우 양끝 배치 */
+    padding: 0 20px;                /* 좌우 여백 */
+    margin-top: 20px;
 }
+#footer-btns .stButton>button {
+    width:135px !important;   /* 3배 크기 */
+    height:135px !important;
+    padding:0 !important;
+    border-radius:12px !important;
+    font-size:40px !important; /* 아이콘 크기 키움 */
+    line-height:1 !important;
+    background-color:#005bac;
+    color:white;
+    border:none;
+}
+#footer-btns .stButton>button:hover {
+    background-color:#0072e0;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -283,9 +296,10 @@ else:
 
     # 🔹뒤로가기/홈 버튼 (정사각형)
     st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
-    col1, col2 = st.columns([1,1])
-    with col1:
-        st.button("⟳", key="btn-back", on_click=go_back, help="뒤로가기")
-    with col2:
-        st.button("🏠", key="btn-home", on_click=go_home, help="목차로")
+    with st.container():
+        col1, col2 = st.columns([1,1])
+        with col1:
+            st.button("⟳", key="btn-back", on_click=go_back, help="뒤로가기")
+        with col2:
+            st.button("🏠", key="btn-home", on_click=go_home, help="목차로")
     st.markdown('</div>', unsafe_allow_html=True)
