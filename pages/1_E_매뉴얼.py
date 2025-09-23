@@ -72,8 +72,8 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
     padding: 0 20px;
 }
 #footer-btns .big-btn {
-    width: 135px;               /* 3배 크기 */
-    height: 135px;
+    width: 100px;               /* 3배 크기 */
+    height: 100px;
     border-radius: 20px;
     font-size: 40px;            /* 아이콘 크게 */
     font-weight: bold;
