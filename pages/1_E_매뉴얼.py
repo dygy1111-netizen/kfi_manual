@@ -377,14 +377,5 @@ else:
             st.markdown(content, unsafe_allow_html=True)
 
     # 🔹 목차로 돌아가기 버튼 (하단)
-    st.markdown("""
-    <div class="back-btn">
-        <button onclick="window.scrollTo({top:0, behavior:'auto'}); 
-                     window.parent.postMessage({type:'streamlit:setComponentValue',
-                     key:'go_home', value:true}, '*');">
-            🏠 목차로 돌아가기
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
-    if st.session_state.get("go_home"):
-        go_home()
+    st.markdown('<div class="back-btn">', unsafe_allow_html=True)
+    st.button("🏠 목차로 돌아가기", use_container_width=True, key="btn-home", on_click=go_home)
