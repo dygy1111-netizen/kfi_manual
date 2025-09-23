@@ -232,7 +232,7 @@ elif st.session_state.page == "목차":
             with st.container():
                 st.markdown('<div class="big-card">', unsafe_allow_html=True)
                 for title, key, main in results:
-                    st.button(f"{main} → {title}",
+                    st.button(title,
                              key=f"search-{key}",
                              use_container_width=True,
                              on_click=go_page,
