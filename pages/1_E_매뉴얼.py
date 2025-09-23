@@ -102,6 +102,7 @@ html, body, [class*="css"] {
     padding: 0.7em;
     font-size: 1rem;
     font-weight: 600;
+    transition: background-color 0.2s ease;
 }
 .stButton button:hover {
     background-color: #0072e0;
@@ -142,12 +143,14 @@ table tr:nth-child(even) {
     padding: 0.6em 1em;
     border: none;
     font-weight: 600;
+    transition: background-color 0.2s ease;
 }
 .back-btn button:hover {
     background-color: #0072e0;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # ======================= 데이터 ======================= #
