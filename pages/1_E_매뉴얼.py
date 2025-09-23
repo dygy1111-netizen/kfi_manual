@@ -34,81 +34,121 @@ appendix_list = [
 # ======================= CSS ======================= #
 st.markdown("""
 <style>
+/* ===== 공통 레이아웃 ===== */
 html, body, [class*="css"] {
     font-family: 'Noto Sans KR', sans-serif;
     background-color: #ffffff;
     line-height: 1.7;
 }
-.title-container { text-align: center; margin-top: 30px; margin-bottom: 20px; }
-.main-title { font-size: 2.0rem; font-weight: 800; color: #222222; line-height: 1.4; }
-.sub-title { font-size: 2.0rem; font-weight: 800; color: #444444; line-height: 1.4; }
-.guide-text { text-align: center; font-size: 1.1rem; margin-top: 10px; line-height: 1.6; color: #555555; }
-.menu-box { border: 2px solid #d9e6f2; background-color: #f8fbff;
-            border-radius: 12px; padding: 1.2em; margin-top: 1.2em; }
-.menu-title { font-size: 1.3rem; font-weight: 700; color: #003366;
-              margin-bottom: 0.8em; display: flex; align-items: center; }
-.menu-title .emoji { margin-right: 0.4em; font-size: 1.4rem; }
-.menu-btn { width: 100%; margin-bottom: 0.4em; }
-.stButton button {
-    width: 100%; border-radius: 8px;
-    background-color: #005bac; color: white;
-    border: none; padding: 0.7em;
-    font-size: 1rem; font-weight: 600;
-}
-.stButton button:hover { background-color: #0072e0; }
-.section-title { color:#003366; font-weight:700; margin-top:1.2em; font-size:1.1rem; }
-table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
-table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
-table th { background-color: #005bac; color: white; }
-table tr:nth-child(even) { background-color: #f0f4f8; }
 
-/* 좌우로 크게 배치되는 하단 버튼 */
-#footer-btns {
+/* ===== 제목 영역 ===== */
+.title-container {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+.main-title {
+    font-size: 2.0rem;
+    font-weight: 800;
+    color: #222222;
+    line-height: 1.4;
+}
+.sub-title {
+    font-size: 2.0rem;
+    font-weight: 800;
+    color: #444444;
+    line-height: 1.4;
+}
+.guide-text {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-top: 10px;
+    line-height: 1.6;
+    color: #555555;
+}
+
+/* ===== 메뉴 박스 ===== */
+.menu-box {
+    border: 2px solid #d9e6f2;
+    background-color: #f8fbff;
+    border-radius: 12px;
+    padding: 1.2em;
+    margin-top: 1.2em;
+}
+.menu-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 0.8em;
     display: flex;
-    justify-content: space-between; /* 좌우 끝 */
     align-items: center;
-    padding: 0 20px;
-    margin-top: 28px;
 }
-#footer-btns .stButton>button {
-    width: 100px !important;   /* 크기 3배 */
-    height: 100px !important;
-    border-radius: 20px !important;
-    font-size: 40px !important;
-    font-weight: bold !important;
-    background-color: #005bac !important;
-    color: white !important;
-    border: none !important;
+.menu-title .emoji {
+    margin-right: 0.4em;
+    font-size: 1.4rem;
 }
-#footer-btns .stButton>button:hover {
-    background-color: #0072e0 !important;
+.menu-btn {
+    width: 100%;
+    margin-bottom: 0.4em;
 }
- /* 🔹하단 버튼 전체 컨테이너 */
-div.footer-flex {
-    display: flex;
-    justify-content: space-between;  /* 좌우 끝 */
-    align-items: center;
-    margin-top: 25px;
-    padding: 0 25px;
-}
-/* 🔹버튼 스타일 */
-div.footer-flex button {
-    width: 140px;
-    height: 140px;
-    border-radius: 20px;
-    font-size: 40px;
-    font-weight: bold;
+
+/* ===== 기본 버튼 ===== */
+.stButton button {
+    width: 100%;
+    border-radius: 8px;
     background-color: #005bac;
     color: white;
     border: none;
-    cursor: pointer;
+    padding: 0.7em;
+    font-size: 1rem;
+    font-weight: 600;
 }
-div.footer-flex button:hover {
+.stButton button:hover {
     background-color: #0072e0;
 }
 
+/* ===== 본문 섹션 ===== */
+.section-title {
+    color: #003366;
+    font-weight: 700;
+    margin-top: 1.2em;
+    font-size: 1.1rem;
+}
+
+/* ===== 표 ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5em;
+}
+table th, table td {
+    border: 1px solid #d0d7e2;
+    padding: 8px;
+    text-align: center;
+}
+table th {
+    background-color: #005bac;
+    color: white;
+}
+table tr:nth-child(even) {
+    background-color: #f0f4f8;
+}
+
+/* ===== 하단(목차로 돌아가기) 버튼 ===== */
+.back-btn button {
+    background-color: #005bac;
+    color: white;
+    border-radius: 6px;
+    padding: 0.6em 1em;
+    border: none;
+    font-weight: 600;
+}
+.back-btn button:hover {
+    background-color: #0072e0;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 # ======================= 데이터 ======================= #
 sections = {
