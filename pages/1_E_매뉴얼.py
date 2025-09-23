@@ -232,7 +232,7 @@ elif st.session_state.page == "목차":
 
 else:
     current = st.session_state.page
-    st.markdown(f'<div class="main-title'>{current}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
     # ⭐ 즐겨찾기 토글
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
