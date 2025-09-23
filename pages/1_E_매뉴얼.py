@@ -39,7 +39,7 @@ html, body, [class*="css"] {
     font-family: 'Noto Sans KR', sans-serif;
     background-color: #ffffff;
     line-height: 1.7;
-    scroll-behavior: smooth;   /* 스크롤 부드럽게 */
+    scroll-behavior: smooth;   /* 부드러운 스크롤 */
 }
 
 /* ===== 제목 영역 ===== */
@@ -137,19 +137,13 @@ table tr:nth-child(even) {
 }
 
 /* ===== 하단(목차로 돌아가기) 버튼 ===== */
-.back-btn {
-    display: flex;
-    justify-content: center;     /* 가운데 정렬 */
-    margin-top: 30px;
-}
 .back-btn button {
     background-color: #005bac;
     color: white;
-    border-radius: 8px;
-    padding: 0.8em 1.4em;
+    border-radius: 6px;
+    padding: 0.6em 1em;
     border: none;
     font-weight: 600;
-    font-size: 1rem;
     transition: background-color 0.2s ease;
 }
 .back-btn button:hover {
@@ -157,13 +151,14 @@ table tr:nth-child(even) {
 }
 </style>
 
-<!-- 🔹페이지 로드시 항상 최상단으로 스크롤 -->
+<!-- 🔹페이지가 렌더링될 때마다 강제로 최상단으로 이동 -->
 <script>
-window.addEventListener('load', function(){
-    window.scrollTo({top:0, behavior:'auto'});
+window.addEventListener('streamlit:render', function() {
+    window.scrollTo(0, 0);
 });
 </script>
 """, unsafe_allow_html=True)
+
 
 
 
