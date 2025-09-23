@@ -87,26 +87,21 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 /* 큰 정사각형 버튼 컨테이너 */
 #footer-btns {
     display: flex;
-    justify-content: space-between; /* 좌우 양끝 */
-    align-items: center;
-    padding: 0 30px;
+    justify-content: space-between;  /* 좌우 끝으로 정렬 */
     margin-top: 30px;
+    padding: 0 30px;
 }
-
-/* 버튼 스타일 */
-.big-btn {
-    width: 135px;
-    height: 135px;
-    border-radius: 20px;
-    font-size: 40px;
-    font-weight: bold;
-    background-color: #005bac;
-    color: white;
+#footer-btns .stButton>button {
+    width: 135px !important;  /* 3배 크기 */
+    height: 135px !important;
+    border-radius: 20px !important;
+    font-size: 40px !important;
+    background-color: #005bac !important;
+    color: white !important;
     border: none;
-    cursor: pointer;
 }
-.big-btn:hover {
-    background-color: #0072e0;
+#footer-btns .stButton>button:hover {
+    background-color: #0072e0 !important;
 }
 
 </style>
@@ -319,19 +314,16 @@ else:
             st.markdown(content, unsafe_allow_html=True)
 
     # 🔹뒤로가기/홈 버튼 (정사각형)
-    st.markdown("""
-<div id="footer-btns">
-    <form action="#" method="post">
-        <button class="big-btn" type="submit" name="action" value="back">⟳</button>
-    </form>
-    <form action="#" method="post">
-        <button class="big-btn" type="submit" name="action" value="home">🏠</button>
-    </form>
-</div>
-""", unsafe_allow_html=True)
+    # 🔹뒤로가기/홈 버튼 (크게 + 좌우 끝 배치)
+    st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
 
-# 버튼 액션 처리
-    if st.session_state.get("action") == "back":
-    go_back()
-    elif st.session_state.get("action") == "home":
-    go_home()
+    col1, col2 = st.columns([1,1])
+    with col1:
+        if st.button("⟳", key="btn-back"):
+            go_back()
+    with col2:
+        if st.button("🏠", key="btn-home"):
+            go_home()
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
