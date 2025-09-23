@@ -2,8 +2,6 @@ import streamlit as st
 import os, glob, json
 from pathlib import Path
 from io import BytesIO
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
 
 # ======================= 기본 설정 ======================= #
 st.set_page_config(page_title="위험물탱크 E-매뉴얼",
