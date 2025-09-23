@@ -85,6 +85,28 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 #footer-btns .big-btn:hover {
     background-color: #0072e0;
 }
+            /* 좌우로 크게 배치되는 하단 버튼 */
+#footer-btns {
+    display: flex;
+    justify-content: space-between; /* 좌우 끝 */
+    align-items: center;
+    padding: 0 20px;
+    margin-top: 28px;
+}
+#footer-btns .stButton>button {
+    width: 135px !important;   /* 크기 3배 */
+    height: 135px !important;
+    border-radius: 20px !important;
+    font-size: 40px !important;
+    font-weight: bold !important;
+    background-color: #005bac !important;
+    color: white !important;
+    border: none !important;
+}
+#footer-btns .stButton>button:hover {
+    background-color: #0072e0 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -313,16 +335,22 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-    # 🔹뒤로가기/홈 버튼 (HTML + 쿼리파라미터)
-    st.markdown("""
-    <div id="footer-btns">
-        <form method="get">
-            <input type="hidden" name="action" value="back"/>
-            <button class="big-btn" type="submit">⟳</button>
-        </form>
-        <form method="get">
-            <input type="hidden" name="action" value="home"/>
-            <button class="big-btn" type="submit">🏠</button>
-        </form>
-    </div>
-    """, unsafe_allow_html=True)
+# 🔹뒤로가기/홈 버튼 (세션 상태 기반)
+st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
+col1, col2 = st.columns([1,1])
+
+with col1:
+    if st.button("⟳", key="btn-back"):
+        # 현재 페이지를 pop하고 직전 페이지로 이동
+        if len(st.session_state.history) > 1:
+            st.session_state.history.pop(0)       # 현재 페이지 제거
+            st.session_state.page = st.session_state.history[0]
+        else:
+            st.session_state.page = "목차"
+
+with col2:
+    if st.button("🏠", key="btn-home"):
+        st.session_state.page = "목차"
+
+st.markdown('</div>', unsafe_allow_html=True)
+
