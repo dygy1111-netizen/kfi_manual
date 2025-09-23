@@ -5,7 +5,6 @@ from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-
 # ======================= 기본 설정 ======================= #
 st.set_page_config(page_title="위험물탱크 E-매뉴얼",
                    page_icon="📘",
@@ -23,7 +22,6 @@ def save_all_users(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-
 # ======================= 부록 리스트 ======================= #
 appendix_list = [
     {"title": "물분무설비 설치기준", "key": "물분무설비 설치기준"},
@@ -32,7 +30,6 @@ appendix_list = [
     {"title": "전기방식설비", "key": "전기방식설비"},
     {"title": "위험물제조소등 접지저항기준(소방청 협의사항)", "key": "위험물제조소등 접지저항기준(소방청 협의사항)"}
 ]
-
 
 # ======================= CSS ======================= #
 st.markdown("""
@@ -64,30 +61,27 @@ table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
 table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
 table th { background-color: #005bac; color: white; }
 table tr:nth-child(even) { background-color: #f0f4f8; }
-.back-btn button {
-    background-color: #005bac; color: white;
-    border-radius: 6px; padding: 0.6em 1em;
-    border: none; font-weight: 600;
-}
-.stButton>button.small-square {
-    width:45px !important;      /* 정사각형 너비 */
-    height:45px !important;     /* 정사각형 높이 */
-    padding:0 !important;
-    border-radius:8px !important; /* 모서리 둥글기 */
-    font-size:20px !important;  /* 아이콘 크기 */
-    line-height:1 !important;
-}
 
-.back-btn button:hover { background-color: #0072e0; }
+/* 작은 정사각형 버튼 (뒤로가기/홈) */
+#footer-btns .stButton>button {
+    width:45px !important;
+    height:45px !important;
+    padding:0 !important;
+    border-radius:8px !important;
+    font-size:20px !important;
+    line-height:1 !important;
+    margin:4px;
+}
 </style>
 """, unsafe_allow_html=True)
-
 
 # ======================= 데이터 ======================= #
 sections = {
     "1. 위험물탱크 위치, 구조 및 설비의 기준": [
         "1.1 안전거리","1.2 보유공지","1.3 표지 및 게시판",
-        "1.4-1 탱크 내부 압력 해소 구조","1.4-2 탱크 부식방지 설비","1.4-3 통기관","1.4-4 자동계량식 유량계","1.4-5 주입구","1.4-6 펌프설비","1.4-7 배관 및 밸브","1.4-8 부상지붕탱크의 설비","1.4-9 전기설비","1.4-10 부속설비","1.5 방유제","1.6 옥외탱크저장소의 특례","1.7 소화설비"
+        "1.4-1 탱크 내부 압력 해소 구조","1.4-2 탱크 부식방지 설비","1.4-3 통기관","1.4-4 자동계량식 유량계",
+        "1.4-5 주입구","1.4-6 펌프설비","1.4-7 배관 및 밸브","1.4-8 부상지붕탱크의 설비",
+        "1.4-9 전기설비","1.4-10 부속설비","1.5 방유제","1.6 옥외탱크저장소의 특례","1.7 소화설비"
     ],
     "2. 안전성능검사": ["2.1 검사절차 및 확인사항","2.2 검사방법","2.3 참고사항"],
     "3. 정기검사": ["3.1 검사절차 및 확인사항","3.2 검사방법","3.3 참고사항"],
@@ -98,11 +92,7 @@ sections = {
 search_index = []  # [(표시이름, key, 상위메뉴, 본문텍스트)]
 for main, subs in sections.items():
     for sub in subs:
-        if isinstance(sub, str):
-            key = sub
-        else:
-            key = sub["key"]
-
+        key = sub if isinstance(sub, str) else sub["key"]
         safe = key.replace(" ", "_").replace("/", "_")
         p = Path(f"contents/{safe}.md")
         body = ""
@@ -111,11 +101,8 @@ for main, subs in sections.items():
                 body = p.read_text(encoding="utf-8").lower()
             except:
                 body = ""
-
-        # title, key, main, body 4개 모두 저장
         title = sub if isinstance(sub, str) else sub["title"]
         search_index.append((title, key, main, body))
-
 
 # ======================= 유틸 함수 ======================= #
 def find_images(name):
@@ -184,17 +171,14 @@ def toggle_favorite(item):
     else:
         st.session_state.favorites.add(item)
     save_user_data()
-    
+
 def go_back():
     if st.session_state.history:
-        # 직전 방문 페이지가 있으면 그 페이지로 이동
         if len(st.session_state.history) > 1:
             prev_page = st.session_state.history[1]
             st.session_state.page = prev_page
         else:
-            # 기록이 하나뿐이면 목차로 이동
             st.session_state.page = "목차"
-
 
 # ======================= 사이드바 ======================= #
 if st.session_state.favorites:
@@ -223,7 +207,9 @@ if st.session_state.page == "인트로":
     cover = None
     for ext in ("jpg","jpeg","png"):
         p = Path(f"images/cover.{ext}")
-        if p.exists(): cover = p; break
+        if p.exists():
+            cover = p
+            break
     if cover:
         st.markdown("---")
         st.image(str(cover), use_container_width=True, caption="E-매뉴얼 표지")
@@ -232,7 +218,6 @@ if st.session_state.page == "인트로":
     if st.button("📘 매뉴얼 바로가기", use_container_width=True): go_home()
 
 elif st.session_state.page == "목차":
-    # 🔍 메인 검색창
     st.markdown('<div class="main-title">📘 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
     st.session_state.search = st.text_input("", value=st.session_state.search, placeholder="🔍")
     q = st.session_state.search.strip().lower()
@@ -244,20 +229,16 @@ elif st.session_state.page == "목차":
             for title, key, main, body in search_index
             if q in title.lower() or q in body
         ]
-
         if results:
-            st.markdown(
-                "<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>",
-                unsafe_allow_html=True
-            )
+            st.markdown("<br><div style='font-weight:700; color:#005bac;'>🔎 검색 결과</div>", unsafe_allow_html=True)
             with st.container():
                 st.markdown('<div class="big-card">', unsafe_allow_html=True)
                 for title, key, main in results:
                     st.button(title,
-                             key=f"search-{key}",
-                             use_container_width=True,
-                             on_click=go_page,
-                             args=(key,))
+                              key=f"search-{key}",
+                              use_container_width=True,
+                              on_click=go_page,
+                              args=(key,))
                 st.markdown("</div>", unsafe_allow_html=True)
 
     # --- 📚 전체 메뉴 블록 (항상 표시) ---
@@ -272,6 +253,7 @@ elif st.session_state.page == "목차":
         st.markdown("</div>", unsafe_allow_html=True)
 
 else:
+    # ===== 설명 페이지 =====
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
 
@@ -279,7 +261,7 @@ else:
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # ✅ 이미지 여러 장 + 설명 출력
+    # ✅ 이미지 + 본문 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
     img_files = find_images(safe_name)
     for img_path, desc in img_files:
@@ -291,7 +273,6 @@ else:
         if "### 부록" in content:
             main_part, appendix_part = content.split("### 부록", 1)
             st.markdown(main_part, unsafe_allow_html=True)
-
             st.markdown("### 부록")
             for line in appendix_part.splitlines():
                 line = line.strip()
@@ -300,12 +281,11 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-    # 🔹뒤로가기 함수는 기존에 추가한 go_back() 사용
-col1, col2 = st.columns([1,1])
-with col1:
-    st.button("⟳", key="btn-back", on_click=go_back,
-              help="뒤로가기", type="secondary", class_="small-square")
-with col2:
-    st.button("🏠", key="btn-home", on_click=go_home,
-              help="목차로", type="secondary", class_="small-square")
-
+    # 🔹뒤로가기/홈 버튼 (정사각형)
+    st.markdown('<div id="footer-btns">', unsafe_allow_html=True)
+    col1, col2 = st.columns([1,1])
+    with col1:
+        st.button("⟳", key="btn-back", on_click=go_back, help="뒤로가기")
+    with col2:
+        st.button("🏠", key="btn-home", on_click=go_home, help="목차로")
+    st.markdown('</div>', unsafe_allow_html=True)
