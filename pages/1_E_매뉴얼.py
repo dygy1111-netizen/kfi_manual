@@ -62,30 +62,7 @@ table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center
 table th { background-color: #005bac; color: white; }
 table tr:nth-child(even) { background-color: #f0f4f8; }
 
-/* ===== 하단 큰 정사각형 버튼(HTML) 영역 ===== */
-#footer-btns {
-    display: flex;
-    justify-content: space-between; /* 좌우 양끝 */
-    align-items: center;
-    gap: 20px;
-    margin-top: 28px;
-    padding: 0 20px;
-}
-#footer-btns .big-btn {
-    width: 100px;               /* 3배 크기 */
-    height: 100px;
-    border-radius: 20px;
-    font-size: 40px;            /* 아이콘 크게 */
-    font-weight: bold;
-    background-color: #005bac;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-#footer-btns .big-btn:hover {
-    background-color: #0072e0;
-}
-            /* 좌우로 크게 배치되는 하단 버튼 */
+/* 좌우로 크게 배치되는 하단 버튼 */
 #footer-btns {
     display: flex;
     justify-content: space-between; /* 좌우 끝 */
@@ -94,8 +71,8 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
     margin-top: 28px;
 }
 #footer-btns .stButton>button {
-    width: 135px !important;   /* 크기 3배 */
-    height: 135px !important;
+    width: 100px !important;   /* 크기 3배 */
+    height: 100px !important;
     border-radius: 20px !important;
     font-size: 40px !important;
     font-weight: bold !important;
@@ -106,7 +83,7 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 #footer-btns .stButton>button:hover {
     background-color: #0072e0 !important;
 }
-
+ 
 </style>
 """, unsafe_allow_html=True)
 
@@ -353,4 +330,3 @@ with col2:
         st.session_state.page = "목차"
 
 st.markdown('</div>', unsafe_allow_html=True)
-
