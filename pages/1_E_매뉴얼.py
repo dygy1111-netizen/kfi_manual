@@ -336,20 +336,6 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-# 🔹뒤로가기/홈 버튼 (HTML + 세션 상태)
-back_clicked = st.button("hidden_back", key="hidden_back", help="", on_click=None)
-home_clicked = st.button("hidden_home", key="hidden_home", help="", on_click=None)
-
-# 실제 버튼 UI를 HTML로 출력
-st.markdown("""
-<div class="footer-flex">
-    <button onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'hidden_back', value: true}, '*')">⟳</button>
-    <button onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', key: 'hidden_home', value: true}, '*')">🏠</button>
-</div>
-""", unsafe_allow_html=True)
-
-# 클릭 이벤트 처리
-if back_clicked:
-    go_back()
-elif home_clicked:
-    go_home()
+    # 🔹 목차로 돌아가기 버튼 (하단)
+    st.markdown('<div class="back-btn">', unsafe_allow_html=True)
+    st.button("🏠 목차로 돌아가기", use_container_width=True, key="btn-home", on_click=go_home)
