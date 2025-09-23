@@ -31,7 +31,7 @@ appendix_list = [
     {"title": "위험물제조소등 접지저항기준(소방청 협의사항)", "key": "위험물제조소등 접지저항기준(소방청 협의사항)"}
 ]
 
-# ======================= CSS & JS ======================= #
+# ======================= CSS ======================= #
 st.markdown("""
 <style>
 /* ===== 공통 레이아웃 ===== */
@@ -39,7 +39,6 @@ html, body, [class*="css"] {
     font-family: 'Noto Sans KR', sans-serif;
     background-color: #ffffff;
     line-height: 1.7;
-    scroll-behavior: smooth;   /* 부드러운 스크롤 */
 }
 
 /* ===== 제목 영역 ===== */
@@ -103,7 +102,6 @@ html, body, [class*="css"] {
     padding: 0.7em;
     font-size: 1rem;
     font-weight: 600;
-    transition: background-color 0.2s ease;
 }
 .stButton button:hover {
     background-color: #0072e0;
@@ -144,22 +142,12 @@ table tr:nth-child(even) {
     padding: 0.6em 1em;
     border: none;
     font-weight: 600;
-    transition: background-color 0.2s ease;
 }
 .back-btn button:hover {
     background-color: #0072e0;
 }
 </style>
-
-<!-- 🔹페이지가 렌더링될 때마다 강제로 최상단으로 이동 -->
-<script>
-window.addEventListener('streamlit:render', function() {
-    window.scrollTo(0, 0);
-});
-</script>
 """, unsafe_allow_html=True)
-
-
 
 
 # ======================= 데이터 ======================= #
