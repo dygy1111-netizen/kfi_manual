@@ -177,16 +177,12 @@ def toggle_favorite(item):
 
 # ======================= 페이지 ======================= #
 # ======================= 사이드바 ======================= #
-st.sidebar.markdown("## 🔎 바로가기")
-if st.sidebar.button("💡 자주하는 질문 (FAQ)", use_container_width=True):
-    st.switch_page("pages/2_자주하는질문.py")
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("## 📚 전체 목차")
+# ✅ 목차를 대제목별로 펼쳐보기
+st.sidebar.markdown("## 📚 전체 메뉴")
 for main, subs in sections.items():
-    with st.sidebar.expander(f"📂 {main}", expanded=False):
+    with st.sidebar.expander(f"📂 {main}", expanded=False):  # 기본 닫힘
         for sub in subs:
-            st.sidebar.button(sub, key=f"side-{sub}", on_click=go_page, args=(sub,))
+            st.button(sub, key=f"side-{sub}", on_click=go_page, args=(sub,))
 
 if st.session_state.favorites:
     st.sidebar.markdown("---")
@@ -217,16 +213,23 @@ if st.session_state.page == "인트로":
     </div>
     """, unsafe_allow_html=True)
 
+    # ✅ 버튼 (이미지 위쪽에 나란히 배치, 1클릭 이동)
     col1, col2 = st.columns(2)
     with col1:
         if st.button("📘 매뉴얼 시작하기", use_container_width=True):
-            go_home()  # → 목차로 이동
+            go_home()  # → 목차 페이지로 이동
     with col2:
-        if st.button("💡 자주하는 질문 (FAQ)", use_container_width=True):
-            # ✅ 멀티페이지의 pages/2_자주하는질문.py로 바로 전환
-            st.switch_page("pages/2_자주하는질문.py")
+        # ✅ pages/2_자주하는질문.py 직접 이동
+        st.markdown(
+            '<a href="/2_자주하는질문" target="_self">'
+            '<button style="width:100%;background-color:#005bac;color:white;'
+            'border:none;border-radius:8px;padding:0.7em;font-size:1rem;font-weight:600;">'
+            '💡 자주하는 질문 (FAQ)'
+            '</button></a>',
+            unsafe_allow_html=True
+        )
 
-    # 커버 이미지
+    # ✅ 커버 이미지 (버튼 아래)
     cover = None
     for ext in ("jpg", "jpeg", "png"):
         p = Path(f"images/cover.{ext}")
