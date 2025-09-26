@@ -47,14 +47,6 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ===================== 사이드바 (빠른 이동 메뉴) ===================== #
-with st.sidebar:
-    st.markdown('<div class="sidebar-btn">', unsafe_allow_html=True)
-    st.button("🏠 Home", key="sb-home", on_click=lambda: st.switch_page("home.py"))
-    st.button("📘 E 매뉴얼", key="sb-manual", on_click=lambda: st.switch_page("pages/1_E_매뉴얼.py"))
-    st.button("💡 자주하는 질문", key="sb-faq", on_click=lambda: st.switch_page("pages/2_자주하는질문.py"))
-    st.markdown('</div>', unsafe_allow_html=True)
-
 # ===================== 메인 페이지 ===================== #
 st.markdown('<div class="main-title">클릭하며 배우는</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
