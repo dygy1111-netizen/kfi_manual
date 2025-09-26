@@ -216,22 +216,13 @@ def jump_to_section(target: str):
 with st.sidebar:
     st.header("📂 빠른 메뉴")
 
-    # (필요시) 고정 링크들
-    # st.page_link("home.py", label="🏠 Home")
-    # st.page_link("pages/1_E_매뉴얼.py", label="📘 E 매뉴얼")
-    # st.page_link("pages/2_자주하는질문.py", label="💡 자주하는 질문")
-
-    # 대제목 → 하위 메뉴 펼침
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
-                st.button(
-                    sub,
-                    key=f"side-{sub}",
-                    use_container_width=True,
-                    on_click=jump_to_section,   # 🔴 여기!
-                    args=(sub,)
-                )
+                if st.button(sub, key=f"side-{sub}", use_container_width=True):
+                    st.session_state["jump_to"] = sub   # 섹션 저장
+                    st.switch_page("pages/1_E_매뉴얼.py")  # ✅ 여기서 바로 이동
+
 
     # ⭐ 즐겨찾기
     if st.session_state.get("favorites"):
