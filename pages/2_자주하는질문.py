@@ -1,11 +1,10 @@
 import streamlit as st
-import json, re, glob, os
+import json, re
 from pathlib import Path
 
-st.set_page_config(page_title="자주하는 질문", page_icon="💡", layout="wide")
+st.set_page_config(page_title="자주하는 질문", page_icon="💡", layout="centered")
 
-# ======================= 데이터 (목차 공유) ======================= #
-# 👉 home.py / 1_E_매뉴얼.py 와 동일하게 유지
+# ======================= 목차 데이터 (home / E-매뉴얼과 동일) ======================= #
 sections = {
     "1. 위험물탱크 위치, 구조 및 설비의 기준": [
         "1.1 안전거리","1.2 보유공지","1.3 표지 및 게시판",
@@ -18,43 +17,56 @@ sections = {
     ],
     "2. 안전성능검사": ["2.1 검사절차 및 확인사항","2.2 검사방법","2.3 참고사항"],
     "3. 정기검사": ["3.1 검사절차 및 확인사항","3.2 검사방법","3.3 참고사항"],
-    "4. 부록": ["물분무설비 설치기준","부상지붕탱크 구조",
-               "내부부상지붕탱크 구조","전기방식설비",
-               "위험물제조소등 접지저항기준(소방청 협의사항)"]
+    "4. 부록": [
+        "물분무설비 설치기준","부상지붕탱크 구조",
+        "내부부상지붕탱크 구조","전기방식설비",
+        "위험물제조소등 접지저항기준(소방청 협의사항)"
+    ]
 }
 
-# ======================= 세션 상태 ======================= #
 if "page" not in st.session_state:
     st.session_state.page = "자주하는 질문"
 
 def go_page(p):
     st.session_state.page = p
 
-# ======================= 사이드바 ======================= #
-with st.sidebar:
-    # 💡 FAQ 고정 버튼
-    st.button("💡 자주하는 질문 (현재)", use_container_width=True)
-
-    st.markdown("---")
-    st.header("📚 전체 메뉴")
-    # ✅ 대제목 → 클릭 시 하위 메뉴 펼침
-    for main, subs in sections.items():
-        with st.expander(f"📂 {main}", expanded=False):
-            for sub in subs:
-                st.button(sub, key=f"side-{sub}", use_container_width=True,
-                          on_click=go_page, args=(sub,))
-
-# ======================= FAQ 본문 ======================= #
-st.markdown(
-    "<h3 style='font-size:1.3rem; font-weight:700; margin-bottom:0.8rem;'>💡 자주하는 질문 (FAQ)</h3>",
-    unsafe_allow_html=True
-)
-
-# ---------------- CSS (하이라이트 + 접기/펼치기)
+# ======================= CSS (E-매뉴얼과 동일 스타일) ======================= #
 st.markdown("""
 <style>
+html, body, [class*="css"] {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #ffffff;
+    line-height: 1.7;
+}
+.main-title {
+    font-size: 2.0rem;
+    font-weight: 800;
+    color: #222222;
+    line-height: 1.4;
+}
+.section-title {
+    color: #003366;
+    font-weight: 700;
+    margin-top: 1.2em;
+    font-size: 1.1rem;
+}
+.stButton button {
+    width: 100%;
+    border-radius: 8px;
+    background-color: #005bac;
+    color: white;
+    border: none;
+    padding: 0.7em;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+.stButton button:hover {
+    background-color: #0072e0;
+}
+/* FAQ 카드 */
 details.faq {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d0d7e2;
   border-radius: 10px;
   padding: 0.6rem 0.9rem;
   margin: 0.6rem 0;
@@ -84,7 +96,18 @@ mark { padding: 0 2px; background: #fff59d; }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- 데이터 로딩
+# ======================= 사이드바 ======================= #
+with st.sidebar:
+    st.button("💡 자주하는 질문 (현재)", use_container_width=True)
+    st.markdown("---")
+    st.header("📚 전체 메뉴")
+    for main, subs in sections.items():
+        with st.expander(f"📂 {main}", expanded=False):
+            for sub in subs:
+                st.button(sub, key=f"side-{sub}", use_container_width=True,
+                          on_click=go_page, args=(sub,))
+
+# ======================= FAQ 데이터 ======================= #
 faq_path = Path("faq.json")
 if faq_path.exists():
     with open(faq_path, "r", encoding="utf-8") as f:
@@ -94,30 +117,27 @@ else:
         {"q": "샘플 질문", "a": "샘플 답변입니다.\n\n![](faq_images/sample.jpg)"}
     ]
 
-# ---------------- 검색 입력
+# ======================= 검색 ======================= #
+st.markdown('<div class="main-title">💡 자주하는 질문 (FAQ)</div>', unsafe_allow_html=True)
 keyword = st.text_input("🔍 검색어를 입력하세요", placeholder="질문 또는 답변 키워드").strip()
 
-# ---------------- 검색 필터링
 if keyword:
     key_l = keyword.lower()
     results = [it for it in faq_list if key_l in it["q"].lower() or key_l in it["a"].lower()]
 else:
     results = faq_list
 
-# ---------------- 하이라이트 함수
 def highlight(text, kw):
     if not kw:
         return text
     pattern = re.compile(re.escape(kw), re.IGNORECASE)
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
-# ---------------- 렌더링 (질문 → 이미지 → 답변)
+# ======================= FAQ 렌더링 ======================= #
 if results:
     for item in results:
         q_html = highlight(item["q"], keyword)
         a_html = highlight(item["a"], keyword)
-
-        # HTML <details>로 접기/펼치기 구현
         st.markdown(
             f"<details class='faq'><summary>{q_html}</summary>"
             f"<div style='margin-top:0.6rem;'>{a_html}</div></details>",
