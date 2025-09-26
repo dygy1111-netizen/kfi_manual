@@ -44,12 +44,6 @@ html, body, [class*="css"] {
     color: #222222;
     line-height: 1.4;
 }
-.section-title {
-    color: #003366;
-    font-weight: 700;
-    margin-top: 1.2em;
-    font-size: 1.1rem;
-}
 .stButton button {
     width: 100%;
     border-radius: 8px;
@@ -64,37 +58,58 @@ html, body, [class*="css"] {
 .stButton button:hover {
     background-color: #0072e0;
 }
-/* FAQ 카드 */
+
+/* ===================== FAQ 카드 ===================== */
 details.faq {
-  border: 1px solid #d0d7e2;
+  border: 2px solid #d0d7e2;           /* 테두리 색상 (매뉴얼 표 색상과 유사) */
   border-radius: 10px;
-  padding: 0.6rem 0.9rem;
-  margin: 0.6rem 0;
-  background: #ffffff;
+  padding: 0.7rem 1rem;
+  margin: 0.8rem 0;
+  background: #f8fbff;                 /* 💡 매뉴얼과 비슷한 연한 파란 배경 */
+  transition: box-shadow 0.2s ease;
 }
 details.faq[open] {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
+
+/* 질문(요약) 스타일 */
 details.faq summary {
   list-style: none;
   cursor: pointer;
   font-weight: 700;
   font-size: 1.05rem;
+  color: #003366;                      /* 💡 매뉴얼과 동일한 진한 파랑 */
   outline: none;
+  padding: 0.3rem 0;
 }
 details.faq summary::-webkit-details-marker { display: none; }
 details.faq summary:after {
   content: "▾";
   float: right;
   transition: transform 0.2s ease;
-  color: #666;
+  color: #005bac;                      /* 화살표 색상 */
 }
 details.faq[open] summary:after {
   transform: rotate(180deg);
 }
-mark { padding: 0 2px; background: #fff59d; }
+
+/* 답변 영역 */
+details.faq div {
+  margin-top: 0.6rem;
+  color: #333333;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* 하이라이트 */
+mark { 
+  padding: 0 2px;
+  background: #fff59d;
+  border-radius: 3px;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
