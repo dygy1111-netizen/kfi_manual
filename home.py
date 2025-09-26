@@ -130,3 +130,13 @@ with col1:
 with col2:
     if st.button("💡 자주하는 질문(FAQ)", use_container_width=True):
         st.switch_page("pages/2_자주하는질문.py")
+
+#cover = None
+#for ext in ("jpg","jpeg","png"):
+#    p = Path(f"images/cover.{ext}")
+#    if p.exists():
+#        cover = p
+#        break
+#if cover:
+#    st.markdown("---")
+#    st.image(str(cover), use_container_width=True, caption="E-매뉴얼 표지")
