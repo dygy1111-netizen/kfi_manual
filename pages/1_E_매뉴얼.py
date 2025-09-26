@@ -190,10 +190,10 @@ def save_user_data():
         }
         save_all_users(all_users)
 
-#def go_home():
- #   st.session_state.page = "목차"
-  #  st.session_state.search = ""      # 검색어 초기화(선택)
-   # st.session_state.need_rerun = True   # 👉 플래그만 설정
+def go_home():
+    st.session_state.page = "목차"
+    st.session_state.search = ""      # 검색어 초기화(선택)
+    st.session_state.need_rerun = True   # 👉 플래그만 설정
 
 def go_page(p):
     st.session_state.page = p
@@ -298,8 +298,4 @@ else:
             st.markdown(content, unsafe_allow_html=True)
 
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
-    st.button(
-    "🏠 목차로 돌아가기",
-    use_container_width=True,
-    on_click=lambda: st.switch_page("pages/1_E_매뉴얼.py")
-)
+    st.button("🏠 목차로 돌아가기", use_container_width=True, on_click=go_home)
