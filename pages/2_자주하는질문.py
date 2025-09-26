@@ -121,14 +121,6 @@ mark {
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
-    st.markdown("### 🔗 빠른 이동")
-    st.markdown('<div class="sidebar-btn">', unsafe_allow_html=True)
-    st.button("🏠 Home", key="sb-home", on_click=lambda: st.switch_page("home.py"))
-    st.button("📘 E 매뉴얼", key="sb-manual", on_click=lambda: st.switch_page("pages/1_E_매뉴얼.py"))
-    st.button("💡 자주하는 질문", key="sb-faq", on_click=lambda: None)  # 현재 페이지
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown("---")
     st.header("📂 빠른 메뉴")
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
