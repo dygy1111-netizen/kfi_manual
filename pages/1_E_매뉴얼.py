@@ -177,23 +177,23 @@ def toggle_favorite(item):
 
 # ======================= 페이지 ======================= #
 # ======================= 사이드바 ======================= #
-# ✅ 사이드바에서 즐겨찾기, 최근 열람, 전체 메뉴를 모두 탐색 가능
+# ✅ 목차를 대제목별로 펼쳐보기
 st.sidebar.markdown("## 📚 전체 메뉴")
 for main, subs in sections.items():
-    st.sidebar.markdown(f"**{main}**")
-    for sub in subs:
-        st.sidebar.button(sub, key=f"side-{sub}", on_click=go_page, args=(sub,))
+    with st.sidebar.expander(f"📂 {main}", expanded=False):  # 기본 닫힘
+        for sub in subs:
+            st.button(sub, key=f"side-{sub}", on_click=go_page, args=(sub,))
 
 if st.session_state.favorites:
     st.sidebar.markdown("---")
     st.sidebar.markdown("⭐ **즐겨찾기**")
-    for i,f in enumerate(st.session_state.favorites):
+    for i, f in enumerate(st.session_state.favorites):
         st.sidebar.button(f, key=f"fav-{i}-{f}", on_click=go_page, args=(f,))
 
 if st.session_state.history:
     st.sidebar.markdown("---")
     st.sidebar.markdown("🕘 **최근 열람**")
-    for i,h in enumerate(reversed(st.session_state.history[-5:])):
+    for i, h in enumerate(reversed(st.session_state.history[-5:])):
         st.sidebar.button(h, key=f"hist-{i}-{h}", on_click=go_page, args=(h,))
 
 
@@ -209,18 +209,25 @@ if st.session_state.page == "인트로":
     st.markdown("""
     <div class="guide-text">
     📘 <b>매뉴얼 시작하기</b> 또는 💡 <b>자주하는 질문(FAQ)</b>을 선택하세요.<br>
-    왼쪽 사이드바에서도 모든 메뉴를 바로 탐색할 수 있습니다.
+    왼쪽 사이드바에서도 모든 메뉴를 탐색할 수 있습니다.
     </div>
     """, unsafe_allow_html=True)
 
-    # ✅ 메인 버튼 (이미지 위쪽)
+    # ✅ 버튼 (이미지 위쪽에 나란히 배치, 1클릭 이동)
     col1, col2 = st.columns(2)
     with col1:
         if st.button("📘 매뉴얼 시작하기", use_container_width=True):
-            go_home()  # 목차로 이동
+            go_home()  # → 목차 페이지로 이동
     with col2:
-        if st.button("💡 자주하는 질문 (FAQ)", use_container_width=True):
-            go_page("자주하는 질문")  # FAQ key에 맞게 수정 필요
+        # ✅ pages/2_자주하는질문.py 직접 이동
+        st.markdown(
+            '<a href="/2_자주하는질문" target="_self">'
+            '<button style="width:100%;background-color:#005bac;color:white;'
+            'border:none;border-radius:8px;padding:0.7em;font-size:1rem;font-weight:600;">'
+            '💡 자주하는 질문 (FAQ)'
+            '</button></a>',
+            unsafe_allow_html=True
+        )
 
     # ✅ 커버 이미지 (버튼 아래)
     cover = None
