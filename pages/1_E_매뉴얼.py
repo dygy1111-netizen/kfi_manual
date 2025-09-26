@@ -201,7 +201,6 @@ def toggle_favorite(item):
 # ======================= 사이드바 ======================= #
 with st.sidebar:
     st.header("📂 빠른 메뉴")
-    st.markdown("---")
     # ✅ 대제목 → 하위 메뉴 펼침
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
