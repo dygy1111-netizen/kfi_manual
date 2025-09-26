@@ -192,8 +192,8 @@ def save_user_data():
 
 def go_home():
     st.session_state.page = "목차"
-    st.session_state.search = ""      # 검색어 초기화 (선택)
-    st.rerun()                        # ✅ 최신 Streamlit에서 사용
+    st.session_state.search = ""      # 검색어 초기화(선택)
+    st.session_state.need_rerun = True   # 👉 플래그만 설정
 
 def go_page(p):
     st.session_state.page = p
