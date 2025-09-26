@@ -48,7 +48,6 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 # ===================== 사이드바 (빠른 이동 메뉴) ===================== #
-st.sidebar.markdown("### 🔗 빠른 이동")
 with st.sidebar:
     st.markdown('<div class="sidebar-btn">', unsafe_allow_html=True)
     st.button("🏠 Home", key="sb-home", on_click=lambda: st.switch_page("home.py"))
