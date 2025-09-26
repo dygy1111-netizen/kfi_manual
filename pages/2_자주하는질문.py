@@ -136,7 +136,6 @@ mark {
 # --- 사이드바에서 '하위항목' 클릭 시, 대상 섹션을 세션에 담고 매뉴얼 페이지로 이동
 def jump_to_section(target: str):
     st.session_state["jump_to"] = target
-    st.switch_page("pages/1_E_매뉴얼.py")
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
@@ -147,7 +146,6 @@ with st.sidebar:
             for sub in subs:
                 if st.button(sub, key=f"side-{sub}", use_container_width=True):
                     st.session_state["jump_to"] = sub   # 섹션 저장
-                    st.switch_page("pages/1_E_매뉴얼.py")  # ✅ 여기서 바로 이동
 
 
     # ⭐ 즐겨찾기
