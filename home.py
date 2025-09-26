@@ -51,9 +51,17 @@ html, body, [class*="css"] {
 st.sidebar.markdown("### 🔗 빠른 이동")
 with st.sidebar:
     st.markdown('<div class="sidebar-btn">', unsafe_allow_html=True)
-    st.button("🏠 Home", key="sb-home", on_click=lambda: st.switch_page("home.py"))
-    st.button("📘 E 매뉴얼", key="sb-manual", on_click=lambda: st.switch_page("pages/1_E_매뉴얼.py"))
-    st.button("💡 자주하는 질문", key="sb-faq", on_click=lambda: st.switch_page("pages/2_자주하는질문.py"))
+
+    # ✅ 버튼 클릭 시 바로 이동 (콜백 X)
+    if st.button("🏠 Home", key="sb-home", use_container_width=True):
+        st.switch_page("home.py")
+
+    if st.button("📘 E 매뉴얼", key="sb-manual", use_container_width=True):
+        st.switch_page("pages/1_E_매뉴얼.py")
+
+    if st.button("💡 자주하는 질문", key="sb-faq", use_container_width=True):
+        st.switch_page("pages/2_자주하는질문.py")
+
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ===================== 메인 페이지 ===================== #
@@ -66,6 +74,7 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("📘 매뉴얼 시작하기", use_container_width=True):
         st.switch_page("pages/1_E_매뉴얼.py")
+
 with col2:
     if st.button("💡 자주하는 질문(FAQ)", use_container_width=True):
         st.switch_page("pages/2_자주하는질문.py")
@@ -77,6 +86,7 @@ for ext in ("jpg", "jpeg", "png"):
     if p.exists():
         cover = p
         break
+
 if cover:
     st.markdown("---")
     st.image(str(cover), use_container_width=True, caption="E-매뉴얼 표지")
