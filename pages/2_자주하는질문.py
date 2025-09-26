@@ -121,7 +121,6 @@ mark {
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
-    st.header("📂 빠른 메뉴")
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
