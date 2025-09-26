@@ -37,9 +37,13 @@ html, body, [class*="css"] {
     line-height: 1.7;
 }
 .main-title {
-    font-size: 2.0rem; font-weight: 800;
-    color: #222222; line-height: 1.4; text-align:center;
+    font-size: 2.0rem;
+    font-weight: 800;
+    color: #222222;
+    line-height: 1.4;
+    text-align: center;
 }
+/* 공통 버튼 스타일 */
 .stButton button {
     width: 100%;
     border-radius: 8px;
@@ -52,6 +56,22 @@ html, body, [class*="css"] {
     transition: background-color 0.2s ease;
 }
 .stButton button:hover { background-color: #0072e0; }
+
+/* 사이드바 빠른 이동 버튼 */
+.sidebar-btn button {
+    width: 100%;
+    border-radius: 8px;
+    background-color: #005bac !important;
+    color: white !important;
+    border: none;
+    padding: 0.6em;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.sidebar-btn button:hover {
+    background-color: #0072e0 !important;
+}
+
 .section-title {
     color:#003366; font-weight:700;
     margin-top:1.2em; font-size:1.1rem;
@@ -71,6 +91,7 @@ table th {
     color: white;
 }
 table tr:nth-child(even) { background-color: #f0f4f8; }
+
 .back-btn button {
     background-color: #005bac;
     color: white;
@@ -171,23 +192,22 @@ def toggle_favorite(item):
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
-    # 💡 자주하는 질문(FAQ) 바로가기 (맨 위 고정)
-    if st.button("💡 자주하는 질문 (FAQ)", use_container_width=True):
-        st.switch_page("pages/2_자주하는질문.py")
+    # 🔗 빠른 이동 (Home/E 매뉴얼/FAQ)
+    st.markdown("### 🔗 빠른 이동")
+    st.markdown('<div class="sidebar-btn">', unsafe_allow_html=True)
+    st.button("🏠 Home", key="sb-home", on_click=lambda: st.switch_page("home.py"))
+    st.button("📘 E 매뉴얼", key="sb-manual", on_click=lambda: st.switch_page("pages/1_E_매뉴얼.py"))
+    st.button("💡 자주하는 질문", key="sb-faq", on_click=lambda: st.switch_page("pages/2_자주하는질문.py"))
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("---")
-    st.header("📚 전체 메뉴")
-    # ✅ 대제목 → 클릭 시 하위 메뉴 펼침
+    st.header("📂 빠른 메뉴")
+    # ✅ 대제목 → 하위 메뉴 펼침
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
-                st.button(
-                    sub,
-                    key=f"side-{sub}",
-                    use_container_width=True,
-                    on_click=go_page,
-                    args=(sub,)
-                )
+                st.button(sub, key=f"side-{sub}", use_container_width=True,
+                          on_click=go_page, args=(sub,))
 
     # ⭐ 즐겨찾기
     if st.session_state.favorites:
