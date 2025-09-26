@@ -44,13 +44,6 @@ from pathlib import Path
 st.set_page_config(page_title="위험물탱크 E-매뉴얼", page_icon="📘", layout="centered")
 
 st.markdown("""
-<div class="title-container">
-    <div class="main-title">클릭하며 배우는</div>
-    <div class="sub-title">위험물탱크 E-매뉴얼</div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
 <div class="guide-text">
 📘 <b>매뉴얼 시작하기</b> 또는 💡 <b>자주하는 질문(FAQ)</b>을 선택하세요.<br>
 왼쪽 사이드바에서도 모든 메뉴를 탐색할 수 있습니다.
