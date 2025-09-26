@@ -197,30 +197,53 @@ def toggle_favorite(item):
     else:
         st.session_state.favorites.add(item)
     save_user_data()
+# --- 사이드바에서 '하위항목' 클릭 시, 대상 섹션을 세션에 담고 매뉴얼 페이지로 이동
+def jump_to_section(target: str):
+    st.session_state["jump_to"] = target
+    st.switch_page("pages/1_E_매뉴얼.py")
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
-    st.markdown("### 📂 빠른 메뉴")
-    # ✅ 대제목 → 하위 메뉴 펼침 (직접 링크)
+    # (필요시) 고정 링크들
+    # st.page_link("home.py", label="🏠 Home")
+    # st.page_link("pages/1_E_매뉴얼.py", label="📘 E 매뉴얼")
+    # st.page_link("pages/2_자주하는질문.py", label="💡 자주하는 질문")
+
+    # 대제목 → 하위 메뉴 펼침
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
-                # E 매뉴얼 페이지로 이동 + 특정 섹션 선택
-                st.page_link("pages/1_E_매뉴얼.py", label=sub)
+                st.button(
+                    sub,
+                    key=f"side-{sub}",
+                    use_container_width=True,
+                    on_click=jump_to_section,   # 🔴 여기!
+                    args=(sub,)
+                )
 
     # ⭐ 즐겨찾기
-    if st.session_state.favorites:
+    if st.session_state.get("favorites"):
         st.markdown("---")
         st.markdown("⭐ **즐겨찾기**")
-        for fav in st.session_state.favorites:
-            st.page_link("pages/1_E_매뉴얼.py", label=fav)
+        for i, f in enumerate(st.session_state.favorites):
+            st.button(
+                f,
+                key=f"fav-{i}-{f}",
+                on_click=jump_to_section,      # 🔴 여기!
+                args=(f,)
+            )
 
     # 🕘 최근 열람
-    if st.session_state.history:
+    if st.session_state.get("history"):
         st.markdown("---")
         st.markdown("🕘 **최근 열람**")
-        for hist in reversed(st.session_state.history[-5:]):
-            st.page_link("pages/1_E_매뉴얼.py", label=hist)
+        for i, h in enumerate(reversed(st.session_state.history[-5:])):
+            st.button(
+                h,
+                key=f"hist-{i}-{h}",
+                on_click=jump_to_section,      # 🔴 여기!
+                args=(h,)
+            )
 
 # ======================= 메인 컨텐츠 ======================= #
 if st.session_state.page == "목차":
