@@ -47,6 +47,31 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
+# ======================= 사이드바 ======================= #
+with st.sidebar:
+    st.markdown("---")
+    # ✅ 대제목 → 하위 메뉴 펼침
+    for main, subs in sections.items():
+        with st.expander(f"📂 {main}", expanded=False):
+            for sub in subs:
+                st.button(sub, key=f"side-{sub}", use_container_width=True,
+                          on_click=go_page, args=(sub,))
+
+    # ⭐ 즐겨찾기
+    if st.session_state.favorites:
+        st.markdown("---")
+        st.markdown("⭐ **즐겨찾기**")
+        for i, f in enumerate(st.session_state.favorites):
+            st.button(f, key=f"fav-{i}-{f}", on_click=go_page, args=(f,))
+
+    # 🕘 최근 열람
+    if st.session_state.history:
+        st.markdown("---")
+        st.markdown("🕘 **최근 열람**")
+        for i, h in enumerate(reversed(st.session_state.history[-5:])):
+            st.button(h, key=f"hist-{i}-{h}", on_click=go_page, args=(h,))
+
+
 # ===================== 메인 페이지 ===================== #
 st.markdown('<div class="main-title">클릭하며 배우는</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
