@@ -47,12 +47,11 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ===================== 사이드바 (빠른 이동 메뉴) ===================== #
-st.sidebar.markdown("### 🔗 빠른 이동")
+# ===================== 사이드바 (상단 고정 메뉴만 표시) ===================== #
 with st.sidebar:
     st.markdown('<div class="sidebar-btn">', unsafe_allow_html=True)
 
-    # ✅ 버튼 클릭 시 바로 이동 (콜백 X)
+    # ✅ 버튼 클릭 시 바로 이동
     if st.button("🏠 Home", key="sb-home", use_container_width=True):
         st.switch_page("home.py")
 
@@ -74,7 +73,6 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("📘 매뉴얼 시작하기", use_container_width=True):
         st.switch_page("pages/1_E_매뉴얼.py")
-
 with col2:
     if st.button("💡 자주하는 질문(FAQ)", use_container_width=True):
         st.switch_page("pages/2_자주하는질문.py")
@@ -86,7 +84,6 @@ for ext in ("jpg", "jpeg", "png"):
     if p.exists():
         cover = p
         break
-
 if cover:
     st.markdown("---")
     st.image(str(cover), use_container_width=True, caption="E-매뉴얼 표지")
