@@ -3,7 +3,22 @@ import json, re
 from pathlib import Path
 
 # ======================= 기본 설정 ======================= #
-st.set_page_config(page_title="자주하는 질문", page_icon="💡", layout="centered")
+import streamlit as st
+import json, re
+from pathlib import Path
+
+# ======================= 기본 설정 ======================= #
+# 🔹Streamlit 기본 메뉴(회색 글씨) 숨기기 위해 menu_items 추가
+st.set_page_config(
+    page_title="자주하는 질문",
+    page_icon="💡",
+    layout="centered",
+    menu_items={
+        "Get Help": None,
+        "Report a bug": None,
+        "About": None
+    }
+)
 
 # ======================= 목차 데이터 (매뉴얼 동일) ======================= #
 sections = {
