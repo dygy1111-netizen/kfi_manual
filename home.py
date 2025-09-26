@@ -81,39 +81,27 @@ html, body, [class*="css"] {
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
-    st.header("📂 빠른 메뉴")
-    # ✅ 대제목 → 하위 메뉴 펼침 (직접 매뉴얼 페이지로 이동)
+    st.markdown("### 📂 빠른 메뉴")
+    # ✅ 대제목 → 하위 메뉴 펼침 (직접 링크)
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
-                st.button(
-                    sub,
-                    key=f"side-{sub}",
-                    use_container_width=True,
-                    on_click=lambda s=sub: st.switch_page("pages/1_E_매뉴얼.py")
-                )
+                # E 매뉴얼 페이지로 이동 + 특정 섹션 선택
+                st.page_link("pages/1_E_매뉴얼.py", label=sub)
 
     # ⭐ 즐겨찾기
     if st.session_state.favorites:
         st.markdown("---")
         st.markdown("⭐ **즐겨찾기**")
-        for i, f in enumerate(st.session_state.favorites):
-            st.button(
-                f,
-                key=f"fav-{i}-{f}",
-                on_click=lambda s=f: st.switch_page("pages/1_E_매뉴얼.py")
-            )
+        for fav in st.session_state.favorites:
+            st.page_link("pages/1_E_매뉴얼.py", label=fav)
 
     # 🕘 최근 열람
     if st.session_state.history:
         st.markdown("---")
         st.markdown("🕘 **최근 열람**")
-        for i, h in enumerate(reversed(st.session_state.history[-5:])):
-            st.button(
-                h,
-                key=f"hist-{i}-{h}",
-                on_click=lambda s=h: st.switch_page("pages/1_E_매뉴얼.py")
-            )
+        for hist in reversed(st.session_state.history[-5:]):
+            st.page_link("pages/1_E_매뉴얼.py", label=hist)
 
 # ===================== 메인 페이지 ===================== #
 st.markdown('<div class="main-title">클릭하며 배우는</div>', unsafe_allow_html=True)
