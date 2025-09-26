@@ -186,20 +186,32 @@ if st.session_state.page == "인트로":
 
     st.markdown("""
     <div class="guide-text">
-    📘 매뉴얼을 시작하려면 아래 버튼을 눌러주세요
+    📘 <b>매뉴얼 시작하기</b> 또는 💡 <b>자주하는 질문(FAQ)</b>을 선택하세요.
     </div>
     """, unsafe_allow_html=True)
 
+    # ✅ 버튼을 이미지 위쪽에 배치 (한 번만 클릭으로 바로 이동)
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("📘 매뉴얼 시작하기", use_container_width=True):
+            go_home()  # 목차 페이지로 이동
+    with col2:
+        if st.button("💡 자주하는 질문 (FAQ)", use_container_width=True):
+            go_page("자주하는 질문")  # FAQ 페이지 key에 맞게 수정 필요
+
+    # ✅ 커버 이미지 (버튼 아래)
     cover = None
-    for ext in ("jpg","jpeg","png"):
+    for ext in ("jpg", "jpeg", "png"):
         p = Path(f"images/cover.{ext}")
         if p.exists():
             cover = p
             break
     if cover:
+        st.markdown("---")
         st.image(str(cover), use_container_width=True, caption="E-매뉴얼 표지")
-    if st.button("📘 매뉴얼 시작", use_container_width=True):
-        go_home()
+    else:
+        st.info("💡 images 폴더에 cover.jpg/png/jpeg 파일을 넣으면 표지가 표시됩니다.")
+
 
 elif st.session_state.page == "목차":
     st.markdown('<div class="main-title">📚 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
