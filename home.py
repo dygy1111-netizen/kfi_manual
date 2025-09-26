@@ -1,18 +1,9 @@
 import streamlit as st
 from pathlib import Path
 
-st.set_page_config(
-    page_title="위험물탱크 E-매뉴얼",
-    page_icon="📘",
-    layout="centered",
-    initial_sidebar_state="expanded",  # 필요시 유지
-    menu_items={    # ✅ 기본 메뉴 제거
-        'Get Help': None,
-        'Report a bug': None,
-        'About': None
-    }
-)
-
+st.set_page_config(page_title="위험물탱크 E-매뉴얼",
+                   page_icon="📘",
+                   layout="centered")
 
 # ✅ 공통 CSS (매뉴얼과 동일)
 st.markdown("""
