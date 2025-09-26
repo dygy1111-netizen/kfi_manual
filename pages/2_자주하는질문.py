@@ -140,6 +140,8 @@ def jump_to_section(target: str):
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
+    st.header("📂 빠른 메뉴")
+
     # (필요시) 고정 링크들
     # st.page_link("home.py", label="🏠 Home")
     # st.page_link("pages/1_E_매뉴얼.py", label="📘 E 매뉴얼")
