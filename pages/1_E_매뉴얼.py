@@ -192,9 +192,9 @@ def save_user_data():
 
 def go_home():
     st.session_state.page = "목차"
-    st.session_state.search = ""      # 검색어도 초기화 (선택 사항)
-    st.experimental_rerun()          # ✅ 강제 리렌더링 → 최상단에서 시작
-    
+    st.session_state.search = ""      # 검색어 초기화 (선택)
+    st.rerun()                        # ✅ 최신 Streamlit에서 사용
+
 def go_page(p):
     st.session_state.page = p
     if p in st.session_state.history:
