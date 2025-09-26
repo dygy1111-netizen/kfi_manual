@@ -171,10 +171,14 @@ def toggle_favorite(item):
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
+    # 💡 자주하는 질문(FAQ) 바로가기 (맨 위 고정)
+    if st.button("💡 자주하는 질문 (FAQ)", use_container_width=True):
+        st.switch_page("pages/2_자주하는질문.py")
+
+    st.markdown("---")
     st.header("📚 전체 메뉴")
-    # ✅ 대제목 → 클릭 시 하위 메뉴 펼쳐짐
+    # ✅ 대제목 → 클릭 시 하위 메뉴 펼침
     for main, subs in sections.items():
-        # st.expander를 sidebar 컨테이너 안에서 호출
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
                 st.button(
@@ -185,17 +189,14 @@ with st.sidebar:
                     args=(sub,)
                 )
 
-    st.markdown("---")
-    # 💡 자주하는 질문(FAQ) 바로가기
-    if st.button("💡 자주하는 질문(FAQ)", use_container_width=True):
-        st.switch_page("pages/2_자주하는질문.py")
-
+    # ⭐ 즐겨찾기
     if st.session_state.favorites:
         st.markdown("---")
         st.markdown("⭐ **즐겨찾기**")
         for i, f in enumerate(st.session_state.favorites):
             st.button(f, key=f"fav-{i}-{f}", on_click=go_page, args=(f,))
 
+    # 🕘 최근 열람
     if st.session_state.history:
         st.markdown("---")
         st.markdown("🕘 **최근 열람**")
