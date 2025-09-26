@@ -171,6 +171,16 @@ if "search" not in st.session_state: st.session_state.search = ""
 if "favorites" not in st.session_state: st.session_state.favorites = set()
 if "history" not in st.session_state: st.session_state.history = []
 
+# --- 사이드바에서 특정 항목을 선택해 들어온 경우 바로 해당 페이지로 진입
+if "jump_to" in st.session_state and st.session_state["jump_to"]:
+    target = st.session_state.pop("jump_to")
+    # 유효성 검사(선택지가 실제 sections 안에 있으면 바로 이동)
+    if any(target in subs for subs in sections.values()):
+        st.session_state.page = target
+    else:
+        # 혹시 부록 같은 독립 항목이면 그대로 설정
+        st.session_state.page = target
+
 def save_user_data():
     if "user_id" in st.session_state:
         all_users = load_all_users()
