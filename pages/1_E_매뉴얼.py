@@ -1,7 +1,6 @@
 import streamlit as st
 import os, glob, json
 from pathlib import Path
-from io import BytesIO
 
 # ======================= 기본 설정 ======================= #
 st.set_page_config(page_title="위험물탱크 E-매뉴얼",
@@ -37,17 +36,10 @@ html, body, [class*="css"] {
     background-color: #ffffff;
     line-height: 1.7;
 }
-.title-container { text-align: center; margin-top: 30px; margin-bottom: 20px; }
-.main-title { font-size: 2.0rem; font-weight: 800; color: #222222; line-height: 1.4; }
-.sub-title { font-size: 2.0rem; font-weight: 800; color: #444444; line-height: 1.4; }
-.guide-text { text-align: center; font-size: 1.1rem; margin-top: 10px; line-height: 1.6; color: #555555; }
-
-.menu-box { border: 2px solid #d9e6f2; background-color: #f8fbff;
-            border-radius: 12px; padding: 1.2em; margin-top: 1.2em; }
-.menu-title { font-size: 1.3rem; font-weight: 700; color: #003366;
-              margin-bottom: 0.8em; display: flex; align-items: center; }
-.menu-btn { width: 100%; margin-bottom: 0.4em; }
-
+.main-title {
+    font-size: 2.0rem; font-weight: 800;
+    color: #222222; line-height: 1.4; text-align:center;
+}
 .stButton button {
     width: 100%;
     border-radius: 8px;
@@ -57,15 +49,28 @@ html, body, [class*="css"] {
     padding: 0.7em;
     font-size: 1rem;
     font-weight: 600;
+    transition: background-color 0.2s ease;
 }
 .stButton button:hover { background-color: #0072e0; }
-
-.section-title { color:#003366; font-weight:700; margin-top:1.2em; font-size:1.1rem; }
-table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
-table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
-table th { background-color: #005bac; color: white; }
+.section-title {
+    color:#003366; font-weight:700;
+    margin-top:1.2em; font-size:1.1rem;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5em;
+}
+table th, table td {
+    border: 1px solid #d0d7e2;
+    padding: 8px;
+    text-align: center;
+}
+table th {
+    background-color: #005bac;
+    color: white;
+}
 table tr:nth-child(even) { background-color: #f0f4f8; }
-
 .back-btn button {
     background-color: #005bac;
     color: white;
@@ -83,9 +88,11 @@ sections = {
     "1. 위험물탱크 위치, 구조 및 설비의 기준": [
         "1.1 안전거리","1.2 보유공지","1.3 표지 및 게시판",
         "1.4-1 탱크 내부 압력 해소 구조","1.4-2 탱크 부식방지 설비","1.4-3 통기관",
-        "1.4-4 자동계량식 유량계","1.4-5 주입구","1.4-6 펌프설비","1.4-7 배관 및 밸브",
-        "1.4-8 부상지붕탱크의 설비","1.4-9 전기설비","1.4-10 부속설비",
-        "1.5 방유제","1.6 옥외탱크저장소의 특례","1.7 소화설비","1.8 경보설비"
+        "1.4-4 자동계량식 유량계","1.4-5 주입구","1.4-6 펌프설비",
+        "1.4-7 배관 및 밸브","1.4-8 부상지붕탱크의 설비",
+        "1.4-9 전기설비","1.4-10 부속설비",
+        "1.5 방유제","1.6 옥외탱크저장소의 특례",
+        "1.7 소화설비","1.8 경보설비"
     ],
     "2. 안전성능검사": ["2.1 검사절차 및 확인사항","2.2 검사방법","2.3 참고사항"],
     "3. 정기검사": ["3.1 검사절차 및 확인사항","3.2 검사방법","3.3 참고사항"],
@@ -108,7 +115,7 @@ for main, subs in sections.items():
         title = sub if isinstance(sub, str) else sub["title"]
         search_index.append((title, key, main, body))
 
-# ======================= 유틸 ======================= #
+# ======================= 유틸 함수 ======================= #
 def find_images(name):
     exts = ['jpg','jpeg','png']
     results = []
@@ -130,23 +137,10 @@ def load_content(key):
     return None
 
 # ======================= 세션 상태 ======================= #
-if "page" not in st.session_state: st.session_state.page = "인트로"
+if "page" not in st.session_state: st.session_state.page = "목차"
 if "search" not in st.session_state: st.session_state.search = ""
 if "favorites" not in st.session_state: st.session_state.favorites = set()
 if "history" not in st.session_state: st.session_state.history = []
-
-# ======================= 사용자 로그인 ======================= #
-st.sidebar.header("🔑 로그인")
-user_id = st.sidebar.text_input("사번을 입력하세요", value=st.session_state.get("user_id",""))
-if user_id:
-    st.session_state.user_id = user_id
-    all_users = load_all_users()
-    if user_id not in all_users:
-        all_users[user_id] = {"favorites": [], "history": []}
-        save_all_users(all_users)
-    if not st.session_state.favorites and not st.session_state.history:
-        st.session_state.favorites = set(all_users[user_id]["favorites"])
-        st.session_state.history = all_users[user_id]["history"]
 
 def save_user_data():
     if "user_id" in st.session_state:
@@ -175,80 +169,34 @@ def toggle_favorite(item):
         st.session_state.favorites.add(item)
     save_user_data()
 
-# ======================= 페이지 ======================= #
 # ======================= 사이드바 ======================= #
-# ✅ 목차를 대제목별로 펼쳐보기
-st.sidebar.markdown("## 📚 전체 메뉴")
+st.sidebar.header("📚 전체 메뉴")
 for main, subs in sections.items():
-    with st.sidebar.expander(f"📂 {main}", expanded=False):  # 기본 닫힘
+    with st.sidebar.expander(f"📂 {main}", expanded=False):
         for sub in subs:
-            st.button(sub, key=f"side-{sub}", on_click=go_page, args=(sub,))
+            st.sidebar.button(sub, key=f"side-{sub}", on_click=go_page, args=(sub,))
+# FAQ 바로가기
+st.sidebar.markdown("---")
+if st.sidebar.button("💡 자주하는 질문(FAQ)", use_container_width=True):
+    st.switch_page("pages/2_자주하는질문.py")
 
 if st.session_state.favorites:
     st.sidebar.markdown("---")
     st.sidebar.markdown("⭐ **즐겨찾기**")
-    for i, f in enumerate(st.session_state.favorites):
+    for i,f in enumerate(st.session_state.favorites):
         st.sidebar.button(f, key=f"fav-{i}-{f}", on_click=go_page, args=(f,))
-
 if st.session_state.history:
     st.sidebar.markdown("---")
     st.sidebar.markdown("🕘 **최근 열람**")
-    for i, h in enumerate(reversed(st.session_state.history[-5:])):
+    for i,h in enumerate(reversed(st.session_state.history[-5:])):
         st.sidebar.button(h, key=f"hist-{i}-{h}", on_click=go_page, args=(h,))
 
-
-# ======================= 인트로(표지) 페이지 ======================= #
-if st.session_state.page == "인트로":
-    st.markdown("""
-    <div class="title-container">
-        <div class="main-title">클릭하며 배우는</div>
-        <div class="sub-title">위험물탱크 E-매뉴얼</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="guide-text">
-    📘 <b>매뉴얼 시작하기</b> 또는 💡 <b>자주하는 질문(FAQ)</b>을 선택하세요.<br>
-    왼쪽 사이드바에서도 모든 메뉴를 탐색할 수 있습니다.
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ✅ 버튼 (이미지 위쪽에 나란히 배치, 1클릭 이동)
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("📘 매뉴얼 시작하기", use_container_width=True):
-            go_home()  # → 목차 페이지로 이동
-    with col2:
-        # ✅ pages/2_자주하는질문.py 직접 이동
-        st.markdown(
-            '<a href="/2_자주하는질문" target="_self">'
-            '<button style="width:100%;background-color:#005bac;color:white;'
-            'border:none;border-radius:8px;padding:0.7em;font-size:1rem;font-weight:600;">'
-            '💡 자주하는 질문 (FAQ)'
-            '</button></a>',
-            unsafe_allow_html=True
-        )
-
-    # ✅ 커버 이미지 (버튼 아래)
-    cover = None
-    for ext in ("jpg", "jpeg", "png"):
-        p = Path(f"images/cover.{ext}")
-        if p.exists():
-            cover = p
-            break
-    if cover:
-        st.markdown("---")
-        st.image(str(cover), use_container_width=True, caption="E-매뉴얼 표지")
-    else:
-        st.info("💡 images 폴더에 cover.jpg/png/jpeg 파일을 넣으면 표지가 표시됩니다.")
-
-
-elif st.session_state.page == "목차":
+# ======================= 메인 컨텐츠 ======================= #
+if st.session_state.page == "목차":
     st.markdown('<div class="main-title">📚 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
     st.session_state.search = st.text_input("🔍 검색", value=st.session_state.search)
     q = st.session_state.search.strip().lower()
 
-    # 검색 결과
     if q:
         results = [(title, key) for title, key, main, body in search_index
                    if q in title.lower() or q in body]
@@ -257,7 +205,6 @@ elif st.session_state.page == "목차":
             for title, key in results:
                 st.button(title, use_container_width=True, on_click=go_page, args=(key,))
 
-    # 전체 메뉴
     st.markdown("### 📂 전체 목차")
     for main, subs in sections.items():
         st.markdown(f"**{main}**")
@@ -268,20 +215,16 @@ elif st.session_state.page == "목차":
                           on_click=go_page, args=(sub,))
 
 else:
-    # 설명 페이지
     current = st.session_state.page
     st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
-    # 이미지 출력
     safe_name = current.replace(" ", "_").replace("/", "_")
-    img_files = find_images(safe_name)
-    for img_path, desc in img_files:
+    for img_path, desc in find_images(safe_name):
         caption = f"{current} ({desc})" if desc else current
         st.image(img_path, use_container_width=True, caption=caption)
 
-    # 본문 출력
     content = load_content(current)
     if content:
         if "### 부록" in content:
@@ -295,6 +238,5 @@ else:
         else:
             st.markdown(content, unsafe_allow_html=True)
 
-    # 목차로 돌아가기
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     st.button("🏠 목차로 돌아가기", use_container_width=True, on_click=go_home)
