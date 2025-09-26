@@ -47,20 +47,13 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ===================== 사이드바 (상단 고정 메뉴만 표시) ===================== #
+# ===================== 사이드바 (빠른 이동 메뉴) ===================== #
+st.sidebar.markdown("### 🔗 빠른 이동")
 with st.sidebar:
     st.markdown('<div class="sidebar-btn">', unsafe_allow_html=True)
-
-    # ✅ 버튼 클릭 시 바로 이동
-    if st.button("🏠 Home", key="sb-home", use_container_width=True):
-        st.switch_page("home.py")
-
-    if st.button("📘 E 매뉴얼", key="sb-manual", use_container_width=True):
-        st.switch_page("pages/1_E_매뉴얼.py")
-
-    if st.button("💡 자주하는 질문", key="sb-faq", use_container_width=True):
-        st.switch_page("pages/2_자주하는질문.py")
-
+    st.button("🏠 Home", key="sb-home", on_click=lambda: st.switch_page("home.py"))
+    st.button("📘 E 매뉴얼", key="sb-manual", on_click=lambda: st.switch_page("pages/1_E_매뉴얼.py"))
+    st.button("💡 자주하는 질문", key="sb-faq", on_click=lambda: st.switch_page("pages/2_자주하는질문.py"))
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ===================== 메인 페이지 ===================== #
