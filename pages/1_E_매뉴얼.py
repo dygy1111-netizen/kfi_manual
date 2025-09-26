@@ -267,11 +267,10 @@ if st.session_state.page == "목차":
     st.markdown("### 📂 전체 목차")
     for main, subs in sections.items():
         st.markdown(f"**{main}**")
-        cols = st.columns(2)
-        for i, sub in enumerate(subs):
-            with cols[i % 2]:
-                st.button(sub, key=f"menu-{sub}", use_container_width=True,
-                          on_click=go_page, args=(sub,))
+        for sub in subs:
+            st.button(sub, key=f"menu-{sub}", use_container_width=True,
+              on_click=go_page, args=(sub,))
+
 
 else:
     current = st.session_state.page
