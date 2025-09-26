@@ -81,6 +81,17 @@ html, body, [class*="css"] {
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
+    st.header("📂 빠른 메뉴")
+    st.markdown('<div class="sidebar-btn">', unsafe_allow_html=True)
+    st.button("🏠 Home", key="sb-home",
+              on_click=lambda: st.switch_page("home.py"))
+    st.button("📘 E 매뉴얼", key="sb-manual",
+              on_click=lambda: st.switch_page("pages/1_E_매뉴얼.py"))
+    st.button("💡 자주하는 질문", key="sb-faq",
+              on_click=lambda: st.switch_page("pages/2_자주하는질문.py"))
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("---")
     # ✅ 대제목 → 하위 메뉴 펼침 (직접 매뉴얼 페이지로 이동)
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
