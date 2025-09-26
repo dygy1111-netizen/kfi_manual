@@ -170,26 +170,37 @@ def toggle_favorite(item):
     save_user_data()
 
 # ======================= 사이드바 ======================= #
-st.sidebar.header("📚 전체 메뉴")
-for main, subs in sections.items():
-    with st.sidebar.expander(f"📂 {main}", expanded=False):
-        for sub in subs:
-            st.sidebar.button(sub, key=f"side-{sub}", on_click=go_page, args=(sub,))
-# FAQ 바로가기
-st.sidebar.markdown("---")
-if st.sidebar.button("💡 자주하는 질문(FAQ)", use_container_width=True):
-    st.switch_page("pages/2_자주하는질문.py")
+with st.sidebar:
+    st.header("📚 전체 메뉴")
+    # ✅ 대제목 → 클릭 시 하위 메뉴 펼쳐짐
+    for main, subs in sections.items():
+        # st.expander를 sidebar 컨테이너 안에서 호출
+        with st.expander(f"📂 {main}", expanded=False):
+            for sub in subs:
+                st.button(
+                    sub,
+                    key=f"side-{sub}",
+                    use_container_width=True,
+                    on_click=go_page,
+                    args=(sub,)
+                )
 
-if st.session_state.favorites:
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("⭐ **즐겨찾기**")
-    for i,f in enumerate(st.session_state.favorites):
-        st.sidebar.button(f, key=f"fav-{i}-{f}", on_click=go_page, args=(f,))
-if st.session_state.history:
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("🕘 **최근 열람**")
-    for i,h in enumerate(reversed(st.session_state.history[-5:])):
-        st.sidebar.button(h, key=f"hist-{i}-{h}", on_click=go_page, args=(h,))
+    st.markdown("---")
+    # 💡 자주하는 질문(FAQ) 바로가기
+    if st.button("💡 자주하는 질문(FAQ)", use_container_width=True):
+        st.switch_page("pages/2_자주하는질문.py")
+
+    if st.session_state.favorites:
+        st.markdown("---")
+        st.markdown("⭐ **즐겨찾기**")
+        for i, f in enumerate(st.session_state.favorites):
+            st.button(f, key=f"fav-{i}-{f}", on_click=go_page, args=(f,))
+
+    if st.session_state.history:
+        st.markdown("---")
+        st.markdown("🕘 **최근 열람**")
+        for i, h in enumerate(reversed(st.session_state.history[-5:])):
+            st.button(h, key=f"hist-{i}-{h}", on_click=go_page, args=(h,))
 
 # ======================= 메인 컨텐츠 ======================= #
 if st.session_state.page == "목차":
