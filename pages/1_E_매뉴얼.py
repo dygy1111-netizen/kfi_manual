@@ -176,6 +176,28 @@ def toggle_favorite(item):
     save_user_data()
 
 # ======================= 페이지 ======================= #
+# ======================= 사이드바 ======================= #
+# ✅ 사이드바에서 즐겨찾기, 최근 열람, 전체 메뉴를 모두 탐색 가능
+st.sidebar.markdown("## 📚 전체 메뉴")
+for main, subs in sections.items():
+    st.sidebar.markdown(f"**{main}**")
+    for sub in subs:
+        st.sidebar.button(sub, key=f"side-{sub}", on_click=go_page, args=(sub,))
+
+if st.session_state.favorites:
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("⭐ **즐겨찾기**")
+    for i,f in enumerate(st.session_state.favorites):
+        st.sidebar.button(f, key=f"fav-{i}-{f}", on_click=go_page, args=(f,))
+
+if st.session_state.history:
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("🕘 **최근 열람**")
+    for i,h in enumerate(reversed(st.session_state.history[-5:])):
+        st.sidebar.button(h, key=f"hist-{i}-{h}", on_click=go_page, args=(h,))
+
+
+# ======================= 인트로(표지) 페이지 ======================= #
 if st.session_state.page == "인트로":
     st.markdown("""
     <div class="title-container">
@@ -186,18 +208,19 @@ if st.session_state.page == "인트로":
 
     st.markdown("""
     <div class="guide-text">
-    📘 <b>매뉴얼 시작하기</b> 또는 💡 <b>자주하는 질문(FAQ)</b>을 선택하세요.
+    📘 <b>매뉴얼 시작하기</b> 또는 💡 <b>자주하는 질문(FAQ)</b>을 선택하세요.<br>
+    왼쪽 사이드바에서도 모든 메뉴를 바로 탐색할 수 있습니다.
     </div>
     """, unsafe_allow_html=True)
 
-    # ✅ 버튼을 이미지 위쪽에 배치 (한 번만 클릭으로 바로 이동)
+    # ✅ 메인 버튼 (이미지 위쪽)
     col1, col2 = st.columns(2)
     with col1:
         if st.button("📘 매뉴얼 시작하기", use_container_width=True):
-            go_home()  # 목차 페이지로 이동
+            go_home()  # 목차로 이동
     with col2:
         if st.button("💡 자주하는 질문 (FAQ)", use_container_width=True):
-            go_page("자주하는 질문")  # FAQ 페이지 key에 맞게 수정 필요
+            go_page("자주하는 질문")  # FAQ key에 맞게 수정 필요
 
     # ✅ 커버 이미지 (버튼 아래)
     cover = None
