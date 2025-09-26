@@ -298,7 +298,6 @@ else:
             st.markdown(content, unsafe_allow_html=True)
 
     st.markdown('<div class="back-btn">', unsafe_allow_html=True)
-    st.button("🏠 목차로 돌아가기", use_container_width=True, on_click=go_home)
-if st.session_state.get("need_rerun", False):
-    st.session_state.need_rerun = False
-    st.rerun()
+    st.button("🏠 목차로 돌아가기",
+          use_container_width=True,
+          on_click=lambda: st.switch_page("pages/1_E_매뉴얼.py"))
