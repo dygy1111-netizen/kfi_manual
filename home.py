@@ -117,7 +117,7 @@ with st.sidebar:
             )
 
 # ===================== 메인 페이지 ===================== #
-st.markdown('<div class="sub-title">위험물탱크 모바일 E-매뉴얼</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
 st.markdown('<div class="guide-text">📘 매뉴얼 또는 💡 자주하는 질문을 선택하세요</div>', unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
