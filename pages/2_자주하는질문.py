@@ -45,11 +45,6 @@ html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background
 .stButton button { width:100%; border-radius:8px; background:#005bac; color:#fff; border:none;
   padding:0.9em; font-size:1.05rem; font-weight:600;}
 .stButton button:hover { background:#0072e0; }
-details.faq { border:2px solid #d0d7e2; border-radius:10px; padding:0.7rem 1rem; margin:0.8rem 0; background:#f8fbff;}
-details.faq summary { list-style:none; cursor:pointer; font-weight:700; font-size:1.05rem; color:#003366; padding:0.3rem 0;}
-details.faq summary::-webkit-details-marker { display:none;}
-details.faq summary:after { content:"▾"; float:right; color:#005bac;}
-details.faq[open] summary:after { transform: rotate(180deg); }
 mark { padding:0 2px; background:#fff59d; border-radius:3px; }
 </style>
 """, unsafe_allow_html=True)
@@ -78,7 +73,7 @@ def jump_to_section(target: str):
     st.session_state["jump_to"] = target
     st.switch_page("pages/1_E_매뉴얼.py")
 
-# ---------------- 사이드바: 비번 없는 간단 로그인(선택) + 빠른메뉴 ----------------
+# ---------------- 사이드바: 로그인(아이디만) + 빠른메뉴 ----------------
 with st.sidebar:
     st.header("👤 사용자 로그인 (선택)")
     if st.session_state.auth_user:
@@ -132,7 +127,7 @@ if faq_path.exists():
 else:
     faq_list = [{"q": "샘플 질문", "a": "샘플 답변입니다.\n\n![](faq_images/sample.jpg)"}]
 
-# ---------------- 렌더 ----------------
+# ---------------- 검색/하이라이트 ----------------
 st.markdown('<div class="main-title">💡 자주하는 질문 (FAQ)</div>', unsafe_allow_html=True)
 keyword = st.text_input("🔍 검색어를 입력하세요", placeholder="질문 또는 답변 키워드").strip()
 
@@ -141,37 +136,23 @@ def highlight(text, kw):
     pattern = re.compile(re.escape(kw), re.IGNORECASE)
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
-results = []
-if keyword:
-    key_l = keyword.lower()
-    results = [it for it in faq_list if key_l in it.get("q","").lower() or key_l in it.get("a","").lower()]
-else:
-    results = faq_list
+results = [it for it in faq_list if (keyword.lower() in it.get("q","").lower()
+                                     or keyword.lower() in it.get("a","").lower())] if keyword else faq_list
 
+# ---------------- 렌더: expander + st.image (이미지 안전 서빙) ----------------
 if results:
     for item in results:
-        q_html = highlight(item.get("q",""), keyword)
-        a_html = highlight(item.get("a",""), keyword)
+        q_text = item.get("q","(제목 없음)")
+        with st.expander(q_text):
+            # 본문: 마크다운 렌더(하이라이트 포함). a에 마크다운/이미지가 있어도 정상 처리됨.
+            st.markdown(highlight(item.get("a",""), keyword), unsafe_allow_html=True)
 
-        # ✅ 이미지 처리 추가
-        imgs = []
-        if isinstance(item.get("img"), str):
-            imgs = [item["img"]]
-        if isinstance(item.get("images"), list):
-            imgs.extend([p for p in item["images"] if isinstance(p, str)])
-
-        img_html = ""
-        for p in imgs:
-            img_html += (
-                f'<div style="margin-top:8px">'
-                f'<img src="{p}" style="max-width:100%; height:auto; border:1px solid #e5e7eb; border-radius:8px;">'
-                f'</div>'
-            )
-
-        st.markdown(
-            f"<details class='faq'><summary>{q_html}</summary><div>{a_html}{img_html}</div></details>",
-            unsafe_allow_html=True
-        )
+            # 이미지 필드 처리: "img": "path"  /  "images": ["path1","path2", ...]
+            if isinstance(item.get("img"), str):
+                st.image(item["img"], use_container_width=True)
+            if isinstance(item.get("images"), list):
+                for p in item["images"]:
+                    if isinstance(p, str):
+                        st.image(p, use_container_width=True)
 else:
     st.warning("검색 결과가 없습니다.")
-
