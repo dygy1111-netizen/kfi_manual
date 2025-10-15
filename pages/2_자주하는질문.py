@@ -41,7 +41,7 @@ def save_user_data(username: str, favorites, history):
 # ---------------- 스타일 ----------------
 st.markdown("""
 <style>
-:root { --content-max: 980px; --img-max: 860px; }
+:root { --content-max: 1100px; --img-max: 1100px; }  /* 🔸 폭 확대 */
 html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background:#fff; line-height:1.7;}
 @media (min-width: 1200px){
   .block-container { max-width: var(--content-max); }
@@ -63,6 +63,7 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
   border:1px solid #e5e7eb; border-radius:8px; margin: 8px 0; }
 </style>
 """, unsafe_allow_html=True)
+
 
 # ---------------- 목차(사이드바) + 로그인(선택) ----------------
 sections = {

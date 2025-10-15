@@ -61,6 +61,7 @@ table tr:nth-child(even) { background-color: #f0f4f8; }
 </style>
 """, unsafe_allow_html=True)
 
+
 # ---------------- 데이터 ----------------
 appendix_list = [
     {"title": "물분무설비 설치기준", "key": "물분무설비 설치기준"},
