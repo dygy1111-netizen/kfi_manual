@@ -124,7 +124,6 @@ def go_home():
     st.session_state.page = "목차"
     st.session_state.search = ""
     persist_user_state()
-    st.rerun()
 
 def go_page(p):
     st.session_state.page = p
