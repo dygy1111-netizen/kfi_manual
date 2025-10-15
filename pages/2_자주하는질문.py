@@ -152,9 +152,26 @@ if results:
     for item in results:
         q_html = highlight(item.get("q",""), keyword)
         a_html = highlight(item.get("a",""), keyword)
+
+        # ✅ 이미지 처리 추가
+        imgs = []
+        if isinstance(item.get("img"), str):
+            imgs = [item["img"]]
+        if isinstance(item.get("images"), list):
+            imgs.extend([p for p in item["images"] if isinstance(p, str)])
+
+        img_html = ""
+        for p in imgs:
+            img_html += (
+                f'<div style="margin-top:8px">'
+                f'<img src="{p}" style="max-width:100%; height:auto; border:1px solid #e5e7eb; border-radius:8px;">'
+                f'</div>'
+            )
+
         st.markdown(
-            f"<details class='faq'><summary>{q_html}</summary><div>{a_html}</div></details>",
+            f"<details class='faq'><summary>{q_html}</summary><div>{a_html}{img_html}</div></details>",
             unsafe_allow_html=True
         )
 else:
     st.warning("검색 결과가 없습니다.")
+
