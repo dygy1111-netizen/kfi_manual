@@ -42,12 +42,22 @@ def save_user_data(username: str, favorites, history):
 # ---------------- 스타일 ----------------
 st.markdown("""
 <style>
+:root { --content-max: 980px; --img-max: 860px; }
 html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background:#fff; line-height:1.7;}
+@media (min-width: 1200px){
+  .block-container { max-width: var(--content-max); }
+}
 .main-title { font-size: 2.0rem; font-weight: 800; color: #222; text-align:center;}
 .stButton button { width:100%; border-radius:8px; background:#005bac; color:#fff; border:none;
   padding:0.9em; font-size:1.05rem; font-weight:600;}
 .stButton button:hover { background:#0072e0; }
 .back-btn button { background:#005bac; color:#fff; border-radius:6px; padding:0.6em 1em; border:none; font-weight:600;}
+
+/* ✅ 마크다운 표 스타일 복원 */
+table { width: 100%; border-collapse: collapse; margin: 0.5em 0 1.2em; }
+table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
+table th { background-color: #005bac; color: #fff; }
+table tr:nth-child(even) { background-color: #f0f4f8; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -91,7 +101,7 @@ for main, subs in sections.items():
 
 # ---------------- 유틸 ----------------
 def find_images(name):
-    exts = ['jpg','jpeg','png']
+    exts = ['jpg','jpeg','png','webp']
     results = []
     for e in exts:
         for path in sorted(glob.glob(f"images/{name}*.{e}")):
@@ -106,7 +116,6 @@ def load_content(key):
     return p.read_text(encoding="utf-8") if p.exists() else None
 
 def persist_user_state():
-    # 로그인한 경우에만 파일 저장
     if st.session_state.auth_user:
         save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
 
@@ -139,7 +148,7 @@ def jump_to_section(target: str):
 if "jump_to" in st.session_state and st.session_state["jump_to"]:
     st.session_state.page = st.session_state.pop("jump_to")
 
-# ---------------- 사이드바: 비번 없는 간단 로그인(선택) + 빠른메뉴 ----------------
+# ---------------- 사이드바: 로그인(선택) + 빠른메뉴 ----------------
 with st.sidebar:
     st.header("👤 사용자 로그인 (선택)")
     if st.session_state.auth_user:
@@ -218,6 +227,7 @@ else:
     safe_name = current.replace(" ", "_").replace("/", "_")
     imgs = find_images(safe_name)
     if imgs:
+        # 2열 배치 유지 (이미지는 원본 비율로 줄어듦)
         for i in range(0, len(imgs), 2):
             cols = st.columns(2)
             for c, (img_path, desc) in zip(cols, imgs[i:i+2]):

@@ -1,6 +1,7 @@
 import streamlit as st
 import json, re, os
 from pathlib import Path
+from PIL import Image
 
 st.set_page_config(
     page_title="자주하는 질문",
@@ -40,16 +41,30 @@ def save_user_data(username: str, favorites, history):
 # ---------------- 스타일 ----------------
 st.markdown("""
 <style>
+:root { --content-max: 980px; --img-max: 860px; }
 html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background:#fff; line-height:1.7;}
+@media (min-width: 1200px){
+  .block-container { max-width: var(--content-max); }
+}
 .main-title { font-size: 2.0rem; font-weight: 800; color: #222; text-align:center;}
 .stButton button { width:100%; border-radius:8px; background:#005bac; color:#fff; border:none;
   padding:0.9em; font-size:1.05rem; font-weight:600;}
 .stButton button:hover { background:#0072e0; }
 mark { padding:0 2px; background:#fff59d; border-radius:3px; }
+
+/* ✅ 마크다운 표 스타일 복원 */
+table { width: 100%; border-collapse: collapse; margin: 0.5em 0 1.2em; }
+table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
+table th { background-color: #005bac; color: #fff; }
+table tr:nth-child(even) { background-color: #f0f4f8; }
+
+/* ✅ FAQ 본문 래퍼: 마크다운 이미지에도 공통 여백/테두리 적용 */
+.faq-body img { max-width: var(--img-max); width: 100%; height: auto;
+  border:1px solid #e5e7eb; border-radius:8px; margin: 8px 0; }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- 목차(사이드바용) ----------------
+# ---------------- 목차(사이드바) + 로그인(선택) ----------------
 sections = {
     "1. 위험물탱크 위치, 구조 및 설비의 기준": [
         "1.1 안전거리","1.2 보유공지","1.3 표지 및 게시판",
@@ -73,7 +88,6 @@ def jump_to_section(target: str):
     st.session_state["jump_to"] = target
     st.switch_page("pages/1_E_매뉴얼.py")
 
-# ---------------- 사이드바: 로그인(아이디만) + 빠른메뉴 ----------------
 with st.sidebar:
     st.header("👤 사용자 로그인 (선택)")
     if st.session_state.auth_user:
@@ -139,20 +153,32 @@ def highlight(text, kw):
 results = [it for it in faq_list if (keyword.lower() in it.get("q","").lower()
                                      or keyword.lower() in it.get("a","").lower())] if keyword else faq_list
 
-# ---------------- 렌더: expander + st.image (이미지 안전 서빙) ----------------
+# ---------------- 이미지 표시 헬퍼: 고정 폭(860px) ----------------
+MAX_IMG_WIDTH = 860
+
+def show_image(path: str):
+    try:
+        img = Image.open(path)
+        # st.image는 width 픽셀 기준으로 리사이즈. 고정폭으로 통일.
+        st.image(img, width=MAX_IMG_WIDTH)
+    except Exception as e:
+        st.caption(f"이미지 로드 실패: {path}")
+
+# ---------------- 렌더: expander + 본문 wrapper + 이미지 ----------------
 if results:
     for item in results:
         q_text = item.get("q","(제목 없음)")
         with st.expander(q_text):
-            # 본문: 마크다운 렌더(하이라이트 포함). a에 마크다운/이미지가 있어도 정상 처리됨.
-            st.markdown(highlight(item.get("a",""), keyword), unsafe_allow_html=True)
+            # 본문을 wrapper로 감싸 마크다운 이미지와 표에도 공통 스타일 적용
+            body_html = f"<div class='faq-body'>{highlight(item.get('a',''), keyword)}</div>"
+            st.markdown(body_html, unsafe_allow_html=True)
 
-            # 이미지 필드 처리: "img": "path"  /  "images": ["path1","path2", ...]
+            # 단일/다중 이미지 필드 별도 지원
             if isinstance(item.get("img"), str):
-                st.image(item["img"], use_container_width=True)
+                show_image(item["img"])
             if isinstance(item.get("images"), list):
                 for p in item["images"]:
                     if isinstance(p, str):
-                        st.image(p, use_container_width=True)
+                        show_image(p)
 else:
     st.warning("검색 결과가 없습니다.")
