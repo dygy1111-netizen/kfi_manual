@@ -228,7 +228,11 @@ else:
     safe_name = current.replace(" ", "_").replace("/", "_")
     imgs = find_images(safe_name)
     if imgs:
-        # 2열 배치 유지 (이미지는 원본 비율로 줄어듦)
+      if st.session_state.get("large_images"):  # ✅ 큰 이미지 모드: 1열
+        for (img_path, desc) in imgs:
+            caption = f"{current} ({desc})" if desc else current
+            st.image(img_path, use_container_width=True, caption=caption)
+      else:  # 기존 2열
         for i in range(0, len(imgs), 2):
             cols = st.columns(2)
             for c, (img_path, desc) in zip(cols, imgs[i:i+2]):
