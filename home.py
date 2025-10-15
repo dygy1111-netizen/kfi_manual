@@ -16,7 +16,6 @@ if "favorites" not in st.session_state: st.session_state.favorites = set()
 if "history" not in st.session_state: st.session_state.history = []
 
 DATA_FILE = "user_data.json"
-ENV_PASSWORD = os.environ.get("APP_LOGIN_PASSWORD", "changeme")  # 배포 시 꼭 변경!
 
 def _load_all_users():
     if os.path.exists(DATA_FILE):
@@ -53,38 +52,34 @@ html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- 사이드바: 간단 로그인(선택) ----------------
+# ---------------- 사이드바: 비번 없는 간단 로그인(선택) ----------------
 with st.sidebar:
-    st.header("🔐 로그인 (선택)")
+    st.header("👤 사용자 로그인 (선택)")
 
     if st.session_state.auth_user:
-        st.success(f"로그인: {st.session_state.auth_user}")
+        st.success(f"현재 사용자: {st.session_state.auth_user}")
         if st.button("로그아웃"):
-            # 로그인 사용자면 저장 후 로그아웃
             save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
             st.session_state.auth_user = None
             st.toast("로그아웃 완료")
             st.rerun()
     else:
-        username = st.text_input("아이디", key="sb_username")
-        password = st.text_input("비밀번호", type="password", key="sb_password")
+        username = st.text_input("아이디 입력", key="sidebar_username")
         if st.button("로그인"):
-            if not username or not password:
-                st.error("아이디/비밀번호를 입력하세요.")
-            elif password != ENV_PASSWORD:
-                st.error("비밀번호가 올바르지 않습니다.")
+            if not username.strip():
+                st.error("아이디를 입력하세요.")
             else:
-                st.session_state.auth_user = username
-                # 사용자 저장 데이터 불러와 현재 세션과 머지
-                ud = load_user_data(username)
-                # 즐겨찾기는 합집합, 최근열람은 기존 유지 + 저장분 선호(중복 제거)
+                u = username.strip()
+                st.session_state.auth_user = u
+                # 사용자 데이터 불러와 현재 세션과 병합
+                ud = load_user_data(u)
                 st.session_state.favorites |= set(ud.get("favorites", []))
                 merged_hist = st.session_state.history + [h for h in ud.get("history", []) if h not in st.session_state.history]
                 st.session_state.history = merged_hist[:5]
-                st.toast("로그인 성공! 데이터가 복원되었습니다.")
+                st.toast("로그인 완료. 사용자 데이터가 복원되었습니다.")
                 st.rerun()
 
-    st.caption("로그인 안 해도 열람 가능(임시 세션 저장). 로그인하면 사용자별로 저장·복원됩니다.")
+    st.caption("로그인 안 해도 열람 가능(세션 임시 저장). 로그인하면 사용자별 저장·복원됩니다.")
 
 # ---------------- 메인 ----------------
 st.markdown('<div class="sub-title">위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)

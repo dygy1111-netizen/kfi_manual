@@ -15,7 +15,6 @@ if "favorites" not in st.session_state: st.session_state.favorites = set()
 if "history" not in st.session_state: st.session_state.history = []
 
 DATA_FILE = "user_data.json"
-ENV_PASSWORD = os.environ.get("APP_LOGIN_PASSWORD", "changeme")
 
 def _load_all_users():
     if os.path.exists(DATA_FILE):
@@ -55,7 +54,7 @@ mark { padding:0 2px; background:#fff59d; border-radius:3px; }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- 목차(사이드바용) + 로그인(선택) ----------------
+# ---------------- 목차(사이드바용) ----------------
 sections = {
     "1. 위험물탱크 위치, 구조 및 설비의 기준": [
         "1.1 안전거리","1.2 보유공지","1.3 표지 및 게시판",
@@ -79,10 +78,11 @@ def jump_to_section(target: str):
     st.session_state["jump_to"] = target
     st.switch_page("pages/1_E_매뉴얼.py")
 
+# ---------------- 사이드바: 비번 없는 간단 로그인(선택) + 빠른메뉴 ----------------
 with st.sidebar:
-    st.header("🔐 로그인 (선택)")
+    st.header("👤 사용자 로그인 (선택)")
     if st.session_state.auth_user:
-        st.success(f"로그인: {st.session_state.auth_user}")
+        st.success(f"현재 사용자: {st.session_state.auth_user}")
         if st.button("로그아웃", key="faq-logout"):
             save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
             st.session_state.auth_user = None
@@ -90,15 +90,12 @@ with st.sidebar:
             st.rerun()
     else:
         u = st.text_input("아이디", key="faq-username")
-        p = st.text_input("비밀번호", type="password", key="faq-password")
         if st.button("로그인", key="faq-login"):
-            if not u or not p:
-                st.error("아이디/비밀번호를 입력하세요.")
-            elif p != ENV_PASSWORD:
-                st.error("비밀번호가 올바르지 않습니다.")
+            if not u.strip():
+                st.error("아이디를 입력하세요.")
             else:
-                st.session_state.auth_user = u
-                ud = load_user_data(u)
+                st.session_state.auth_user = u.strip()
+                ud = load_user_data(st.session_state.auth_user)
                 st.session_state.favorites |= set(ud.get("favorites", []))
                 merged_hist = st.session_state.history + [h for h in ud.get("history", []) if h not in st.session_state.history]
                 st.session_state.history = merged_hist[:5]
