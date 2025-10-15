@@ -3,12 +3,6 @@ import json, re
 from pathlib import Path
 
 # ======================= 기본 설정 ======================= #
-import streamlit as st
-import json, re
-from pathlib import Path
-
-# ======================= 기본 설정 ======================= #
-# 🔹Streamlit 기본 메뉴(회색 글씨) 숨기기 위해 menu_items 추가
 st.set_page_config(
     page_title="자주하는 질문",
     page_icon="💡",
@@ -19,6 +13,13 @@ st.set_page_config(
         "About": None
     }
 )
+
+# ---- 세션 상태 기본값 (공통) ----
+if "page" not in st.session_state: st.session_state.page = "자주하는 질문"
+if "search" not in st.session_state: st.session_state.search = ""
+if "favorites" not in st.session_state: st.session_state.favorites = set()
+if "history" not in st.session_state: st.session_state.history = []
+if "user_id" not in st.session_state: st.session_state.user_id = "local-user"
 
 # ======================= 목차 데이터 (매뉴얼 동일) ======================= #
 sections = {
@@ -40,13 +41,10 @@ sections = {
     ]
 }
 
-if "page" not in st.session_state:
-    st.session_state.page = "자주하는 질문"
-
 def go_page(p):
     st.session_state.page = p
 
-# ======================= CSS (매뉴얼 동일 스타일) ======================= #
+# ======================= CSS ======================= #
 st.markdown("""
 <style>
 html, body, [class*="css"] {
@@ -61,21 +59,18 @@ html, body, [class*="css"] {
     line-height: 1.4;
     text-align: center;
 }
-/* 공통 버튼 */
 .stButton button {
     width: 100%;
     border-radius: 8px;
     background-color: #005bac;
     color: white;
     border: none;
-    padding: 0.7em;
-    font-size: 1rem;
+    padding: 0.9em;
+    font-size: 1.05rem;
     font-weight: 600;
     transition: background-color 0.2s ease;
 }
 .stButton button:hover { background-color: #0072e0; }
-
-/* 사이드바 빠른 이동 버튼 */
 .sidebar-btn button {
     width: 100%;
     border-radius: 8px;
@@ -87,25 +82,21 @@ html, body, [class*="css"] {
     font-weight: 600;
 }
 .sidebar-btn button:hover { background-color: #0072e0 !important; }
-
-/* FAQ 카드 */
 details.faq {
   border: 2px solid #d0d7e2;
   border-radius: 10px;
   padding: 0.7rem 1rem;
   margin: 0.8rem 0;
-  background: #f8fbff;        /* 💡 매뉴얼 표와 비슷한 연한 파랑 */
+  background: #f8fbff;
   transition: box-shadow 0.2s ease;
 }
-details.faq[open] {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
+details.faq[open] { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 details.faq summary {
   list-style: none;
   cursor: pointer;
   font-weight: 700;
   font-size: 1.05rem;
-  color: #003366;             /* 💡 매뉴얼과 동일한 진한 파랑 */
+  color: #003366;
   outline: none;
   padding: 0.3rem 0;
 }
@@ -117,60 +108,41 @@ details.faq summary:after {
   color: #005bac;
 }
 details.faq[open] summary:after { transform: rotate(180deg); }
-
 details.faq div {
   margin-top: 0.6rem;
   color: #333333;
   font-size: 0.95rem;
   line-height: 1.6;
 }
-
-/* 검색 하이라이트 */
-mark {
-  padding: 0 2px;
-  background: #fff59d;
-  border-radius: 3px;
-}
+mark { padding: 0 2px; background: #fff59d; border-radius: 3px; }
 </style>
 """, unsafe_allow_html=True)
-# --- 사이드바에서 '하위항목' 클릭 시, 대상 섹션을 세션에 담고 매뉴얼 페이지로 이동
+
 def jump_to_section(target: str):
     st.session_state["jump_to"] = target
+    st.switch_page("pages/1_E_매뉴얼.py")
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
     st.header("📂 빠른 메뉴")
-
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
                 if st.button(sub, key=f"side-{sub}", use_container_width=True):
-                    st.session_state["jump_to"] = sub   # 섹션 저장
+                    st.session_state["jump_to"] = sub
+                    st.switch_page("pages/1_E_매뉴얼.py")
 
-
-    # ⭐ 즐겨찾기
     if st.session_state.get("favorites"):
         st.markdown("---")
         st.markdown("⭐ **즐겨찾기**")
         for i, f in enumerate(st.session_state.favorites):
-            st.button(
-                f,
-                key=f"fav-{i}-{f}",
-                on_click=jump_to_section,      # 🔴 여기!
-                args=(f,)
-            )
+            st.button(f, key=f"fav-{i}-{f}", on_click=jump_to_section, args=(f,))
 
-    # 🕘 최근 열람
     if st.session_state.get("history"):
         st.markdown("---")
         st.markdown("🕘 **최근 열람**")
         for i, h in enumerate(reversed(st.session_state.history[-5:])):
-            st.button(
-                h,
-                key=f"hist-{i}-{h}",
-                on_click=jump_to_section,      # 🔴 여기!
-                args=(h,)
-            )
+            st.button(h, key=f"hist-{i}-{h}", on_click=jump_to_section, args=(h,))
 
 # ======================= FAQ 데이터 ======================= #
 faq_path = Path("faq.json")
@@ -178,19 +150,11 @@ if faq_path.exists():
     with open(faq_path, "r", encoding="utf-8") as f:
         faq_list = json.load(f)
 else:
-    faq_list = [
-        {"q": "샘플 질문", "a": "샘플 답변입니다.\n\n![](faq_images/sample.jpg)"}
-    ]
+    faq_list = [{"q": "샘플 질문", "a": "샘플 답변입니다.\n\n![](faq_images/sample.jpg)"}]
 
 # ======================= 검색 ======================= #
 st.markdown('<div class="main-title">💡 자주하는 질문 (FAQ)</div>', unsafe_allow_html=True)
 keyword = st.text_input("🔍 검색어를 입력하세요", placeholder="질문 또는 답변 키워드").strip()
-
-if keyword:
-    key_l = keyword.lower()
-    results = [it for it in faq_list if key_l in it["q"].lower() or key_l in it["a"].lower()]
-else:
-    results = faq_list
 
 def highlight(text, kw):
     if not kw:
@@ -199,13 +163,19 @@ def highlight(text, kw):
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
 # ======================= FAQ 렌더링 ======================= #
+results = []
+if keyword:
+    key_l = keyword.lower()
+    results = [it for it in faq_list if key_l in it["q"].lower() or key_l in it["a"].lower()]
+else:
+    results = faq_list
+
 if results:
     for item in results:
         q_html = highlight(item["q"], keyword)
         a_html = highlight(item["a"], keyword)
         st.markdown(
-            f"<details class='faq'><summary>{q_html}</summary>"
-            f"<div>{a_html}</div></details>",
+            f"<details class='faq'><summary>{q_html}</summary><div>{a_html}</div></details>",
             unsafe_allow_html=True
         )
 else:

@@ -3,7 +3,6 @@ import os, glob, json
 from pathlib import Path
 
 # ======================= 기본 설정 ======================= #
-# 🔹menu_items 옵션을 추가해 Streamlit 기본 메뉴(회색 글씨) 제거
 st.set_page_config(
     page_title="위험물탱크 E-매뉴얼",
     page_icon="📘",
@@ -14,6 +13,13 @@ st.set_page_config(
         "About": None
     }
 )
+
+# ---- 세션 상태 기본값 (공통) ----
+if "page" not in st.session_state: st.session_state.page = "목차"
+if "search" not in st.session_state: st.session_state.search = ""
+if "favorites" not in st.session_state: st.session_state.favorites = set()
+if "history" not in st.session_state: st.session_state.history = []
+if "user_id" not in st.session_state: st.session_state.user_id = "local-user"
 
 DATA_FILE = "user_data.json"
 
@@ -51,21 +57,18 @@ html, body, [class*="css"] {
     line-height: 1.4;
     text-align: center;
 }
-/* 공통 버튼 스타일 */
 .stButton button {
     width: 100%;
     border-radius: 8px;
     background-color: #005bac;
     color: white;
     border: none;
-    padding: 0.7em;
-    font-size: 1rem;
+    padding: 0.9em;
+    font-size: 1.05rem;
     font-weight: 600;
     transition: background-color 0.2s ease;
 }
 .stButton button:hover { background-color: #0072e0; }
-
-/* 사이드바 빠른 이동 버튼 */
 .sidebar-btn button {
     width: 100%;
     border-radius: 8px;
@@ -76,39 +79,25 @@ html, body, [class*="css"] {
     font-size: 1rem;
     font-weight: 600;
 }
-.sidebar-btn button:hover {
-    background-color: #0072e0 !important;
-}
-
+.sidebar-btn button:hover { background-color: #0072e0 !important; }
 .section-title {
     color:#003366; font-weight:700;
     margin-top:1.2em; font-size:1.1rem;
 }
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 0.5em;
-}
-table th, table td {
-    border: 1px solid #d0d7e2;
-    padding: 8px;
-    text-align: center;
-}
-table th {
-    background-color: #005bac;
-    color: white;
-}
+table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
+table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
+table th { background-color: #005bac; color: white; }
 table tr:nth-child(even) { background-color: #f0f4f8; }
-
 .back-btn button {
-    background-color: #005bac;
-    color: white;
-    border-radius: 6px;
-    padding: 0.6em 1em;
-    border: none;
-    font-weight: 600;
+    background-color: #005bac; color: white; border-radius: 6px;
+    padding: 0.6em 1em; border: none; font-weight: 600;
 }
 .back-btn button:hover { background-color: #0072e0; }
+.main-title-sticky {
+  position: sticky; top: 0; z-index: 10;
+  background: #ffffff; padding: 0.6rem 0 0.4rem;
+  border-bottom: 1px solid #eef2f7;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -165,35 +154,18 @@ def load_content(key):
             return f.read()
     return None
 
-# ======================= 세션 상태 ======================= #
-if "page" not in st.session_state: st.session_state.page = "목차"
-if "search" not in st.session_state: st.session_state.search = ""
-if "favorites" not in st.session_state: st.session_state.favorites = set()
-if "history" not in st.session_state: st.session_state.history = []
-
-# --- 사이드바에서 특정 항목을 선택해 들어온 경우 바로 해당 페이지로 진입
-if "jump_to" in st.session_state and st.session_state["jump_to"]:
-    target = st.session_state.pop("jump_to")
-    # 유효성 검사(선택지가 실제 sections 안에 있으면 바로 이동)
-    if any(target in subs for subs in sections.values()):
-        st.session_state.page = target
-    else:
-        # 혹시 부록 같은 독립 항목이면 그대로 설정
-        st.session_state.page = target
-
 def save_user_data():
-    if "user_id" in st.session_state:
-        all_users = load_all_users()
-        all_users[st.session_state.user_id] = {
-            "favorites": list(st.session_state.favorites),
-            "history": st.session_state.history
-        }
-        save_all_users(all_users)
+    all_users = load_all_users()
+    all_users[st.session_state.user_id] = {
+        "favorites": list(st.session_state.favorites),
+        "history": st.session_state.history
+    }
+    save_all_users(all_users)
 
 def go_home():
     st.session_state.page = "목차"
-    st.session_state.search = ""      # 검색어 초기화(선택)
-    st.session_state.need_rerun = True   # 👉 플래그만 설정
+    st.session_state.search = ""
+    st.rerun()
 
 def go_page(p):
     st.session_state.page = p
@@ -209,77 +181,86 @@ def toggle_favorite(item):
     else:
         st.session_state.favorites.add(item)
     save_user_data()
-# --- 사이드바에서 '하위항목' 클릭 시, 대상 섹션을 세션에 담고 매뉴얼 페이지로 이동
+
 def jump_to_section(target: str):
     st.session_state["jump_to"] = target
+    st.switch_page("pages/1_E_매뉴얼.py")
+
+# --- 사이드바에서 특정 항목을 선택해 들어온 경우 바로 해당 페이지로 진입
+if "jump_to" in st.session_state and st.session_state["jump_to"]:
+    target = st.session_state.pop("jump_to")
+    if any(target in subs for subs in sections.values()):
+        st.session_state.page = target
+    else:
+        st.session_state.page = target
+
 # ======================= 사이드바 ======================= #
 with st.sidebar:
     st.header("📂 빠른 메뉴")
-
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
                 if st.button(sub, key=f"side-{sub}", use_container_width=True):
-                    st.session_state["jump_to"] = sub   # 섹션 저장
-                    st.switch_page("pages/1_E_매뉴얼.py")  # ✅ 여기서 바로 이동
-
+                    st.session_state["jump_to"] = sub
+                    st.switch_page("pages/1_E_매뉴얼.py")
 
     # ⭐ 즐겨찾기
     if st.session_state.get("favorites"):
         st.markdown("---")
         st.markdown("⭐ **즐겨찾기**")
         for i, f in enumerate(st.session_state.favorites):
-            st.button(
-                f,
-                key=f"fav-{i}-{f}",
-                on_click=jump_to_section,      # 🔴 여기!
-                args=(f,)
-            )
+            st.button(f, key=f"fav-{i}-{f}", on_click=jump_to_section, args=(f,))
 
     # 🕘 최근 열람
     if st.session_state.get("history"):
         st.markdown("---")
         st.markdown("🕘 **최근 열람**")
         for i, h in enumerate(reversed(st.session_state.history[-5:])):
-            st.button(
-                h,
-                key=f"hist-{i}-{h}",
-                on_click=jump_to_section,      # 🔴 여기!
-                args=(h,)
-            )
+            st.button(h, key=f"hist-{i}-{h}", on_click=jump_to_section, args=(h,))
 
 # ======================= 메인 컨텐츠 ======================= #
 if st.session_state.page == "목차":
-    st.markdown('<div class="main-title">📚 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title main-title-sticky">📚 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
     st.session_state.search = st.text_input("🔍 검색", value=st.session_state.search)
     q = st.session_state.search.strip().lower()
 
-    if q:
-        results = [(title, key) for title, key, main, body in search_index
-                   if q in title.lower() or q in body]
+    # 멀티 키워드 AND 매칭
+    tokens = [t for t in q.split() if t]
+    def matches(title, body):
+        if not tokens:
+            return False
+        return all(t in title.lower() or t in body for t in tokens)
+
+    if tokens:
+        results = [(title, key, main) for title, key, main, body in search_index if matches(title, body)]
         if results:
             st.markdown("### 🔎 검색 결과")
-            for title, key in results:
+            for title, key, main in results:
+                st.caption(main)
                 st.button(title, use_container_width=True, on_click=go_page, args=(key,))
+        else:
+            st.info("검색 결과가 없습니다.")
 
     st.markdown("### 📂 전체 목차")
     for main, subs in sections.items():
         st.markdown(f"**{main}**")
         for sub in subs:
-            st.button(sub, key=f"menu-{sub}", use_container_width=True,
-              on_click=go_page, args=(sub,))
-
+            st.button(sub, key=f"menu-{sub}", use_container_width=True, on_click=go_page, args=(sub,))
 
 else:
     current = st.session_state.page
-    st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="main-title main-title-sticky">{current}</div>', unsafe_allow_html=True)
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
     safe_name = current.replace(" ", "_").replace("/", "_")
-    for img_path, desc in find_images(safe_name):
-        caption = f"{current} ({desc})" if desc else current
-        st.image(img_path, use_container_width=True, caption=caption)
+    imgs = find_images(safe_name)
+    if imgs:
+        for i in range(0, len(imgs), 2):
+            cols = st.columns(2)
+            for c, (img_path, desc) in zip(cols, imgs[i:i+2]):
+                caption = f"{current} ({desc})" if desc else current
+                c.image(img_path, use_container_width=True, caption=caption)
 
     content = load_content(current)
     if content:

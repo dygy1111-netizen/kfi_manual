@@ -1,5 +1,4 @@
 import streamlit as st
-import os, json, glob
 from pathlib import Path
 
 st.set_page_config(
@@ -8,6 +7,13 @@ st.set_page_config(
     layout="centered",
     menu_items={"Get Help": None, "Report a bug": None, "About": None}
 )
+
+# ---- 세션 상태 기본값 (공통) ----
+if "page" not in st.session_state: st.session_state.page = "목차"
+if "search" not in st.session_state: st.session_state.search = ""
+if "favorites" not in st.session_state: st.session_state.favorites = set()
+if "history" not in st.session_state: st.session_state.history = []
+if "user_id" not in st.session_state: st.session_state.user_id = "local-user"
 
 # ======================= 데이터 (매뉴얼 목차와 동일) ======================= #
 sections = {
@@ -29,11 +35,9 @@ sections = {
     ]
 }
 
-if "favorites" not in st.session_state: st.session_state.favorites = set()
-if "history" not in st.session_state: st.session_state.history = []
-
 def go_page(p):
-    st.switch_page("pages/1_E_매뉴얼.py")  # 목차 페이지로 이동
+    st.session_state["jump_to"] = p
+    st.switch_page("pages/1_E_매뉴얼.py")
     st.session_state.history.insert(0, p)
     st.session_state.history = st.session_state.history[:5]
 
@@ -50,21 +54,17 @@ html, body, [class*="css"] {
 .sub-title  { font-size: 2.0rem; font-weight: 800; color: #444444;
               line-height: 1.4; text-align:center;}
 .guide-text { text-align: center; font-size: 1.1rem; margin-top: 10px; color: #555555; }
-
-/* 파란 버튼 공통 스타일 */
 .stButton button {
     width: 100%;
     border-radius: 8px;
     background-color: #005bac;
     color: white;
     border: none;
-    padding: 0.7em;
-    font-size: 1rem;
+    padding: 0.9em;
+    font-size: 1.05rem;
     font-weight: 600;
 }
 .stButton button:hover { background-color: #0072e0; }
-
-/* 사이드바 버튼 */
 .sidebar-btn button {
     width: 100%;
     border-radius: 8px;
@@ -78,43 +78,32 @@ html, body, [class*="css"] {
 .sidebar-btn button:hover { background-color: #0072e0 !important; }
 </style>
 """, unsafe_allow_html=True)
-# --- 사이드바에서 '하위항목' 클릭 시, 대상 섹션을 세션에 담고 매뉴얼 페이지로 이동
+
 def jump_to_section(target: str):
     st.session_state["jump_to"] = target
+    st.switch_page("pages/1_E_매뉴얼.py")
 
 # ======================= 사이드바 ======================= #
 with st.sidebar:
     st.header("📂 빠른 메뉴")
-
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
                 if st.button(sub, key=f"side-{sub}", use_container_width=True):
-                    st.session_state["jump_to"] = sub   # 섹션 저장
+                    st.session_state["jump_to"] = sub
+                    st.switch_page("pages/1_E_매뉴얼.py")
 
-    # ⭐ 즐겨찾기
     if st.session_state.get("favorites"):
         st.markdown("---")
         st.markdown("⭐ **즐겨찾기**")
         for i, f in enumerate(st.session_state.favorites):
-            st.button(
-                f,
-                key=f"fav-{i}-{f}",
-                on_click=jump_to_section,      # 🔴 여기!
-                args=(f,)
-            )
+            st.button(f, key=f"fav-{i}-{f}", on_click=jump_to_section, args=(f,))
 
-    # 🕘 최근 열람
     if st.session_state.get("history"):
         st.markdown("---")
         st.markdown("🕘 **최근 열람**")
         for i, h in enumerate(reversed(st.session_state.history[-5:])):
-            st.button(
-                h,
-                key=f"hist-{i}-{h}",
-                on_click=jump_to_section,      # 🔴 여기!
-                args=(h,)
-            )
+            st.button(h, key=f"hist-{i}-{h}", on_click=jump_to_section, args=(h,))
 
 # ===================== 메인 페이지 ===================== #
 st.markdown('<div class="sub-title">위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
@@ -127,13 +116,3 @@ with col1:
 with col2:
     if st.button("💡 자주하는 질문(FAQ)", use_container_width=True):
         st.switch_page("pages/2_자주하는질문.py")
-
-#cover = None
-#for ext in ("jpg","jpeg","png"):
-#    p = Path(f"images/cover.{ext}")
-#    if p.exists():
-#        cover = p
-#        break
-#if cover:
-#    st.markdown("---")
-#    st.image(str(cover), use_container_width=True, caption="E-매뉴얼 표지")
