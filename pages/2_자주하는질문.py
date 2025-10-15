@@ -1,27 +1,41 @@
 import streamlit as st
-import json, re
+import json, re, os
 from pathlib import Path
 
-# ======================= 기본 설정 ======================= #
 st.set_page_config(
     page_title="자주하는 질문",
     page_icon="💡",
     layout="centered",
-    menu_items={
-        "Get Help": None,
-        "Report a bug": None,
-        "About": None
-    }
+    menu_items={"Get Help": None, "Report a bug": None, "About": None}
 )
 
-# ---- 세션 상태 기본값 (공통) ----
-if "page" not in st.session_state: st.session_state.page = "자주하는 질문"
-if "search" not in st.session_state: st.session_state.search = ""
+# ---------------- 로그인 확인 ----------------
+if "auth_user" not in st.session_state or st.session_state.auth_user is None:
+    st.warning("로그인이 필요합니다.")
+    st.switch_page("home.py")
+
+# ---------------- 세션 기본 ----------------
 if "favorites" not in st.session_state: st.session_state.favorites = set()
 if "history" not in st.session_state: st.session_state.history = []
-if "user_id" not in st.session_state: st.session_state.user_id = "local-user"
 
-# ======================= 목차 데이터 (매뉴얼 동일) ======================= #
+# ---------------- 스타일 ----------------
+st.markdown("""
+<style>
+html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background:#fff; line-height:1.7;}
+.main-title { font-size: 2.0rem; font-weight: 800; color: #222; text-align:center;}
+.stButton button { width:100%; border-radius:8px; background:#005bac; color:#fff; border:none;
+  padding:0.9em; font-size:1.05rem; font-weight:600;}
+.stButton button:hover { background:#0072e0; }
+details.faq { border:2px solid #d0d7e2; border-radius:10px; padding:0.7rem 1rem; margin:0.8rem 0; background:#f8fbff;}
+details.faq summary { list-style:none; cursor:pointer; font-weight:700; font-size:1.05rem; color:#003366; padding:0.3rem 0;}
+details.faq summary::-webkit-details-marker { display:none;}
+details.faq summary:after { content:"▾"; float:right; color:#005bac;}
+details.faq[open] summary:after { transform: rotate(180deg); }
+mark { padding:0 2px; background:#fff59d; border-radius:3px; }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------- 목차(사이드바용) ----------------
 sections = {
     "1. 위험물탱크 위치, 구조 및 설비의 기준": [
         "1.1 안전거리","1.2 보유공지","1.3 표지 및 게시판",
@@ -41,90 +55,13 @@ sections = {
     ]
 }
 
-def go_page(p):
-    st.session_state.page = p
-
-# ======================= CSS ======================= #
-st.markdown("""
-<style>
-html, body, [class*="css"] {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #ffffff;
-    line-height: 1.7;
-}
-.main-title {
-    font-size: 2.0rem;
-    font-weight: 800;
-    color: #222222;
-    line-height: 1.4;
-    text-align: center;
-}
-.stButton button {
-    width: 100%;
-    border-radius: 8px;
-    background-color: #005bac;
-    color: white;
-    border: none;
-    padding: 0.9em;
-    font-size: 1.05rem;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-}
-.stButton button:hover { background-color: #0072e0; }
-.sidebar-btn button {
-    width: 100%;
-    border-radius: 8px;
-    background-color: #005bac !important;
-    color: white !important;
-    border: none;
-    padding: 0.6em;
-    font-size: 1rem;
-    font-weight: 600;
-}
-.sidebar-btn button:hover { background-color: #0072e0 !important; }
-details.faq {
-  border: 2px solid #d0d7e2;
-  border-radius: 10px;
-  padding: 0.7rem 1rem;
-  margin: 0.8rem 0;
-  background: #f8fbff;
-  transition: box-shadow 0.2s ease;
-}
-details.faq[open] { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-details.faq summary {
-  list-style: none;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: #003366;
-  outline: none;
-  padding: 0.3rem 0;
-}
-details.faq summary::-webkit-details-marker { display: none; }
-details.faq summary:after {
-  content: "▾";
-  float: right;
-  transition: transform 0.2s ease;
-  color: #005bac;
-}
-details.faq[open] summary:after { transform: rotate(180deg); }
-details.faq div {
-  margin-top: 0.6rem;
-  color: #333333;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-mark { padding: 0 2px; background: #fff59d; border-radius: 3px; }
-</style>
-""", unsafe_allow_html=True)
-
 def jump_to_section(target: str):
     st.session_state["jump_to"] = target
     st.switch_page("pages/1_E_매뉴얼.py")
 
-# ======================= 사이드바 ======================= #
+# ---------------- 사이드바 ----------------
 with st.sidebar:
-    st.header("📂 빠른 메뉴")
+    st.header(f"📂 빠른 메뉴 ({st.session_state.auth_user})")
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
@@ -133,47 +70,44 @@ with st.sidebar:
                     st.switch_page("pages/1_E_매뉴얼.py")
 
     if st.session_state.get("favorites"):
-        st.markdown("---")
-        st.markdown("⭐ **즐겨찾기**")
+        st.markdown("---"); st.markdown("⭐ **즐겨찾기**")
         for i, f in enumerate(st.session_state.favorites):
             st.button(f, key=f"fav-{i}-{f}", on_click=jump_to_section, args=(f,))
-
     if st.session_state.get("history"):
-        st.markdown("---")
-        st.markdown("🕘 **최근 열람**")
+        st.markdown("---"); st.markdown("🕘 **최근 열람**")
         for i, h in enumerate(reversed(st.session_state.history[-5:])):
             st.button(h, key=f"hist-{i}-{h}", on_click=jump_to_section, args=(h,))
 
-# ======================= FAQ 데이터 ======================= #
+# ---------------- FAQ 데이터 ----------------
 faq_path = Path("faq.json")
 if faq_path.exists():
-    with open(faq_path, "r", encoding="utf-8") as f:
-        faq_list = json.load(f)
+    try:
+        faq_list = json.loads(faq_path.read_text(encoding="utf-8"))
+    except:
+        faq_list = [{"q": "샘플 질문", "a": "샘플 답변입니다.\n\n![](faq_images/sample.jpg)"}]
 else:
     faq_list = [{"q": "샘플 질문", "a": "샘플 답변입니다.\n\n![](faq_images/sample.jpg)"}]
 
-# ======================= 검색 ======================= #
+# ---------------- 검색/렌더 ----------------
 st.markdown('<div class="main-title">💡 자주하는 질문 (FAQ)</div>', unsafe_allow_html=True)
 keyword = st.text_input("🔍 검색어를 입력하세요", placeholder="질문 또는 답변 키워드").strip()
 
 def highlight(text, kw):
-    if not kw:
-        return text
+    if not kw: return text
     pattern = re.compile(re.escape(kw), re.IGNORECASE)
     return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", text)
 
-# ======================= FAQ 렌더링 ======================= #
 results = []
 if keyword:
     key_l = keyword.lower()
-    results = [it for it in faq_list if key_l in it["q"].lower() or key_l in it["a"].lower()]
+    results = [it for it in faq_list if key_l in it.get("q","").lower() or key_l in it.get("a","").lower()]
 else:
     results = faq_list
 
 if results:
     for item in results:
-        q_html = highlight(item["q"], keyword)
-        a_html = highlight(item["a"], keyword)
+        q_html = highlight(item.get("q",""), keyword)
+        a_html = highlight(item.get("a",""), keyword)
         st.markdown(
             f"<details class='faq'><summary>{q_html}</summary><div>{a_html}</div></details>",
             unsafe_allow_html=True

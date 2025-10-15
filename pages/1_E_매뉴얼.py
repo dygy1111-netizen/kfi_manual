@@ -1,39 +1,65 @@
 import streamlit as st
-import os, glob, json
+import os, glob, json, re
 from pathlib import Path
 
-# ======================= 기본 설정 ======================= #
 st.set_page_config(
     page_title="위험물탱크 E-매뉴얼",
     page_icon="📘",
     layout="centered",
-    menu_items={
-        "Get Help": None,
-        "Report a bug": None,
-        "About": None
-    }
+    menu_items={"Get Help": None, "Report a bug": None, "About": None}
 )
 
-# ---- 세션 상태 기본값 (공통) ----
+# ---------------- 로그인 확인 ----------------
+if "auth_user" not in st.session_state or st.session_state.auth_user is None:
+    st.warning("로그인이 필요합니다.")
+    st.switch_page("home.py")
+
+# ---------------- 세션 기본 ----------------
 if "page" not in st.session_state: st.session_state.page = "목차"
 if "search" not in st.session_state: st.session_state.search = ""
 if "favorites" not in st.session_state: st.session_state.favorites = set()
 if "history" not in st.session_state: st.session_state.history = []
-if "user_id" not in st.session_state: st.session_state.user_id = "local-user"
 
 DATA_FILE = "user_data.json"
 
-def load_all_users():
+def _load_all_users():
     if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except:
+            return {}
     return {}
 
-def save_all_users(data):
+def _save_all_users(data: dict):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# ======================= 부록 리스트 ======================= #
+def load_user_data(username: str):
+    all_users = _load_all_users()
+    return all_users.get(username, {"favorites": [], "history": []})
+
+def save_user_data(username: str, favorites, history):
+    all_users = _load_all_users()
+    all_users[username] = {
+        "favorites": list(favorites),
+        "history": history[:5],
+    }
+    _save_all_users(all_users)
+
+# ---------------- 스타일 ----------------
+st.markdown("""
+<style>
+html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background:#fff; line-height:1.7;}
+.main-title { font-size: 2.0rem; font-weight: 800; color: #222; text-align:center;}
+.stButton button { width:100%; border-radius:8px; background:#005bac; color:#fff; border:none;
+  padding:0.9em; font-size:1.05rem; font-weight:600;}
+.stButton button:hover { background:#0072e0; }
+.back-btn button { background:#005bac; color:#fff; border-radius:6px; padding:0.6em 1em; border:none; font-weight:600;}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------- 데이터 ----------------
 appendix_list = [
     {"title": "물분무설비 설치기준", "key": "물분무설비 설치기준"},
     {"title": "부상지붕탱크 구조", "key": "부상지붕탱크 구조"},
@@ -41,67 +67,6 @@ appendix_list = [
     {"title": "전기방식설비", "key": "전기방식설비"},
     {"title": "위험물제조소등 접지저항기준(소방청 협의사항)", "key": "위험물제조소등 접지저항기준(소방청 협의사항)"}
 ]
-
-# ======================= CSS ======================= #
-st.markdown("""
-<style>
-html, body, [class*="css"] {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #ffffff;
-    line-height: 1.7;
-}
-.main-title {
-    font-size: 2.0rem;
-    font-weight: 800;
-    color: #222222;
-    line-height: 1.4;
-    text-align: center;
-}
-.stButton button {
-    width: 100%;
-    border-radius: 8px;
-    background-color: #005bac;
-    color: white;
-    border: none;
-    padding: 0.9em;
-    font-size: 1.05rem;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-}
-.stButton button:hover { background-color: #0072e0; }
-.sidebar-btn button {
-    width: 100%;
-    border-radius: 8px;
-    background-color: #005bac !important;
-    color: white !important;
-    border: none;
-    padding: 0.6em;
-    font-size: 1rem;
-    font-weight: 600;
-}
-.sidebar-btn button:hover { background-color: #0072e0 !important; }
-.section-title {
-    color:#003366; font-weight:700;
-    margin-top:1.2em; font-size:1.1rem;
-}
-table { width: 100%; border-collapse: collapse; margin-top: 0.5em; }
-table th, table td { border: 1px solid #d0d7e2; padding: 8px; text-align: center; }
-table th { background-color: #005bac; color: white; }
-table tr:nth-child(even) { background-color: #f0f4f8; }
-.back-btn button {
-    background-color: #005bac; color: white; border-radius: 6px;
-    padding: 0.6em 1em; border: none; font-weight: 600;
-}
-.back-btn button:hover { background-color: #0072e0; }
-.main-title-sticky {
-  position: sticky; top: 0; z-index: 10;
-  background: #ffffff; padding: 0.6rem 0 0.4rem;
-  border-bottom: 1px solid #eef2f7;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ======================= 데이터 ======================= #
 sections = {
     "1. 위험물탱크 위치, 구조 및 설비의 기준": [
         "1.1 안전거리","1.2 보유공지","1.3 표지 및 게시판",
@@ -117,11 +82,11 @@ sections = {
     "4. 부록": [item["title"] for item in appendix_list]
 }
 
-# ======================= 검색 인덱스 ======================= #
+# ---------------- 검색 인덱스 ----------------
 search_index = []
 for main, subs in sections.items():
     for sub in subs:
-        key = sub if isinstance(sub, str) else sub["key"]
+        key = sub
         safe = key.replace(" ", "_").replace("/", "_")
         p = Path(f"contents/{safe}.md")
         body = ""
@@ -130,41 +95,31 @@ for main, subs in sections.items():
                 body = p.read_text(encoding="utf-8").lower()
             except:
                 body = ""
-        title = sub if isinstance(sub, str) else sub["title"]
-        search_index.append((title, key, main, body))
+        search_index.append((sub, key, main, body))
 
-# ======================= 유틸 함수 ======================= #
+# ---------------- 유틸 ----------------
 def find_images(name):
     exts = ['jpg','jpeg','png']
     results = []
     for e in exts:
         for path in sorted(glob.glob(f"images/{name}*.{e}")):
             base = os.path.splitext(os.path.basename(path))[0]
-            desc = ""
-            if base.startswith(name + "_"):
-                desc = base[len(name)+1:]
+            desc = base[len(name)+1:] if base.startswith(name + "_") else ""
             results.append((path, desc))
     return results
 
 def load_content(key):
     safe = key.replace(" ", "_").replace("/", "_")
     p = Path(f"contents/{safe}.md")
-    if p.exists():
-        with open(p, "r", encoding="utf-8") as f:
-            return f.read()
-    return None
+    return p.read_text(encoding="utf-8") if p.exists() else None
 
-def save_user_data():
-    all_users = load_all_users()
-    all_users[st.session_state.user_id] = {
-        "favorites": list(st.session_state.favorites),
-        "history": st.session_state.history
-    }
-    save_all_users(all_users)
+def persist_user_state():
+    save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
 
 def go_home():
     st.session_state.page = "목차"
     st.session_state.search = ""
+    persist_user_state()
     st.rerun()
 
 def go_page(p):
@@ -173,30 +128,27 @@ def go_page(p):
         st.session_state.history.remove(p)
     st.session_state.history.insert(0, p)
     st.session_state.history = st.session_state.history[:5]
-    save_user_data()
+    persist_user_state()
 
 def toggle_favorite(item):
     if item in st.session_state.favorites:
         st.session_state.favorites.remove(item)
     else:
         st.session_state.favorites.add(item)
-    save_user_data()
+    persist_user_state()
 
 def jump_to_section(target: str):
     st.session_state["jump_to"] = target
     st.switch_page("pages/1_E_매뉴얼.py")
 
-# --- 사이드바에서 특정 항목을 선택해 들어온 경우 바로 해당 페이지로 진입
+# ---- 외부에서 jump_to로 넘어온 경우 처리
 if "jump_to" in st.session_state and st.session_state["jump_to"]:
     target = st.session_state.pop("jump_to")
-    if any(target in subs for subs in sections.values()):
-        st.session_state.page = target
-    else:
-        st.session_state.page = target
+    st.session_state.page = target
 
-# ======================= 사이드바 ======================= #
+# ---------------- 사이드바 ----------------
 with st.sidebar:
-    st.header("📂 빠른 메뉴")
+    st.header(f"📂 빠른 메뉴 ({st.session_state.auth_user})")
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
@@ -204,34 +156,32 @@ with st.sidebar:
                     st.session_state["jump_to"] = sub
                     st.switch_page("pages/1_E_매뉴얼.py")
 
-    # ⭐ 즐겨찾기
     if st.session_state.get("favorites"):
-        st.markdown("---")
-        st.markdown("⭐ **즐겨찾기**")
+        st.markdown("---"); st.markdown("⭐ **즐겨찾기**")
         for i, f in enumerate(st.session_state.favorites):
             st.button(f, key=f"fav-{i}-{f}", on_click=jump_to_section, args=(f,))
-
-    # 🕘 최근 열람
     if st.session_state.get("history"):
-        st.markdown("---")
-        st.markdown("🕘 **최근 열람**")
+        st.markdown("---"); st.markdown("🕘 **최근 열람**")
         for i, h in enumerate(reversed(st.session_state.history[-5:])):
             st.button(h, key=f"hist-{i}-{h}", on_click=jump_to_section, args=(h,))
 
-# ======================= 메인 컨텐츠 ======================= #
+# ---------------- 메인 ----------------
 if st.session_state.page == "목차":
-    st.markdown('<div class="main-title main-title-sticky">📚 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title">📚 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
+
+    # 최초 진입 시 복원(이미 복원된 경우 skip)
+    if not st.session_state.history and not st.session_state.favorites:
+        ud = load_user_data(st.session_state.auth_user)
+        st.session_state.favorites = set(ud.get("favorites", []))
+        st.session_state.history = ud.get("history", [])
+
     st.session_state.search = st.text_input("🔍 검색", value=st.session_state.search)
     q = st.session_state.search.strip().lower()
-
-    # 멀티 키워드 AND 매칭
     tokens = [t for t in q.split() if t]
-    def matches(title, body):
-        if not tokens:
-            return False
-        return all(t in title.lower() or t in body for t in tokens)
 
     if tokens:
+        def matches(title, body):
+            return all(t in title.lower() or t in body for t in tokens)
         results = [(title, key, main) for title, key, main, body in search_index if matches(title, body)]
         if results:
             st.markdown("### 🔎 검색 결과")
@@ -249,7 +199,7 @@ if st.session_state.page == "목차":
 
 else:
     current = st.session_state.page
-    st.markdown(f'<div class="main-title main-title-sticky">{current}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
     fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
     st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
