@@ -42,7 +42,7 @@ def save_user_data(username: str, favorites, history):
 # ---------------- 스타일 ----------------
 st.markdown("""
 <style>
-:root { --content-max: 980px; --img-max: 860px; }
+:root { --content-max: 980px; --img-max: 1000px; }
 html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background:#fff; line-height:1.7;}
 @media (min-width: 1200px){
   .block-container { max-width: var(--content-max); }
