@@ -16,6 +16,7 @@ if "favorites" not in st.session_state: st.session_state.favorites = set()
 if "history" not in st.session_state: st.session_state.history = []
 
 DATA_FILE = "user_data.json"
+ENV_PASSWORD = os.environ.get("APP_LOGIN_PASSWORD", "changeme")  # 배포 시 꼭 변경!
 
 def _load_all_users():
     if os.path.exists(DATA_FILE):
@@ -31,16 +32,12 @@ def _save_all_users(data: dict):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 def load_user_data(username: str):
-    all_users = _load_all_users()
-    return all_users.get(username, {"favorites": [], "history": []})
+    return _load_all_users().get(username, {"favorites": [], "history": []})
 
 def save_user_data(username: str, favorites, history):
-    all_users = _load_all_users()
-    all_users[username] = {
-        "favorites": list(favorites),
-        "history": history[:5],
-    }
-    _save_all_users(all_users)
+    data = _load_all_users()
+    data[username] = {"favorites": list(favorites), "history": history[:5]}
+    _save_all_users(data)
 
 # ---------------- 스타일 ----------------
 st.markdown("""
@@ -56,54 +53,47 @@ html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif; background
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- 로그인 전용(회원가입 없음) ----------------
-ENV_PASSWORD = os.environ.get("APP_LOGIN_PASSWORD", "changeme")  # ← 반드시 배포 환경에서 바꾸세요!
+# ---------------- 사이드바: 간단 로그인(선택) ----------------
+with st.sidebar:
+    st.header("🔐 로그인 (선택)")
 
-def login_view():
-    st.markdown('<div class="sub-title">로그인</div>', unsafe_allow_html=True)
-    username = st.text_input("아이디")
-    password = st.text_input("비밀번호", type="password")
-    col1, col2 = st.columns([1,1])
-    with col1:
+    if st.session_state.auth_user:
+        st.success(f"로그인: {st.session_state.auth_user}")
+        if st.button("로그아웃"):
+            # 로그인 사용자면 저장 후 로그아웃
+            save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
+            st.session_state.auth_user = None
+            st.toast("로그아웃 완료")
+            st.rerun()
+    else:
+        username = st.text_input("아이디", key="sb_username")
+        password = st.text_input("비밀번호", type="password", key="sb_password")
         if st.button("로그인"):
             if not username or not password:
                 st.error("아이디/비밀번호를 입력하세요.")
-                return
-            if password != ENV_PASSWORD:
+            elif password != ENV_PASSWORD:
                 st.error("비밀번호가 올바르지 않습니다.")
-                return
-            # 로그인 성공
-            st.session_state.auth_user = username
-            # 사용자 데이터 복원
-            ud = load_user_data(username)
-            st.session_state.favorites = set(ud.get("favorites", []))
-            st.session_state.history = ud.get("history", [])
-            st.success(f"{username}님 환영합니다.")
-            st.rerun()
-    with col2:
-        st.info("관리자: Render/환경변수 'APP_LOGIN_PASSWORD' 로 비밀번호 관리")
+            else:
+                st.session_state.auth_user = username
+                # 사용자 저장 데이터 불러와 현재 세션과 머지
+                ud = load_user_data(username)
+                # 즐겨찾기는 합집합, 최근열람은 기존 유지 + 저장분 선호(중복 제거)
+                st.session_state.favorites |= set(ud.get("favorites", []))
+                merged_hist = st.session_state.history + [h for h in ud.get("history", []) if h not in st.session_state.history]
+                st.session_state.history = merged_hist[:5]
+                st.toast("로그인 성공! 데이터가 복원되었습니다.")
+                st.rerun()
 
-if st.session_state.auth_user is None:
-    login_view()
-    st.stop()
+    st.caption("로그인 안 해도 열람 가능(임시 세션 저장). 로그인하면 사용자별로 저장·복원됩니다.")
 
-# ---------------- 로그인 이후 메인 ----------------
+# ---------------- 메인 ----------------
 st.markdown('<div class="sub-title">위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
-st.markdown(f"**안녕하세요, {st.session_state.auth_user}님.**")
+st.markdown("**매뉴얼 또는 FAQ를 선택하세요.**")
 
-col1, col2, col3 = st.columns([1,1,1])
+col1, col2 = st.columns(2)
 with col1:
-    if st.button("📘 매뉴얼 시작하기"):
+    if st.button("📘 매뉴얼 시작하기", use_container_width=True):
         st.switch_page("pages/1_E_매뉴얼.py")
 with col2:
-    if st.button("💡 자주하는 질문(FAQ)"):
+    if st.button("💡 자주하는 질문(FAQ)", use_container_width=True):
         st.switch_page("pages/2_자주하는질문.py")
-with col3:
-    if st.button("로그아웃"):
-        # 저장 후 로그아웃
-        save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
-        st.session_state.auth_user = None
-        st.session_state.favorites = set()
-        st.session_state.history = []
-        st.success("로그아웃 되었습니다.")
-        st.rerun()

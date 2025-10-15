@@ -9,18 +9,15 @@ st.set_page_config(
     menu_items={"Get Help": None, "Report a bug": None, "About": None}
 )
 
-# ---------------- 로그인 확인 ----------------
-if "auth_user" not in st.session_state or st.session_state.auth_user is None:
-    st.warning("로그인이 필요합니다.")
-    st.switch_page("home.py")
-
 # ---------------- 세션 기본 ----------------
+if "auth_user" not in st.session_state: st.session_state.auth_user = None
 if "page" not in st.session_state: st.session_state.page = "목차"
 if "search" not in st.session_state: st.session_state.search = ""
 if "favorites" not in st.session_state: st.session_state.favorites = set()
 if "history" not in st.session_state: st.session_state.history = []
 
 DATA_FILE = "user_data.json"
+ENV_PASSWORD = os.environ.get("APP_LOGIN_PASSWORD", "changeme")
 
 def _load_all_users():
     if os.path.exists(DATA_FILE):
@@ -36,16 +33,12 @@ def _save_all_users(data: dict):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 def load_user_data(username: str):
-    all_users = _load_all_users()
-    return all_users.get(username, {"favorites": [], "history": []})
+    return _load_all_users().get(username, {"favorites": [], "history": []})
 
 def save_user_data(username: str, favorites, history):
-    all_users = _load_all_users()
-    all_users[username] = {
-        "favorites": list(favorites),
-        "history": history[:5],
-    }
-    _save_all_users(all_users)
+    data = _load_all_users()
+    data[username] = {"favorites": list(favorites), "history": history[:5]}
+    _save_all_users(data)
 
 # ---------------- 스타일 ----------------
 st.markdown("""
@@ -114,7 +107,9 @@ def load_content(key):
     return p.read_text(encoding="utf-8") if p.exists() else None
 
 def persist_user_state():
-    save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
+    # 로그인한 경우에만 파일 저장
+    if st.session_state.auth_user:
+        save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
 
 def go_home():
     st.session_state.page = "목차"
@@ -143,12 +138,39 @@ def jump_to_section(target: str):
 
 # ---- 외부에서 jump_to로 넘어온 경우 처리
 if "jump_to" in st.session_state and st.session_state["jump_to"]:
-    target = st.session_state.pop("jump_to")
-    st.session_state.page = target
+    st.session_state.page = st.session_state.pop("jump_to")
 
-# ---------------- 사이드바 ----------------
+# ---------------- 사이드바: 간단 로그인(선택) + 빠른메뉴 ----------------
 with st.sidebar:
-    st.header(f"📂 빠른 메뉴 ({st.session_state.auth_user})")
+    st.header("🔐 로그인 (선택)")
+    if st.session_state.auth_user:
+        st.success(f"로그인: {st.session_state.auth_user}")
+        if st.button("로그아웃", key="sb-logout"):
+            save_user_data(st.session_state.auth_user, st.session_state.favorites, st.session_state.history)
+            st.session_state.auth_user = None
+            st.toast("로그아웃 완료")
+            st.rerun()
+    else:
+        u = st.text_input("아이디", key="sb_username")
+        p = st.text_input("비밀번호", type="password", key="sb_password")
+        if st.button("로그인", key="sb-login"):
+            if not u or not p:
+                st.error("아이디/비밀번호를 입력하세요.")
+            elif p != ENV_PASSWORD:
+                st.error("비밀번호가 올바르지 않습니다.")
+            else:
+                st.session_state.auth_user = u
+                ud = load_user_data(u)
+                st.session_state.favorites |= set(ud.get("favorites", []))
+                merged_hist = st.session_state.history + [h for h in ud.get("history", []) if h not in st.session_state.history]
+                st.session_state.history = merged_hist[:5]
+                st.toast("로그인 성공! 데이터가 복원되었습니다.")
+                st.rerun()
+
+    st.caption("로그인 안 해도 열람 가능(세션 임시 저장). 로그인하면 사용자별 저장·복원됩니다.")
+
+    st.markdown("---")
+    st.header("📂 빠른 메뉴")
     for main, subs in sections.items():
         with st.expander(f"📂 {main}", expanded=False):
             for sub in subs:
@@ -168,12 +190,6 @@ with st.sidebar:
 # ---------------- 메인 ----------------
 if st.session_state.page == "목차":
     st.markdown('<div class="main-title">📚 위험물탱크 E-매뉴얼</div>', unsafe_allow_html=True)
-
-    # 최초 진입 시 복원(이미 복원된 경우 skip)
-    if not st.session_state.history and not st.session_state.favorites:
-        ud = load_user_data(st.session_state.auth_user)
-        st.session_state.favorites = set(ud.get("favorites", []))
-        st.session_state.history = ud.get("history", [])
 
     st.session_state.search = st.text_input("🔍 검색", value=st.session_state.search)
     q = st.session_state.search.strip().lower()
