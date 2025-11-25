@@ -367,7 +367,7 @@ else:
                     if line:
                         st.button(line, on_click=go_page, args=(line,))
             else:
-                st.markdown(content', unsafe_allow_html=True)
+                st.markdown(content, unsafe_allow_html=True)
 
         st.markdown('<div class="back-btn">', unsafe_allow_html=True)
         st.button("🏠 목차로 돌아가기", use_container_width=True, on_click=go_home)
