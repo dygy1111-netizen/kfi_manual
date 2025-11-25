@@ -303,7 +303,7 @@ if st.session_state.page_type == "guideline":
                     break
         except:
             pass
-        st.markdown(f'<div class="main-title">{title}</div>', unsafe_allow_html=True)
+        st.markdown(content, unsafe_allow_html=True)
 
         # 본문 표시
         try:
