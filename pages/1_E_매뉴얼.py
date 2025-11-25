@@ -307,7 +307,7 @@ if st.session_state.page_type == "guideline":
         # 본문 표시
         try:
             md = Path(path_str).read_text(encoding="utf-8")
-            st.markdown(f'<div class="manual-body">{md}</div>', unsafe_allow_html=True)
+            st.markdown(md, unsafe_allow_html=True)
         except Exception as e:
             st.error(f"문서 로딩 오류: {e}")
 
