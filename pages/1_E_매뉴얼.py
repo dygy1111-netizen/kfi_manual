@@ -344,7 +344,7 @@ else:
 
     else:
         current = st.session_state.page
-        st.markdown(content, unsafe_allow_html=True)
+        st.markdown(f'<div class="main-title">{current}</div>', unsafe_allow_html=True)
         fav_icon = "⭐ 즐겨찾기 해제" if current in st.session_state.favorites else "☆ 즐겨찾기 추가"
         st.button(fav_icon, key="fav-toggle", on_click=toggle_favorite, args=(current,))
 
